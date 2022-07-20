@@ -27,12 +27,12 @@ public class Assignment {
 	
 	@ManyToOne(fetch = FetchType.LAZY)
 	@JoinColumn(name = "assigned_by", nullable = false)
-	private Account assignedBy;
+	private Users assignedBy;
 	
 	@ManyToOne
     @MapsId("assignedTo")
     @JoinColumn(name = "assigned_to", columnDefinition = "VARCHAR(10)")
-	private Account assignedTo;
+	private Users assignedTo;
 
 	@ManyToOne
     @MapsId("assetCode")

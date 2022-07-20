@@ -33,5 +33,5 @@ public class Location {
 	private List<Asset> assets;
 	
 	@OneToMany(fetch = FetchType.LAZY, mappedBy = "locationId")
-	private List<Account> accounts;
+	private List<Users> users;
 }

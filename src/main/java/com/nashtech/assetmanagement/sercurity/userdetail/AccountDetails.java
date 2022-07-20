@@ -1,4 +1,4 @@
-package com.nashtech.assetmanagement.sercurity.config.userdetail;
+package com.nashtech.assetmanagement.sercurity.userdetail;
 
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
