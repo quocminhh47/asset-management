@@ -38,6 +38,9 @@ public class Account {
 	@Column(name = "username", length = 250, nullable = false)
 	private String userName;
 
+	@Column(name = "password", length = 250, nullable = false)
+	private String password;
+
 	@Column(name = "joined_date", nullable = false)
 	private Date joinedDate;
 
