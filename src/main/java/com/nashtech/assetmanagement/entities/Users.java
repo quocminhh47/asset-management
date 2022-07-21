@@ -29,22 +29,22 @@ public class Users {
 	@Column(nullable = false, length = 10)
 	private String staffCode;
 
-	@Column(name = "first_name", length = 150, nullable = false)
+	@Column(name = "first_name", length = 150)
 	private String firstName;
 
-	@Column(name = "last_name", length = 150, nullable = false)
+	@Column(name = "last_name", length = 150)
 	private String lastName;
 
-	@Column(name = "username", length = 250, nullable = false)
+	@Column(name = "username", length = 250)
 	private String userName;
 
-	@Column(name = "password", length = 250, nullable = false)
+	@Column(name = "password", length = 250)
 	private String password;
 
-	@Column(name = "joined_date", nullable = false)
+	@Column(name = "joined_date" )
 	private Date joinedDate;
 
-	@Column(name = "birth_date", nullable = false)
+	@Column(name = "birth_date")
 	private Date birthDate;
 
 	@Column
@@ -54,12 +54,12 @@ public class Users {
 	private Boolean state;
 
 	@ManyToOne(fetch = FetchType.LAZY)
-	@JoinColumn(name = "role_id", nullable = false)
-	private Role roleId;
+	@JoinColumn(name = "role_id")
+	private Role role;
 
 	@ManyToOne(fetch = FetchType.LAZY)
-	@JoinColumn(name = "location_id", nullable = false)
-	private Location locationId;
+	@JoinColumn(name = "location_id")
+	private Location location;
 
 	@OneToMany(fetch = FetchType.LAZY, mappedBy = "assignedBy")
 	private List<Assignment> assignments;

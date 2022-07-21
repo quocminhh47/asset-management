@@ -24,13 +24,13 @@ import lombok.Setter;
 public class Asset {
 	
 	@Id
-	@Column(name = "asset_code",length = 10, nullable = false)
+	@Column(name = "asset_code",length = 10)
 	private String assetCode;
 	
-	@Column(name = "asset_name",length = 200, nullable = false)
+	@Column(name = "asset_name",length = 200)
 	private String assetName;
 	
-	@Column(nullable = false)
+	@Column()
 	private String specification;
 	
 	@Column(name = "installed_date")
@@ -40,10 +40,10 @@ public class Asset {
 	private Boolean state;
 	
 	@ManyToOne(fetch = FetchType.LAZY)
-	@JoinColumn(name = "location_id", nullable = false)
-	private Location locationId;
+	@JoinColumn(name = "location_id")
+	private Location location;
 	
 	@ManyToOne(fetch = FetchType.LAZY)
-	@JoinColumn(name = "category_id", nullable = false)
-	private Category categoryId;
+	@JoinColumn(name = "category_id")
+	private Category category;
 }

@@ -9,7 +9,7 @@ import lombok.Setter;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-public class RequestLogin {
+public class RequestLoginDTO {
     private String userName;
     private String password;
 }

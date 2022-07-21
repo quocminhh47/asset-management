@@ -15,6 +15,7 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import org.hibernate.annotations.NaturalId;
 
 @Entity
 @Table(name = "role")
@@ -27,10 +28,8 @@ public class Role {
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private Long id;
-	
+	@NaturalId
 	@Column(length = 50, nullable = false)
 	private String name;
-	
-	@OneToMany(fetch = FetchType.LAZY, mappedBy = "roleId")
-	private List<Users> users;
+
 }

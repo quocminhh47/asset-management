@@ -26,7 +26,7 @@ public class Assignment {
 	AssignmentId id;
 	
 	@ManyToOne(fetch = FetchType.LAZY)
-	@JoinColumn(name = "assigned_by", nullable = false)
+	@JoinColumn(name = "assigned_by")
 	private Users assignedBy;
 	
 	@ManyToOne
@@ -39,9 +39,9 @@ public class Assignment {
     @JoinColumn(name = "asset_code", columnDefinition = "VARCHAR(10)")
 	private Asset assetCode;
 	
-	@Column(length = 50, nullable = false)
+	@Column(length = 50)
 	private String state;
 	
-	@Column(nullable = false)
+	@Column()
 	private String note;
 }
