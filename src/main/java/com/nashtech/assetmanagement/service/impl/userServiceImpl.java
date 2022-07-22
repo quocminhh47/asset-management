@@ -99,5 +99,16 @@ public class userServiceImpl implements UserService {
         userRepository.save(newUser);
     }
 
+    @Override
+    public void editUser(UserRequestDto user, String staffCode) {
+        Optional<Users> usersOptional = userRepository.findByStaffCode(staffCode);
+        if (usersOptional.isEmpty()){
+            throw new ResourceNotFoundException("Staff code not found");
+        }
+        Users users = usersOptional.get();
+        userMapper.requestDtoToUser(users,user,roleService.getRole(user.getRoleName()));
+        userRepository.save(users);
+    }
+
 
 }

@@ -30,4 +30,12 @@ public class UserMapper {
         return newUser;
     }
 
+    public void requestDtoToUser(Users users, UserRequestDto user,Role role) {
+        users.setFirstName(user.getFirstName());
+        users.setLastName(user.getLastName());
+        users.setBirthDate(user.getBirthDate());
+        users.setJoinedDate(user.getJoinedDate());
+        users.setGender(user.getGender());
+        users.setRole(role);
+    }
 }

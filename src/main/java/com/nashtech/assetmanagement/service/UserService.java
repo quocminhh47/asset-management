@@ -14,4 +14,6 @@ public interface UserService {
 
     ResponseSignInDTO signIn(RequestLoginDTO requestLoginDTO);
     void createNewUser(UserRequestDto user);
+
+    void editUser(UserRequestDto user,String staffCode);
 }

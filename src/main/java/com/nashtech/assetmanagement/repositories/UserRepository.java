@@ -16,4 +16,6 @@ public interface UserRepository extends JpaRepository<Users, String>{
     int countUsersByStaffCode();
     @Query(value = "select count(*) from users where first_name= :firstname AND last_name=:lastname",nativeQuery = true)
     int countUsersByFirstNameAndLastName(@Param("firstname")String firstName, @Param("lastname")String lastName);
+
+    Optional<Users> findByStaffCode(String staffCode);
 }
