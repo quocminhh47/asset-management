@@ -4,22 +4,26 @@ import com.nashtech.assetmanagement.dto.request.RequestLoginDTO;
 import com.nashtech.assetmanagement.dto.response.ResponseSignInDTO;
 import com.nashtech.assetmanagement.dto.response.ResponseUserDTO;
 import com.nashtech.assetmanagement.entities.Users;
+import com.nashtech.assetmanagement.exception.ResourceNotFoundException;
 import com.nashtech.assetmanagement.mapper.UserMapper;
 import com.nashtech.assetmanagement.repositories.UserRepository;
 import com.nashtech.assetmanagement.sercurity.jwt.JwtUtils;
 import com.nashtech.assetmanagement.sercurity.userdetail.UserPrinciple;
 import com.nashtech.assetmanagement.service.RoleService;
 import com.nashtech.assetmanagement.service.UserService;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 @Service
-public class userServiceImpl implements UserService {
+@Slf4j
+public class UserServiceImpl implements UserService {
 
     private final UserRepository userRepository;
 
@@ -35,7 +39,7 @@ public class userServiceImpl implements UserService {
 
 
     @Autowired
-    public userServiceImpl(UserRepository userRepository, UserMapper userMapper, AuthenticationManager authenticationManager, JwtUtils jwtUtils, PasswordEncoder passwordEncoder, RoleService roleService) {
+    public UserServiceImpl(UserRepository userRepository, UserMapper userMapper, AuthenticationManager authenticationManager, JwtUtils jwtUtils, PasswordEncoder passwordEncoder, RoleService roleService) {
         this.userRepository = userRepository;
         this.userMapper = userMapper;
         this.authenticationManager = authenticationManager;
@@ -68,10 +72,18 @@ public class userServiceImpl implements UserService {
         String token = jwtUtils.generateJwtToken(authentication);
         UserPrinciple userPrinciple = (UserPrinciple) authentication.getPrincipal();
         return new ResponseSignInDTO(userPrinciple.getStaffCode(),
-                userPrinciple.getUsername(), userPrinciple.getAuthorities(),
+                userPrinciple.getUsername(),userPrinciple.getState(),
+                userPrinciple.getAuthorities(),
                 token);
 
     }
-
+    @Override
+    public UserPrinciple loadUserByUsername(String userName)
+            throws UsernameNotFoundException {
+        Users user = userRepository.findByUserName(userName)
+                .orElseThrow(() -> new ResourceNotFoundException(
+                        "Did not find user has username = " + userName));
+        return UserPrinciple.build(user);
+    }
 
 }
