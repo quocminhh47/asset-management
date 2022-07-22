@@ -1,24 +1,42 @@
 package com.nashtech.assetmanagement.dto.response;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
+import lombok.Getter;
+import lombok.Setter;
+import lombok.ToString;
 import org.springframework.http.HttpStatus;
 
+import java.time.LocalDateTime;
 import java.util.Arrays;
+import java.util.Date;
 import java.util.List;
 
+@Getter
+@Setter
+@ToString
 public class ResponseErrorMessage {
     private HttpStatus status;
     private String message;
     private List<String> errors;
+    @JsonProperty("timestamp")
+    private Date timeStamp;
 
-    public ResponseErrorMessage(HttpStatus status, String message, List<String> errors) {
+    public ResponseErrorMessage(HttpStatus status, String message, List<String> errors,Date  timeStamp) {
+        this.timeStamp = timeStamp;
         this.status = status;
         this.message = message;
         this.errors = errors;
     }
-    public ResponseErrorMessage(HttpStatus status, String message, String error) {
+    public ResponseErrorMessage(HttpStatus status, String message, String error,Date  timeStamp) {
+        this.timeStamp = timeStamp;
         this.status = status;
         this.message = message;
         errors= Arrays.asList(error);
     }
 
+    public ResponseErrorMessage(HttpStatus status, String message, Date timeStamp) {
+        this.status = status;
+        this.message = message;
+        this.timeStamp = timeStamp;
+    }
 }

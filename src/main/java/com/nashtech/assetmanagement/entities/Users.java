@@ -3,19 +3,10 @@ package com.nashtech.assetmanagement.entities;
 import java.util.Date;
 import java.util.List;
 
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.FetchType;
-import javax.persistence.Id;
-import javax.persistence.JoinColumn;
-import javax.persistence.ManyToOne;
-import javax.persistence.OneToMany;
-import javax.persistence.Table;
+import javax.persistence.*;
 
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import com.nashtech.assetmanagement.enums.UserState;
+import lombok.*;
 
 @Getter
 @Setter
@@ -35,7 +26,7 @@ public class Users {
 	@Column(name = "last_name", length = 150)
 	private String lastName;
 
-	@Column(name = "username", length = 250)
+	@Column(name = "username", length = 250,unique = true)
 	private String userName;
 
 	@Column(name = "password", length = 250)
@@ -50,8 +41,10 @@ public class Users {
 	@Column
 	private Boolean gender;
 
+
 	@Column
-	private Boolean state;
+	@Enumerated(EnumType.STRING)
+	private UserState state;
 
 	@ManyToOne(fetch = FetchType.LAZY)
 	@JoinColumn(name = "role_id")
