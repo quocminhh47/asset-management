@@ -19,6 +19,7 @@ public class WebSecurityConfig {
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
         http.cors().and().csrf().disable()
                 .authorizeRequests().antMatchers("/**").permitAll();
+        http.headers().frameOptions().disable();
         return http.build();
     }
 
