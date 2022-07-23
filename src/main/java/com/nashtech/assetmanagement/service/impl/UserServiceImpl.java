@@ -87,8 +87,6 @@ public class UserServiceImpl implements UserService {
         Pageable pageable = PageRequest.of(pageNo, pageSize, defaultSorting(sortBy, sortDirection));
 
         Users user = authenticationService.getUser();
-//        String loggedStaffCode = "0143-9673";
-//        String location = "HN";
         String loggedStaffCode = user.getStaffCode();
         String location = user.getLocation().getCode();
         Page<Users> users = userRepository.findAllByOrderByFirstNameAsc(pageable, loggedStaffCode, location);
@@ -104,8 +102,6 @@ public class UserServiceImpl implements UserService {
                                                                    String searchText) {
         Pageable pageable = PageRequest.of(pageNo, pageSize, defaultSorting(sortBy, sortDirection));
         Users user = authenticationService.getUser();
-//        String loggedStaffCode = "0143-9673";
-//        String location = "HN";
         String loggedStaffCode = user.getStaffCode();
         String location = user.getLocation().getCode();
         Page<Users> users = userRepository.searchByStaffCodeOrName(
@@ -133,8 +129,6 @@ public class UserServiceImpl implements UserService {
                 .orElseThrow(() -> new ResourceNotFoundException("Role " + roleName + " not found"));
 
         Users user = authenticationService.getUser();
-//        String location = "HN";
-//        String loggedStaffCode = "0143-9673";
         String loggedStaffCode = user.getStaffCode();
         String location = user.getLocation().getCode();
         Pageable pageable = PageRequest.of(pageNo, pageSize, defaultSorting(sortBy, sortDirection));
