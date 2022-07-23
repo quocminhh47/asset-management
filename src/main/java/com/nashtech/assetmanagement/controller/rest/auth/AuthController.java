@@ -63,6 +63,7 @@ public class AuthController {
                 jwt,
                 userPrinciple.getStaffCode(),
                 userPrinciple.getUsername(),
+                userPrinciple.getState(),
                 roles
         ));
     }

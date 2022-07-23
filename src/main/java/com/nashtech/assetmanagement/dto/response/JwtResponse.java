@@ -1,5 +1,7 @@
 package com.nashtech.assetmanagement.dto.response;
 
+import com.nashtech.assetmanagement.enums.UserState;
+
 import java.util.List;
 
 public class JwtResponse {
@@ -7,13 +9,23 @@ public class JwtResponse {
     private String type = "Bearer";
     private String id;
     private String username;
+    private UserState state;
     private List<String> roles;
 
-    public JwtResponse(String accessToken, String id, String username, List<String> roles) {
+    public JwtResponse(String accessToken, String id, String username,UserState state,List<String> roles) {
         this.token = accessToken;
         this.id = id;
         this.username = username;
+        this.state = state;
         this.roles = roles;
+    }
+
+    public UserState getState() {
+        return state;
+    }
+
+    public void setState(UserState state) {
+        this.state = state;
     }
 
     public String getAccessToken() {
