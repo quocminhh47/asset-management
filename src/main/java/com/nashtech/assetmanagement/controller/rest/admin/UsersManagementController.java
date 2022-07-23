@@ -23,7 +23,7 @@ public class UsersManagementController {
                     value = "pageNo", defaultValue = AppConstants.DEFAULT_PAGE_NUMBER, required = false)
                     int pageNo,
             @RequestParam(
-                    value = "pageSize", defaultValue = "5", required = false)
+                    value = "pageSize", defaultValue = "20", required = false)
 //                    value = "pageSize", defaultValue = AppConstants.DEFAULT_PAGE_SIZE, required = false)
                     int pageSize,
             @RequestParam(
@@ -44,7 +44,7 @@ public class UsersManagementController {
                     value = "pageNo", defaultValue = AppConstants.DEFAULT_PAGE_NUMBER, required = false)
                     int pageNo,
             @RequestParam(
-                    value = "pageSize", defaultValue = "5", required = false)
+                    value = "pageSize", defaultValue = "20", required = false)
 //                    value = "pageSize", defaultValue = AppConstants.DEFAULT_PAGE_SIZE, required = false)
                     int pageSize,
             @RequestParam(
@@ -66,7 +66,7 @@ public class UsersManagementController {
                     value = "pageNo", defaultValue = AppConstants.DEFAULT_PAGE_NUMBER, required = false)
                     int pageNo,
             @RequestParam(
-                    value = "pageSize", defaultValue = "5", required = false)
+                    value = "pageSize", defaultValue = "20", required = false)
 //                    value = "pageSize", defaultValue = AppConstants.DEFAULT_PAGE_SIZE, required = false)
                     int pageSize,
             @RequestParam(
