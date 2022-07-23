@@ -1,6 +1,5 @@
 package com.nashtech.assetmanagement.service;
 
-
 import com.nashtech.assetmanagement.dto.request.RequestLoginDTO;
 import com.nashtech.assetmanagement.dto.response.ListUsersResponse;
 import com.nashtech.assetmanagement.dto.request.UserRequestDto;
@@ -12,7 +11,6 @@ import com.nashtech.assetmanagement.sercurity.userdetail.UserPrinciple;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 
 import com.nashtech.assetmanagement.dto.response.SingleUserResponse;
-
 
 public interface UserService {
 
@@ -50,4 +48,5 @@ public interface UserService {
     SingleUserResponse getUserDetailInfo(String staffCode);
 
     ResponseMessage changePasswordFirstLogin(String userName, String newPassword);
+    ResponseUserDTO changePassword(RequestChangePassDto dto);
 }

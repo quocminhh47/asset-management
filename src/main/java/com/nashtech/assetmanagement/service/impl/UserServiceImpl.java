@@ -1,6 +1,23 @@
 package com.nashtech.assetmanagement.service.impl;
 
+<<<<<<< HEAD
+import java.util.Optional;
+
+import org.modelmapper.ModelMapper;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
+import org.springframework.security.crypto.bcrypt.BCrypt;
+import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.stereotype.Service;
+
+import com.nashtech.assetmanagement.dto.request.RequestChangePassDto;
+=======
 import com.nashtech.assetmanagement.dto.request.RequestFirstLogin;
+>>>>>>> 45c6b3cbc24dda05f601249998803164dc5487c5
 import com.nashtech.assetmanagement.dto.request.RequestLoginDTO;
 import com.nashtech.assetmanagement.dto.request.UserRequestDto;
 import com.nashtech.assetmanagement.dto.response.*;
@@ -78,10 +95,16 @@ public class UserServiceImpl implements UserService {
         this.locationMapper = locationMapper;
     }
 
-    @Override
-    public boolean isUsernameExist(String username) {
-        return userRepository.existsByUserName(username);
-    }
+	@Override
+	public ResponseUserDTO createUser() {
+		Users user = new Users();
+		user.setUserName("ducinox2000");
+		user.setPassword("123456");
+		user.setStaffCode("SD001");
+		user.setRole(roleService.getRole(1L));
+		user.setPassword(passwordEncoder.encode(user.getPassword()));
+		return userMapper.userToResponseUser(userRepository.save(user));
+	}
 
     @Override
     public ResponseUserDTO createUser() {
@@ -236,4 +259,21 @@ public class UserServiceImpl implements UserService {
         return new ResponseMessage(HttpStatus.OK, "Change password successfully.",
                 new Date());
     }
+
+    @Override
+	public ResponseUserDTO changePassword(RequestChangePassDto dto) {
+		Optional<Users> optional = userRepository.findById(dto.getStaffCode());
+		if (!optional.isPresent()) {
+			throw new ResourceNotFoundException(String.format("user.not.found.with.staff.code:%s", dto.getStaffCode()));
+		}
+		Users user = optional.get();
+		if (!BCrypt.checkpw(dto.getPassword().toString(), user.getPassword())) {
+			throw new ResourceNotFoundException("Password is incorrect");
+		}
+        
+		user.setPassword(passwordEncoder.encode(dto.getNewPassword()));
+		user = userRepository.save(user);
+		ResponseUserDTO repDto = modelMapper.map(user, ResponseUserDTO.class);
+		return repDto;
+	}
 }
