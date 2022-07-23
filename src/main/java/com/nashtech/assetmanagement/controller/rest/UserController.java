@@ -1,7 +1,10 @@
 package com.nashtech.assetmanagement.controller.rest;
 
-import javax.validation.Valid;
-
+import com.nashtech.assetmanagement.dto.request.RequestChangePassDto;
+import com.nashtech.assetmanagement.dto.request.RequestFirstLogin;
+import com.nashtech.assetmanagement.dto.response.ResponseMessage;
+import com.nashtech.assetmanagement.dto.response.ResponseUserDTO;
+import com.nashtech.assetmanagement.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.CrossOrigin;
@@ -55,9 +58,4 @@ public class UserController {
                         requestFirstLogin.getNewPassword());
         return new ResponseEntity<>(responseMessage,responseMessage.getStatus());
     }
-    
-//    @PostMapping("/user/api/change-password")
-//    public ResponseEntity<ResponseUserDTO> changePassword(@RequestBody RequestChangePassDto requestChangePassDto){
-//    	return ResponseEntity.ok(userService.changePassword(requestChangePassDto));
-//    }
 }

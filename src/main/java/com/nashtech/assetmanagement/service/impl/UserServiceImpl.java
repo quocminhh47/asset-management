@@ -1,5 +1,6 @@
 package com.nashtech.assetmanagement.service.impl;
 
+<<<<<<< HEAD
 import java.util.Date;
 import java.util.Optional;
 
@@ -19,6 +20,8 @@ import org.springframework.security.crypto.bcrypt.BCrypt;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
+=======
+>>>>>>> develop
 import com.nashtech.assetmanagement.dto.request.RequestChangePassDto;
 import com.nashtech.assetmanagement.dto.request.RequestLoginDTO;
 import com.nashtech.assetmanagement.dto.request.UserRequestDto;
@@ -48,6 +51,26 @@ import com.nashtech.assetmanagement.utils.UserGenerateUtil;
 
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.modelmapper.ModelMapper;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
+import org.springframework.http.HttpStatus;
+import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
+import org.springframework.security.crypto.bcrypt.BCrypt;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.stereotype.Service;
+
+import java.util.Date;
+
+import java.util.Optional;
 
 @Service
 @Slf4j
@@ -65,14 +88,12 @@ public class UserServiceImpl implements UserService {
     private final AuthenticationService authenticationService;
     private final LocationRepository locationRepository;
     private final LocationMapper locationMapper;
-    
-    @Autowired
-    private ModelMapper modelMapper;
+    private final ModelMapper modelMapper;
 
     @Autowired
     public UserServiceImpl(UserRepository userRepository, UsersContent usersContent, RoleRepository roleRepository, UserMapper userMapper, AuthenticationManager authenticationManager, JwtUtils jwtUtils,
                            PasswordEncoder passwordEncoder, RoleService roleService,
-                           LocationRepository locationRepository, LocationMapper locationMapper, AuthenticationService authenticationService) {
+                           LocationRepository locationRepository, LocationMapper locationMapper, AuthenticationService authenticationService, ModelMapper modelMapper) {
         this.userRepository = userRepository;
         this.usersContent = usersContent;
         this.roleRepository = roleRepository;
@@ -84,18 +105,8 @@ public class UserServiceImpl implements UserService {
         this.authenticationService = authenticationService;
         this.locationRepository = locationRepository;
         this.locationMapper = locationMapper;
+        this.modelMapper = modelMapper;
     }
-
-	@Override
-	public ResponseUserDTO createUser() {
-		Users user = new Users();
-		user.setUserName("ducinox2000");
-		user.setPassword("123456");
-		user.setStaffCode("SD001");
-		user.setRole(roleService.getRole(1L));
-		user.setPassword(passwordEncoder.encode(user.getPassword()));
-		return userMapper.userToResponseUser(userRepository.save(user));
-	}
 
     @Override
     public ResponseSignInDTO signIn(RequestLoginDTO requestLoginDTO) {
@@ -119,7 +130,7 @@ public class UserServiceImpl implements UserService {
         newUser.setStaffCode(UserGenerateUtil.generateStaffCode(userRepository.countUsersByStaffCode()));
         int sameName = userRepository.countUsersByFirstNameAndLastName(newUser.getFirstName(),newUser.getLastName());
         newUser.setUserName(UserGenerateUtil.generateUserName(newUser.getFirstName(),newUser.getLastName(),sameName));
-        newUser.setPassword(UserGenerateUtil.generatePassword(newUser.getUserName(),newUser.getBirthDate()));
+        newUser.setPassword(new BCryptPasswordEncoder().encode(UserGenerateUtil.generatePassword(newUser.getUserName(),newUser.getBirthDate())));
         userRepository.save(newUser);
     }
 
