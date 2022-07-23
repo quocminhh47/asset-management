@@ -18,6 +18,6 @@ public class ResponseUserDTO {
     private Date joinedDate;
     private Date birthDate;
     private Boolean gender;
-    private Boolean state;
+    private String state;
 
 }

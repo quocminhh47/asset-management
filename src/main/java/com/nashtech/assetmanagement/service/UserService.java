@@ -1,5 +1,6 @@
 package com.nashtech.assetmanagement.service;
 
+import com.nashtech.assetmanagement.dto.request.RequestChangePassDto;
 import com.nashtech.assetmanagement.dto.request.RequestLoginDTO;
 import com.nashtech.assetmanagement.dto.response.ResponseSignInDTO;
 import com.nashtech.assetmanagement.dto.response.ResponseUserDTO;
@@ -17,4 +18,7 @@ public interface UserService {
 
     UserPrinciple loadUserByUsername(String userName)
             throws UsernameNotFoundException;
+
+
+	ResponseUserDTO changePassword(RequestChangePassDto dto);
 }
