@@ -48,6 +48,5 @@ public interface UserService {
     SingleUserResponse getUserDetailInfo(String staffCode);
 
     ResponseMessage changePasswordFirstLogin(String userName, String newPassword);
-
     ResponseUserDTO changePassword(RequestChangePassDto dto);
 }
