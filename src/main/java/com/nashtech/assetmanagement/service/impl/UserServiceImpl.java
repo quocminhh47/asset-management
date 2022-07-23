@@ -1,9 +1,33 @@
 package com.nashtech.assetmanagement.service.impl;
 
-import com.nashtech.assetmanagement.dto.request.RequestFirstLogin;
+import java.util.Date;
+import java.util.Optional;
+
+import org.modelmapper.ModelMapper;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
+import org.springframework.http.HttpStatus;
+import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
+import org.springframework.security.crypto.bcrypt.BCrypt;
+import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.stereotype.Service;
+
+import com.nashtech.assetmanagement.dto.request.RequestChangePassDto;
 import com.nashtech.assetmanagement.dto.request.RequestLoginDTO;
 import com.nashtech.assetmanagement.dto.request.UserRequestDto;
-import com.nashtech.assetmanagement.dto.response.*;
+import com.nashtech.assetmanagement.dto.response.ListUsersResponse;
+import com.nashtech.assetmanagement.dto.response.LocationResponseDTO;
+import com.nashtech.assetmanagement.dto.response.ResponseMessage;
+import com.nashtech.assetmanagement.dto.response.ResponseSignInDTO;
+import com.nashtech.assetmanagement.dto.response.ResponseUserDTO;
+import com.nashtech.assetmanagement.dto.response.SingleUserResponse;
 import com.nashtech.assetmanagement.entities.Location;
 import com.nashtech.assetmanagement.entities.Role;
 import com.nashtech.assetmanagement.entities.Users;
@@ -21,28 +45,9 @@ import com.nashtech.assetmanagement.service.AuthenticationService;
 import com.nashtech.assetmanagement.service.RoleService;
 import com.nashtech.assetmanagement.service.UserService;
 import com.nashtech.assetmanagement.utils.UserGenerateUtil;
+
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Pageable;
-import org.springframework.data.domain.Sort;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
-import org.springframework.security.authentication.AuthenticationManager;
-import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.security.core.userdetails.UsernameNotFoundException;
-import org.springframework.security.crypto.password.PasswordEncoder;
-import org.springframework.stereotype.Service;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-
-import java.util.Date;
-
-import java.util.Optional;
 
 @Service
 @Slf4j
@@ -60,6 +65,9 @@ public class UserServiceImpl implements UserService {
     private final AuthenticationService authenticationService;
     private final LocationRepository locationRepository;
     private final LocationMapper locationMapper;
+    
+    @Autowired
+    private ModelMapper modelMapper;
 
     @Autowired
     public UserServiceImpl(UserRepository userRepository, UsersContent usersContent, RoleRepository roleRepository, UserMapper userMapper, AuthenticationManager authenticationManager, JwtUtils jwtUtils,
@@ -88,17 +96,6 @@ public class UserServiceImpl implements UserService {
 		user.setPassword(passwordEncoder.encode(user.getPassword()));
 		return userMapper.userToResponseUser(userRepository.save(user));
 	}
-
-    @Override
-    public ResponseUserDTO createUser() {
-        Users user = new Users();
-        user.setUserName("ducinox2000");
-        user.setPassword("123456");
-        user.setStaffCode("SD001");
-        user.setRole(roleService.getRole(1L));
-        user.setPassword(passwordEncoder.encode(user.getPassword()));
-        return userMapper.userToResponseUser(userRepository.save(user));
-    }
 
     @Override
     public ResponseSignInDTO signIn(RequestLoginDTO requestLoginDTO) {
@@ -253,7 +250,6 @@ public class UserServiceImpl implements UserService {
 		if (!BCrypt.checkpw(dto.getPassword().toString(), user.getPassword())) {
 			throw new ResourceNotFoundException("Password is incorrect");
 		}
-        
 		user.setPassword(passwordEncoder.encode(dto.getNewPassword()));
 		user = userRepository.save(user);
 		ResponseUserDTO repDto = modelMapper.map(user, ResponseUserDTO.class);
