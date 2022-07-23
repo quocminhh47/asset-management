@@ -19,5 +19,6 @@ public class ResponseSignInDTO {
     private Collection<? extends GrantedAuthority> roles;
     private String token;
 
+
 }
 

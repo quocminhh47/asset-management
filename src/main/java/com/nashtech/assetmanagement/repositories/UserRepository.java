@@ -7,6 +7,8 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
+import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 
 import java.util.Optional;
 
@@ -37,4 +39,11 @@ public interface UserRepository extends JpaRepository<Users, String> {
                                 @Param("role") Role role,
                                 @Param("staffCode") String loggedStaffCode,
                                 @Param("location") String location);
+
+    @Query(value = "select count(*) FROM users WHERE staff_code like 'SD%'",nativeQuery = true)
+    int countUsersByStaffCode();
+    @Query(value = "select count(*) from users where first_name= :firstname AND last_name=:lastname",nativeQuery = true)
+    int countUsersByFirstNameAndLastName(@Param("firstname")String firstName, @Param("lastname")String lastName);
+
+    Optional<Users> findByStaffCode(String staffCode);
 }
