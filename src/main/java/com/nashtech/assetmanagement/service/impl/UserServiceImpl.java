@@ -171,6 +171,7 @@ public class UserServiceImpl implements UserService {
         } else {
             user.setPassword(passwordEncoder.encode(newPassword));
             user.setState(UserState.ACTIVE);
+            userRepository.save(user);
         }
         return new ResponseMessage(HttpStatus.OK, "Change password successfully.",
                 new Date());
