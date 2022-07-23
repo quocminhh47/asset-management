@@ -1,12 +1,11 @@
 package com.nashtech.assetmanagement.service.impl;
 
+import com.nashtech.assetmanagement.dto.request.RequestFirstLogin;
 import com.nashtech.assetmanagement.dto.request.RequestLoginDTO;
-import com.nashtech.assetmanagement.dto.response.ListUsersResponse;
-import com.nashtech.assetmanagement.dto.response.ResponseSignInDTO;
-import com.nashtech.assetmanagement.dto.response.ResponseUserDTO;
-import com.nashtech.assetmanagement.dto.response.SingleUserResponse;
+import com.nashtech.assetmanagement.dto.response.*;
 import com.nashtech.assetmanagement.entities.Role;
 import com.nashtech.assetmanagement.entities.Users;
+import com.nashtech.assetmanagement.enums.UserState;
 import com.nashtech.assetmanagement.exception.ResourceNotFoundException;
 import com.nashtech.assetmanagement.mapper.UserMapper;
 import com.nashtech.assetmanagement.mapper.UsersContent;
@@ -23,6 +22,8 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
@@ -30,6 +31,10 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+
+import java.util.Date;
 
 @Service
 @Slf4j
@@ -150,4 +155,24 @@ public class UserServiceImpl implements UserService {
                 : Sort.by(sortBy).descending();
     }
 
+    @Override
+    public ResponseMessage changePasswordFirstLogin(String userName, String newPassword) {
+        Users user = userRepository.findByUserName(userName)
+                .orElseThrow(() -> new ResourceNotFoundException("Did not find user " +
+                        "with username: " + userName));
+        if (user.getState() != UserState.INIT) {
+            return new ResponseMessage(HttpStatus.CONFLICT, "You don't have to " +
+                    "change your password for the first time you log in because your " +
+                    "password has already been changed.", new Date());
+        }
+        if (passwordEncoder.matches(newPassword, user.getPassword())) {
+            return new ResponseMessage(HttpStatus.CONFLICT, "The new password must be " +
+                    "different from the previous password.", new Date());
+        } else {
+            user.setPassword(passwordEncoder.encode(newPassword));
+            user.setState(UserState.ACTIVE);
+        }
+        return new ResponseMessage(HttpStatus.OK, "Change password successfully.",
+                new Date());
+    }
 }

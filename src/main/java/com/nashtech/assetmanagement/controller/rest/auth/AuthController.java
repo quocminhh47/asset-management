@@ -1,5 +1,6 @@
 package com.nashtech.assetmanagement.controller.rest.auth;
 
+import com.nashtech.assetmanagement.dto.request.RequestFirstLogin;
 import com.nashtech.assetmanagement.dto.request.RequestLoginDTO;
 import com.nashtech.assetmanagement.dto.response.JwtResponse;
 import com.nashtech.assetmanagement.dto.response.ResponseSignInDTO;
@@ -28,7 +29,7 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 @RestController
-@RequestMapping("/api/auth")
+@RequestMapping("/user/api/auth")
 @AllArgsConstructor
 public class AuthController {
 
@@ -67,9 +68,4 @@ public class AuthController {
                 roles
         ));
     }
-
-//    public ResponseEntity<?> changePasswordFirstLogin() {
-//
-//    }
-
 }

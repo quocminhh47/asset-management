@@ -41,8 +41,8 @@ public class UserPrinciple implements UserDetails {
         if(users.getRole().getName().equalsIgnoreCase("admin"))
             authorities.add(new SimpleGrantedAuthority("ROLE_ADMIN"));
 
-        if(users.getRole().getName().equalsIgnoreCase("user"))
-            authorities.add(new SimpleGrantedAuthority("ROLE_USER"));
+        if(users.getRole().getName().equalsIgnoreCase("staff"))
+            authorities.add(new SimpleGrantedAuthority("ROLE_STAFF"));
 
         return new UserPrinciple(
                 users.getStaffCode(),

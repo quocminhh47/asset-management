@@ -8,7 +8,7 @@ public class AppConstants {
 
     public static final String[] AUTH_WHITELIST = {
             // -- Swagger UI v3 (OpenAPI)
-            "api/auth/signin",
+            "/user/api/auth/**",
             "/v3/api-docs/**",
             "/swagger-ui/**",
             "/api-docs",

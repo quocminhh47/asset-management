@@ -52,7 +52,7 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
                 .sessionManagement().sessionCreationPolicy(STATELESS);
         http.authorizeRequests().antMatchers(AUTH_WHITELIST).permitAll();
         http.authorizeRequests().antMatchers("/admin/api/**").hasRole("ADMIN");
-        http.authorizeRequests().antMatchers("/user/api/**").hasAnyRole("USER", "ADMIN");
+        http.authorizeRequests().antMatchers("/user/api/**").hasAnyRole("STAFF", "ADMIN"); //cai nay co the de thay usser thanh staff  cung duoc
         http.authorizeRequests().anyRequest().permitAll();
         http.addFilterBefore(authenticationJwtTokenFilter(), UsernamePasswordAuthenticationFilter.class);
 
