@@ -16,20 +16,12 @@ import java.util.Date;
 
 @Component
 @Slf4j
-public class AuthenticationEntryPointHandler implements AuthenticationEntryPoint {
+public class JwtAuthEntryPoint implements AuthenticationEntryPoint {
 
     @Override
     public void commence(HttpServletRequest request, HttpServletResponse response,
                          AuthenticationException authException) throws IOException, ServletException {
-        log.error(authException.getMessage());
-        response.setContentType("application/json;charset=UTF-8");
-        response.setStatus(HttpServletResponse.SC_FORBIDDEN);
-        ObjectMapper objectMapper = new ObjectMapper();
-        ResponseErrorMessage responseErrorMessage=
-                new ResponseErrorMessage(HttpStatus.FORBIDDEN,"Access denied",
-                        authException.getMessage(),new Date());
-        String accessDeniedResponse = objectMapper.writeValueAsString(responseErrorMessage);
-        log.warn(responseErrorMessage.toString());
-        response.getWriter().print(accessDeniedResponse);
+            log.error("Unauthorized error: {}", authException.getMessage());
+        response.sendError(HttpServletResponse.SC_UNAUTHORIZED, "Error: Unauthorized");
     }
 }

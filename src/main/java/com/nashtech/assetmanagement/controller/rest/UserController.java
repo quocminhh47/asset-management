@@ -3,15 +3,16 @@ package com.nashtech.assetmanagement.controller.rest;
 import org.springframework.context.annotation.Role;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
 
-@RequestMapping
+@RestController
 public class UserController {
-    @GetMapping("/user/1")
+    @GetMapping("/admin/api/admin")
     public String get1(){
-        return "user";
-    }
-    @GetMapping("/admin/2")
-    public String get2(){
         return "admin";
+    }
+    @GetMapping("/user/api/user")
+    public String get2(){
+        return "user";
     }
 }
