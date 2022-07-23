@@ -1,5 +1,6 @@
 package com.nashtech.assetmanagement.mapper;
 
+import com.nashtech.assetmanagement.dto.request.UserRequestDto;
 import com.nashtech.assetmanagement.dto.response.ResponseUserDTO;
 import com.nashtech.assetmanagement.dto.response.SingleUserResponse;
 import com.nashtech.assetmanagement.entities.Location;
