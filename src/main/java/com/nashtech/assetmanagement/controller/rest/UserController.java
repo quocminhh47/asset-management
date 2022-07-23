@@ -1,7 +1,9 @@
 package com.nashtech.assetmanagement.controller.rest;
 
+import com.nashtech.assetmanagement.dto.request.RequestChangePassDto;
 import com.nashtech.assetmanagement.dto.request.RequestFirstLogin;
 import com.nashtech.assetmanagement.dto.response.ResponseMessage;
+import com.nashtech.assetmanagement.dto.response.ResponseUserDTO;
 import com.nashtech.assetmanagement.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
