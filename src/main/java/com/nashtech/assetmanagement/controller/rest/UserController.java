@@ -1,5 +1,9 @@
 package com.nashtech.assetmanagement.controller.rest;
 
+import org.springframework.context.annotation.Role;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
 import com.nashtech.assetmanagement.dto.request.UserRequestDto;
 import com.nashtech.assetmanagement.dto.response.LocationResponseDTO;
 import com.nashtech.assetmanagement.service.UserService;
@@ -32,5 +36,13 @@ public class UserController {
     @GetMapping("/location/{staffCode}")
     public ResponseEntity<LocationResponseDTO> getLocationByStaffCode(@PathVariable("staffCode")String id){
         return ResponseEntity.ok(this.userService.getLocationByStaffCode(id));
+    }
+    @GetMapping("/admin/api/admin")
+    public String get1(){
+        return "admin";
+    }
+    @GetMapping("/user/api/user")
+    public String get2(){
+        return "user";
     }
 }
