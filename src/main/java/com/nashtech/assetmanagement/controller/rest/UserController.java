@@ -2,7 +2,6 @@ package com.nashtech.assetmanagement.controller.rest;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -27,7 +26,7 @@ public class UserController {
         return "admin";
     }
     
-    @PostMapping("/users/change-password")
+    @PostMapping("/user/api/change-password")
     public ResponseEntity<ResponseUserDTO> changePassword(@RequestBody RequestChangePassDto requestChangePassDto){
     	return ResponseEntity.ok(userService.changePassword(requestChangePassDto));
     }
