@@ -2,18 +2,17 @@ package com.nashtech.assetmanagement.entities;
 
 import java.util.Date;
 import java.util.List;
-
 import javax.persistence.*;
-
 import com.nashtech.assetmanagement.enums.UserState;
 import lombok.*;
 
+import org.hibernate.annotations.NaturalId;
 @Getter
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
 @Entity
-@Table(name = "[users]")
+@Table(name = "users")
 public class Users {
 
 	@Id
@@ -26,7 +25,8 @@ public class Users {
 	@Column(name = "last_name", length = 150)
 	private String lastName;
 
-	@Column(name = "username", length = 250,unique = true)
+	@NaturalId
+	@Column(name = "username", length = 250, unique = true)
 	private String userName;
 
 	@Column(name = "password", length = 250)
@@ -41,16 +41,16 @@ public class Users {
 	@Column
 	private Boolean gender;
 
-
 	@Column
 	@Enumerated(EnumType.STRING)
 	private UserState state;
 
-	@ManyToOne(fetch = FetchType.LAZY)
+	@ManyToOne
 	@JoinColumn(name = "role_id")
 	private Role role;
 
-	@ManyToOne(fetch = FetchType.LAZY)
+
+	@ManyToOne
 	@JoinColumn(name = "location_id")
 	private Location location;
 
