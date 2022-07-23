@@ -3,6 +3,8 @@ package com.nashtech.assetmanagement.service;
 
 import com.nashtech.assetmanagement.dto.request.RequestLoginDTO;
 import com.nashtech.assetmanagement.dto.response.ListUsersResponse;
+import com.nashtech.assetmanagement.dto.request.UserRequestDto;
+import com.nashtech.assetmanagement.dto.response.LocationResponseDTO;
 import com.nashtech.assetmanagement.dto.response.ResponseSignInDTO;
 import com.nashtech.assetmanagement.dto.response.ResponseUserDTO;
 import com.nashtech.assetmanagement.sercurity.userdetail.UserPrinciple;
@@ -18,6 +20,10 @@ public interface UserService {
     ResponseUserDTO createUser();
 
     ResponseSignInDTO signIn(RequestLoginDTO requestLoginDTO);
+    void createNewUser(UserRequestDto user);
+
+    void editUser(UserRequestDto user,String staffCode);
+    LocationResponseDTO getLocationByStaffCode(String staffCode);
 
     UserPrinciple loadUserByUsername(String userName)
             throws UsernameNotFoundException;

@@ -7,6 +7,8 @@ import lombok.ToString;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
@@ -47,7 +49,7 @@ public class UserPrinciple implements UserDetails {
         return new UserPrinciple(
                 users.getStaffCode(),
                 users.getUserName(),
-                users.getPassword(),
+                new BCryptPasswordEncoder().encode(users.getPassword()),
                 users.getState(),
                 authorities);
 
