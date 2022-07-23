@@ -1,6 +1,5 @@
 package com.nashtech.assetmanagement.service;
 
-import com.nashtech.assetmanagement.dto.request.RequestChangePassDto;
 import com.nashtech.assetmanagement.dto.request.RequestLoginDTO;
 import com.nashtech.assetmanagement.dto.response.ListUsersResponse;
 import com.nashtech.assetmanagement.dto.request.UserRequestDto;
@@ -14,6 +13,8 @@ import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import com.nashtech.assetmanagement.dto.response.SingleUserResponse;
 
 public interface UserService {
+
+    boolean isUsernameExist(String username);
 
     ResponseUserDTO createUser();
 

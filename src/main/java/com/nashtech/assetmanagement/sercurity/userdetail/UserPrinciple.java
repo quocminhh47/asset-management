@@ -49,7 +49,7 @@ public class UserPrinciple implements UserDetails {
         return new UserPrinciple(
                 users.getStaffCode(),
                 users.getUserName(),
-                users.getPassword(),
+                new BCryptPasswordEncoder().encode(users.getPassword()),
                 users.getState(),
                 authorities);
 
