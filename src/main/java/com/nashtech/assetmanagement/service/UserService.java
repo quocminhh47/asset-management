@@ -1,22 +1,16 @@
 package com.nashtech.assetmanagement.service;
 
+import com.nashtech.assetmanagement.dto.request.RequestChangePassDto;
 import com.nashtech.assetmanagement.dto.request.RequestLoginDTO;
-import com.nashtech.assetmanagement.dto.response.ListUsersResponse;
 import com.nashtech.assetmanagement.dto.request.UserRequestDto;
-import com.nashtech.assetmanagement.dto.response.LocationResponseDTO;
-import com.nashtech.assetmanagement.dto.response.ResponseSignInDTO;
-import com.nashtech.assetmanagement.dto.response.ResponseUserDTO;
 import com.nashtech.assetmanagement.dto.response.*;
 import com.nashtech.assetmanagement.sercurity.userdetail.UserPrinciple;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
-
-import com.nashtech.assetmanagement.dto.response.SingleUserResponse;
 
 public interface UserService {
 
     boolean isUsernameExist(String username);
 
-    ResponseUserDTO createUser();
 
     ResponseSignInDTO signIn(RequestLoginDTO requestLoginDTO);
     void createNewUser(UserRequestDto user);
@@ -49,4 +43,5 @@ public interface UserService {
 
     ResponseMessage changePasswordFirstLogin(String userName, String newPassword);
     ResponseUserDTO changePassword(RequestChangePassDto dto);
+
 }

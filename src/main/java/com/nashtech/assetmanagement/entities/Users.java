@@ -1,12 +1,15 @@
 package com.nashtech.assetmanagement.entities;
 
+import com.nashtech.assetmanagement.enums.UserState;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
+import org.hibernate.annotations.NaturalId;
+
+import javax.persistence.*;
 import java.util.Date;
 import java.util.List;
-import javax.persistence.*;
-import com.nashtech.assetmanagement.enums.UserState;
-import lombok.*;
-
-import org.hibernate.annotations.NaturalId;
 @Getter
 @Setter
 @NoArgsConstructor
