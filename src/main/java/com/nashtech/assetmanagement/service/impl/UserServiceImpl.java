@@ -1,36 +1,9 @@
 package com.nashtech.assetmanagement.service.impl;
 
-<<<<<<< HEAD
-import java.util.Date;
-import java.util.Optional;
-
-import org.modelmapper.ModelMapper;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Pageable;
-import org.springframework.data.domain.Sort;
-import org.springframework.http.HttpStatus;
-import org.springframework.security.authentication.AuthenticationManager;
-import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.security.core.userdetails.UsernameNotFoundException;
-import org.springframework.security.crypto.bcrypt.BCrypt;
-import org.springframework.security.crypto.password.PasswordEncoder;
-import org.springframework.stereotype.Service;
-
-=======
->>>>>>> develop
 import com.nashtech.assetmanagement.dto.request.RequestChangePassDto;
 import com.nashtech.assetmanagement.dto.request.RequestLoginDTO;
 import com.nashtech.assetmanagement.dto.request.UserRequestDto;
-import com.nashtech.assetmanagement.dto.response.ListUsersResponse;
-import com.nashtech.assetmanagement.dto.response.LocationResponseDTO;
-import com.nashtech.assetmanagement.dto.response.ResponseMessage;
-import com.nashtech.assetmanagement.dto.response.ResponseSignInDTO;
-import com.nashtech.assetmanagement.dto.response.ResponseUserDTO;
-import com.nashtech.assetmanagement.dto.response.SingleUserResponse;
+import com.nashtech.assetmanagement.dto.response.*;
 import com.nashtech.assetmanagement.entities.Location;
 import com.nashtech.assetmanagement.entities.Role;
 import com.nashtech.assetmanagement.entities.Users;
@@ -48,7 +21,6 @@ import com.nashtech.assetmanagement.service.AuthenticationService;
 import com.nashtech.assetmanagement.service.RoleService;
 import com.nashtech.assetmanagement.service.UserService;
 import com.nashtech.assetmanagement.utils.UserGenerateUtil;
-
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.modelmapper.ModelMapper;
@@ -69,7 +41,6 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.util.Date;
-
 import java.util.Optional;
 
 @Service
@@ -106,6 +77,11 @@ public class UserServiceImpl implements UserService {
         this.locationRepository = locationRepository;
         this.locationMapper = locationMapper;
         this.modelMapper = modelMapper;
+    }
+
+    @Override
+    public boolean isUsernameExist(String username) {
+        return userRepository.existsByUserName(username);
     }
 
     @Override
@@ -261,6 +237,7 @@ public class UserServiceImpl implements UserService {
 		if (!BCrypt.checkpw(dto.getPassword().toString(), user.getPassword())) {
 			throw new ResourceNotFoundException("Password is incorrect");
 		}
+        
 		user.setPassword(passwordEncoder.encode(dto.getNewPassword()));
 		user = userRepository.save(user);
 		ResponseUserDTO repDto = modelMapper.map(user, ResponseUserDTO.class);

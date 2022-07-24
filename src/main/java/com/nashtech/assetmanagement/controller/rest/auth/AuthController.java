@@ -1,9 +1,7 @@
 package com.nashtech.assetmanagement.controller.rest.auth;
 
-import com.nashtech.assetmanagement.dto.request.RequestFirstLogin;
 import com.nashtech.assetmanagement.dto.request.RequestLoginDTO;
 import com.nashtech.assetmanagement.dto.response.JwtResponse;
-import com.nashtech.assetmanagement.dto.response.ResponseSignInDTO;
 import com.nashtech.assetmanagement.entities.Users;
 import com.nashtech.assetmanagement.enums.UserState;
 import com.nashtech.assetmanagement.exception.ResourceNotFoundException;
@@ -11,8 +9,9 @@ import com.nashtech.assetmanagement.exception.UnauthorizedException;
 import com.nashtech.assetmanagement.repositories.UserRepository;
 import com.nashtech.assetmanagement.sercurity.jwt.JwtUtils;
 import com.nashtech.assetmanagement.sercurity.userdetail.UserPrinciple;
-import com.nashtech.assetmanagement.service.impl.UserServiceImpl;
+import com.nashtech.assetmanagement.service.UserService;
 import lombok.AllArgsConstructor;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -32,14 +31,14 @@ import java.util.stream.Collectors;
 @RequestMapping("/user/api/auth")
 @AllArgsConstructor
 public class AuthController {
-
+    @Autowired
+    private final UserService userService;
     private final UserRepository userRepository;
     private final AuthenticationManager authenticationManager;
     private final JwtUtils jwtUtils;
 
     @PostMapping("/signin")
     public ResponseEntity<?> signIn(@Valid @RequestBody RequestLoginDTO requestLoginDTO) {
-
         Users user = userRepository.findByUserName(requestLoginDTO.getUserName())
                 .orElseThrow(() -> new ResourceNotFoundException(("Username is not found")));
 

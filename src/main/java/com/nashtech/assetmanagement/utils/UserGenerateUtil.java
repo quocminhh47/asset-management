@@ -1,12 +1,10 @@
 package com.nashtech.assetmanagement.utils;
 
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
 
 import java.util.Calendar;
 import java.util.Date;
 import java.util.GregorianCalendar;
-import java.util.Locale;
 @Slf4j
 public class UserGenerateUtil {
 
