@@ -6,9 +6,6 @@ INSERT INTO public.location(code, name)
 VALUES ('HCM', 'HO CHI MINH');
 INSERT INTO public.users (staff_code, birth_date, first_name, gender, joined_date, last_name, password, username,
                           location_id, role_id, state)
-VALUES ('SD0014', '2000-07-22 07:00:00.000000', 'Ga', true, '2022-07-22 07:00:00.000000', 'Vler ', 'gavd@22072000',
-        'gav', 'HCM', 1, 'ACTIVE');
-INSERT INTO public.users (staff_code, birth_date, first_name, gender, joined_date, last_name, password, username,
-                          location_id, role_id, state)
-VALUES ('SD0015', '2000-07-22 07:00:00.000000', 'Ga', true, '2022-07-22 07:00:00.000000', 'Vler ', 'gavd@22072000',
-        'gav1', 'HCM', 1, 'INIT');
+VALUES ('SD0001', '2000-07-22 07:00:00.000000', 'Van', true, '2022-07-22 07:00:00.000000', 'Nguyen ', '$2a$10$r3uRMuUjABLpLEK16a2z3ul7dHRQCRRR58jGsvhaJL3WJZlNH/E3y',
+        'vann', 'HCM', 1, 'INIT');
+-- user name : vann pass: 123

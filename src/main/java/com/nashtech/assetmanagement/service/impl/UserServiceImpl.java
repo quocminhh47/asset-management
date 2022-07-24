@@ -102,7 +102,7 @@ public class UserServiceImpl implements UserService {
         }
         Location location = locationRepository.findByName(user.getLocationName());
         Users newUser = UserMapper.MapToUser(user,roleService.getRole(user.getRoleName()),location);
-        newUser.setState(UserState.ACTIVE);
+        newUser.setState(UserState.INIT);
         newUser.setStaffCode(UserGenerateUtil.generateStaffCode(userRepository.countUsersByStaffCode()));
         int sameName = userRepository.countUsersByFirstNameAndLastName(newUser.getFirstName(),newUser.getLastName());
         newUser.setUserName(UserGenerateUtil.generateUserName(newUser.getFirstName(),newUser.getLastName(),sameName));
