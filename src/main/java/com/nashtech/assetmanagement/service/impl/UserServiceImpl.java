@@ -237,7 +237,9 @@ public class UserServiceImpl implements UserService {
 		if (!BCrypt.checkpw(dto.getPassword().toString(), user.getPassword())) {
 			throw new ResourceNotFoundException("Password is incorrect");
 		}
-        
+        if (BCrypt.checkpw(dto.getNewPassword().toString(), user.getPassword())) {
+			throw new ResourceNotFoundException("You entered an old password");
+		}
 		user.setPassword(passwordEncoder.encode(dto.getNewPassword()));
 		user = userRepository.save(user);
 		ResponseUserDTO repDto = modelMapper.map(user, ResponseUserDTO.class);
