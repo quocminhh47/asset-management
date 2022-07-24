@@ -49,7 +49,7 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
         http.authorizeRequests().antMatchers("/user/api/**").hasAnyRole("STAFF", "ADMIN"); //cai nay co the de thay usser thanh staff  cung duoc
         http.authorizeRequests().anyRequest().permitAll();
         http.addFilterBefore(authenticationJwtTokenFilter(), UsernamePasswordAuthenticationFilter.class);
-        http.headers().frameOptions().disable();
+
     }
 
     @Bean
