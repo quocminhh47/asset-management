@@ -11,7 +11,7 @@ import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
 
-@RequestMapping("/admin/api")
+@RequestMapping("")
 @CrossOrigin(origins = "http://localhost:3000")
 @RestController
 public class UserController {
@@ -22,17 +22,17 @@ public class UserController {
         this.userService = userService;
     }
 
-    @PostMapping("/create")
+    @PostMapping("/admin/api/create")
     public void createNewUser(@RequestBody @Valid UserRequestDto user){
         this.userService.createNewUser(user);
     }
 
-    @PutMapping("/edit/{id}")
+    @PutMapping("/admin/api/edit/{id}")
     public void editUser(@RequestBody @Valid UserRequestDto user, @PathVariable("id") String staffCode){
         this.userService.editUser(user,staffCode);
     }
 
-    @GetMapping("/location/{staffCode}")
+    @GetMapping("/admin/api/location/{staffCode}")
     public ResponseEntity<LocationResponseDTO> getLocationByStaffCode(@PathVariable("staffCode")String id){
         return ResponseEntity.ok(this.userService.getLocationByStaffCode(id));
     }
