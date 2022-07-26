@@ -41,6 +41,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.util.Date;
+import java.util.List;
 import java.util.Optional;
 
 @Service
@@ -103,7 +104,9 @@ public class UserServiceImpl implements UserService {
         Location location = locationRepository.findByName(user.getLocationName());
         Users newUser = UserMapper.MapToUser(user,roleService.getRole(user.getRoleName()),location);
         newUser.setState(UserState.INIT);
-        newUser.setStaffCode(UserGenerateUtil.generateStaffCode(userRepository.countUsersByStaffCode()));
+        List<String> staffCodeList = userRepository.findAllStaffCode();
+        int biggestStaffCode = UserGenerateUtil.getBiggestStaffCode(staffCodeList);
+        newUser.setStaffCode(UserGenerateUtil.generateStaffCode(biggestStaffCode));
         int sameName = userRepository.countUsersByFirstNameAndLastName(newUser.getFirstName(),newUser.getLastName());
         newUser.setUserName(UserGenerateUtil.generateUserName(newUser.getFirstName(),newUser.getLastName(),sameName));
         newUser.setPassword(new BCryptPasswordEncoder().encode(UserGenerateUtil.generatePassword(newUser.getUserName(),newUser.getBirthDate())));

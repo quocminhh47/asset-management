@@ -8,6 +8,7 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
+import java.util.List;
 import java.util.Optional;
 
 public interface UserRepository extends JpaRepository<Users, String> {
@@ -17,7 +18,8 @@ public interface UserRepository extends JpaRepository<Users, String> {
 
     @Query(value = " select u from Users u where not u.staffCode = :staffCode and u.location.code = :location")
     Page<Users> findAllByOrderByFirstNameAsc(Pageable pageable, @Param("staffCode") String staffCode, @Param("location") String location);
-
+    @Query(value = "select staff_code from users where staff_code LIKE 'SD%'",nativeQuery = true)
+    List<String> findAllStaffCode();
 
     @Query(value = "SELECT * FROM users u" +
             " where (( LOWER(u.staff_code) like %:text%) or" +

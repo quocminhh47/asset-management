@@ -5,8 +5,21 @@ import lombok.extern.slf4j.Slf4j;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.GregorianCalendar;
+import java.util.List;
+
 @Slf4j
 public class UserGenerateUtil {
+    public static int getBiggestStaffCode(List<String> staffCodeList){
+        int max = 0;
+        for(String staffCode:staffCodeList){
+            String parts[] = staffCode.split("SD");
+            int value =  Integer.parseInt(parts[1]);
+            if(value>max){
+                max = value;
+            }
+        }
+        return max;
+    }
 
     public static String generateUserName(String firstName, String lastName,int sameName) {
         String[] eachWord = lastName.split(" ");
