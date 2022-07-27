@@ -163,7 +163,10 @@ public class UserServiceImpl implements UserService {
         String loggedStaffCode = user.getStaffCode();
         String location = user.getLocation().getCode();
         Page<Users> users = userRepository.searchByStaffCodeOrName(
-                searchText.replaceAll(" ", ""), loggedStaffCode.replaceAll(" ", ""), location, pageable);
+                searchText.replaceAll(" ", "").toLowerCase(),
+                loggedStaffCode.replaceAll(" ", "").toLowerCase(),
+                location.toLowerCase(),
+                pageable);
 
         return usersContent.getUsersContent(users);
     }
