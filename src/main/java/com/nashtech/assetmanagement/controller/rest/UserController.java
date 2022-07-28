@@ -4,12 +4,14 @@ import com.nashtech.assetmanagement.dto.request.RequestFirstLogin;
 import com.nashtech.assetmanagement.dto.request.UserRequestDto;
 import com.nashtech.assetmanagement.dto.response.LocationResponseDTO;
 import com.nashtech.assetmanagement.dto.response.ResponseMessage;
+import com.nashtech.assetmanagement.dto.response.UserDto;
 import com.nashtech.assetmanagement.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
+import java.net.URI;
 
 @RequestMapping("")
 @RestController
@@ -22,13 +24,14 @@ public class UserController {
     }
 
     @PostMapping("/admin/api/create")
-    public void createNewUser(@RequestBody @Valid UserRequestDto user){
-        this.userService.createNewUser(user);
+    public ResponseEntity<UserDto> createNewUser(@RequestBody @Valid UserRequestDto user){
+        return ResponseEntity.created(URI.create("/admin/api/create")).body(this.userService.createNewUser(user));
     }
 
     @PutMapping("/admin/api/edit/{id}")
-    public void editUser(@RequestBody @Valid UserRequestDto user, @PathVariable("id") String staffCode){
-        this.userService.editUser(user,staffCode);
+    public ResponseEntity<UserDto> editUser(@RequestBody @Valid UserRequestDto user, @PathVariable("id") String staffCode){
+        return ResponseEntity.ok(this.userService.editUser(user,staffCode));
+
     }
 
     @GetMapping("/admin/api/location/{staffCode}")

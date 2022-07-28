@@ -13,9 +13,9 @@ public interface UserService {
 
 
     ResponseSignInDTO signIn(RequestLoginDTO requestLoginDTO);
-    void createNewUser(UserRequestDto user);
+    UserDto createNewUser(UserRequestDto user);
 
-    void editUser(UserRequestDto user,String staffCode);
+    UserDto editUser(UserRequestDto user,String staffCode);
     LocationResponseDTO getLocationByStaffCode(String staffCode);
 
     UserPrinciple loadUserByUsername(String userName)
