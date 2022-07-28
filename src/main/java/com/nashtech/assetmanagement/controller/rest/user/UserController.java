@@ -6,6 +6,7 @@ import com.nashtech.assetmanagement.dto.request.UserRequestDto;
 import com.nashtech.assetmanagement.dto.response.LocationResponseDTO;
 import com.nashtech.assetmanagement.dto.response.ResponseMessage;
 import com.nashtech.assetmanagement.dto.response.ResponseUserDTO;
+import com.nashtech.assetmanagement.dto.response.UserDto;
 import com.nashtech.assetmanagement.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -24,8 +25,8 @@ public class UserController {
     }
 
     @PostMapping("/admin/api/create")
-    public void createNewUser(@RequestBody @Valid UserRequestDto user){
-        this.userService.createNewUser(user);
+    public UserDto createNewUser(@RequestBody @Valid UserRequestDto user){
+       return userService.createNewUser(user);
     }
 
     @PutMapping("/admin/api/edit/{id}")
