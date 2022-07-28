@@ -1,6 +1,7 @@
 package com.nashtech.assetmanagement.service.impl;
 
 import com.nashtech.assetmanagement.dto.request.UserRequestDto;
+import com.nashtech.assetmanagement.dto.response.LocationResponseDTO;
 import com.nashtech.assetmanagement.dto.response.UserDto;
 import com.nashtech.assetmanagement.entities.Location;
 import com.nashtech.assetmanagement.entities.Role;
@@ -111,5 +112,43 @@ public class UserServiceImplTest {
         UserDto result = userService.editUser(userRequest,"sd0001");
         assertThat(result).isEqualTo(userResponse);
     }
+    @Test
+    void editUser_ShouldThrowResourceNotFoundEx_WhenStaffCodeIncorrect(){
+        UserRequestDto userRequest = mock(UserRequestDto.class);
+        when(userRepository.findByStaffCode("sd0001")).thenReturn(Optional.empty());
+        ResourceNotFoundException e = Assertions.assertThrows(ResourceNotFoundException.class,
+                () -> userService.editUser(userRequest,"sd0001"));
+        assertThat(e.getMessage()).isEqualTo("Staff code not found");
+    }
+    @Test
+    void editUser_ShouldThrowResourceNotFoundEx_WhenRequestRoleIncorrect(){
+        UserRequestDto userRequest = mock(UserRequestDto.class);
+        Users user = mock(Users.class);
+        when(userRepository.findByStaffCode("sd0001")).thenReturn(Optional.of(user));
+        when(roleRepository.findByName(userRequest.getRoleName())).thenReturn(Optional.empty());
+        ResourceNotFoundException e = Assertions.assertThrows(ResourceNotFoundException.class,
+                () -> userService.editUser(userRequest,"sd0001"));
+        assertThat(e.getMessage()).isEqualTo("Role name not found");
+    }
+
+    @Test
+    void getLocationByStaffCode_ShouldReturnLocationName_WhenStaffCodeCorrect(){
+        Users user = mock(Users.class);
+        Location location = mock(Location.class);
+        LocationResponseDTO response = mock(LocationResponseDTO.class);
+        when(userRepository.findByStaffCode("sd0001")).thenReturn(Optional.of(user));
+        when(user.getLocation()).thenReturn(location);
+        when(locationMapper.locationToLocationDTO(location)).thenReturn(response);
+        LocationResponseDTO result = userService.getLocationByStaffCode("sd0001");
+        assertThat(result).isEqualTo(response);
+    }
+    @Test
+    void getLocationByStaffCode_ShouldThrowResourceNotFoundEx_WhenStaffCodeIncorrect(){
+        when(userRepository.findByStaffCode("sd0001")).thenReturn(Optional.empty());
+        ResourceNotFoundException e = Assertions.assertThrows(ResourceNotFoundException.class,
+                () -> userService.getLocationByStaffCode("sd0001"));
+        assertThat(e.getMessage()).isEqualTo("Staff code not found");
+    }
+
 
 }
