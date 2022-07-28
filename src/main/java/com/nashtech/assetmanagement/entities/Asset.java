@@ -48,15 +48,15 @@ public class Asset{
 	@Enumerated(EnumType.STRING)
 	private AssetState state;
 	
-	@ManyToOne(fetch = FetchType.LAZY)
+	@ManyToOne
 	@JoinColumn(name = "location_id")
 	private Location location;
 	
-	@ManyToOne(fetch = FetchType.LAZY)
+	@ManyToOne
 	@JoinColumn(name = "category_id")
 	private Category category;
 	
-	@ManyToOne(fetch = FetchType.LAZY)
+	@ManyToOne
 	@JoinColumn(name = "user_id")
 	private Users user;
 }

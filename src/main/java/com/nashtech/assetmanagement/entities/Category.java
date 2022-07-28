@@ -26,6 +26,6 @@ public class Category {
 	@Column(name="total_quantity")
 	private Long totalQuantity;
 	
-	@OneToMany(fetch = FetchType.LAZY, mappedBy = "category")
+	@OneToMany( mappedBy = "category")
 	private List<Asset> assets;
 }
