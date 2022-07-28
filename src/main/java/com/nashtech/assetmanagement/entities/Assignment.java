@@ -18,7 +18,7 @@ public class Assignment {
 	@EmbeddedId
 	AssignmentId id;
 	
-	@ManyToOne(fetch = FetchType.LAZY)
+	@ManyToOne
 	@JoinColumn(name = "assigned_by")
 	private Users assignedBy;
 	

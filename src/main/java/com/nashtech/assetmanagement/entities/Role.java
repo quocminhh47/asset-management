@@ -26,7 +26,7 @@ public class Role {
     @Column(length = 50, nullable = false, unique = true)
     private String name;
 
-    @OneToMany(fetch = FetchType.LAZY, mappedBy = "role")
+    @OneToMany( mappedBy = "role")
     private Set<Users> users;
 
 }
