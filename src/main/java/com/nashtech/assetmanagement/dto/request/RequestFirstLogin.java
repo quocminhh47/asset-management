@@ -7,7 +7,7 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import javax.validation.constraints.NotEmpty;
-import javax.validation.constraints.Size;
+import javax.validation.constraints.Pattern;
 
 @Getter
 @Setter
@@ -16,7 +16,9 @@ import javax.validation.constraints.Size;
 public class RequestFirstLogin {
     @NotEmpty
     private String userName;
-    @Size(min = 8)
+    @Pattern(regexp = "^(?=.*[0-9])(?=.*[a-z])(?=.*[A-Z])(?=.*[@#$%^&+=])(?=\\S+$).{8,}$",
+            message = "Password must contain at least 1 uppercase, 1 lowercase, 1 " +
+                    "special character and 1 digit.")
     private String newPassword;
 
 }
