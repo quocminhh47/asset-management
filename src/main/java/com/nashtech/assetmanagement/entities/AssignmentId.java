@@ -17,5 +17,6 @@ public class AssignmentId implements Serializable{
     String assetCode;
     
     @SuppressWarnings("unused")
+    @Column(name = "assigned_date")
 	private Date assignedDate;
 }
