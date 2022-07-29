@@ -14,27 +14,22 @@ import com.nashtech.assetmanagement.repositories.RoleRepository;
 import com.nashtech.assetmanagement.repositories.UserRepository;
 import com.nashtech.assetmanagement.sercurity.jwt.JwtUtils;
 import com.nashtech.assetmanagement.service.AuthenticationService;
-import com.nashtech.assetmanagement.utils.UserGenerateUtil;
 import org.junit.jupiter.api.Assertions;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.ArgumentCaptor;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
-import org.mockito.MockedStatic;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.modelmapper.ModelMapper;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
-import java.util.ArrayList;
 import java.util.Date;
-import java.util.List;
 import java.util.Optional;
 
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
-import static org.mockito.Mockito.*;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 @ExtendWith(MockitoExtension.class)
 public class UserServiceImplTest {
     @Mock
