@@ -62,7 +62,8 @@ public class AssetServiceImplTest {
         ResponseAssetDTO actual=assetServiceImpl.createAsset(requestCreateAsset);
         ArgumentCaptor<String> assetCodeCapture =
                 ArgumentCaptor.forClass(java.lang.String.class);
-        verify(asset).setAssetCode(assetCodeCapture.capture());
+
+        verify(asset).setCode(assetCodeCapture.capture());
         verify(asset).setLocation(location);
         verify(asset).setCategory(category);
         assertThat(actual).isEqualTo(expected);

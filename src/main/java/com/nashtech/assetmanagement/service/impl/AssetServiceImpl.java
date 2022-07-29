@@ -40,14 +40,14 @@ public class AssetServiceImpl implements AssetService {
         String code;
         do {
             code = prefix + GenerateRandomNumber.randomNumber();
-        } while (assetRepository.existsAssetByAssetCode(code));
+        } while (assetRepository.existsAssetByCode(code));
         return code;
     }
 
     @Override
     public ResponseAssetDTO createAsset(RequestCreateAsset requestCreateAsset) {
         Asset asset = assetMapper.RequestAssetToAsset(requestCreateAsset);
-        asset.setAssetCode(generateAssetCode(requestCreateAsset.getCategoryId()));
+        asset.setCode(generateAssetCode(requestCreateAsset.getCategoryId()));
         Category category =
                 categoryRepository.findById(requestCreateAsset.getCategoryId())
                         .orElseThrow(
