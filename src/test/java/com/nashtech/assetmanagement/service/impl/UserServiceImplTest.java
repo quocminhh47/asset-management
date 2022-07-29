@@ -1,10 +1,12 @@
 package com.nashtech.assetmanagement.service.impl;
 
 import com.nashtech.assetmanagement.dto.request.UserRequestDto;
+import com.nashtech.assetmanagement.dto.response.ResponseMessage;
 import com.nashtech.assetmanagement.dto.response.UserDto;
 import com.nashtech.assetmanagement.entities.Location;
 import com.nashtech.assetmanagement.entities.Role;
 import com.nashtech.assetmanagement.entities.Users;
+import com.nashtech.assetmanagement.enums.UserState;
 import com.nashtech.assetmanagement.exception.ResourceNotFoundException;
 import com.nashtech.assetmanagement.mapper.LocationMapper;
 import com.nashtech.assetmanagement.mapper.UserMapper;
@@ -21,6 +23,7 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.modelmapper.ModelMapper;
+import org.springframework.http.HttpStatus;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
@@ -105,6 +108,31 @@ public class UserServiceImplTest {
         when(modelMapper.map(user,UserDto.class)).thenReturn(userResponse);
         UserDto result = userService.editUser(userRequest,"sd0001");
         assertThat(result).isEqualTo(userResponse);
+    }
+    @Test
+    void changePasswordFirstLogin_WhenUserStateIsNotINIT_Expect_ReturnResponseMessage(){
+        Role role=mock(Role.class);
+        Location location=mock(Location.class);
+        Users users=new Users("SD0001","duc","nguyen","ducnguyen","123",null,null,true,
+                UserState.ACTIVE,role,location,null);
+        Optional<Users> usersOptional=Optional.of(users);
+        when(userRepository.findByUserName("duc")).thenReturn(usersOptional);
+        ResponseMessage expected=new ResponseMessage(HttpStatus.CONFLICT, "You don't " +
+                "have to " +
+                "change your password for the first time you log in because your " +
+                "password has already been changed.", new Date());
+        ResponseMessage actual=userService.changePasswordFirstLogin("duc","123");
+        assertThat(actual.getMessage()).isEqualTo(expected.getMessage());
+        assertThat(actual.getStatus()).isEqualTo(expected.getStatus());
+    }
+    @Test
+    void changePasswordFirstLogin_WhenNewPasswordEqualNewPassword_Expect_ReturnResponseMessage(){
+        Role role=mock(Role.class);
+        Location location=mock(Location.class);
+        Users users=new Users("SD0001","duc","nguyen","ducnguyen","123",null,null,true,
+                UserState.ACTIVE,role,location,null);
+        Optional<Users> usersOptional=Optional.of(users);
+        when(userRepository.findByUserName("duc")).thenReturn(usersOptional);
     }
 
 }
