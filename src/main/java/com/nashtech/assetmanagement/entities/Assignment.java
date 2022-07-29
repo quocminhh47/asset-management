@@ -39,7 +39,5 @@ public class Assignment {
 	
 	@Column()
 	private String note;
-
-	@Column(name = "assigned_date")
-	private Date assignedDate;
+	
 }
