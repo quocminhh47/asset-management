@@ -32,12 +32,12 @@ public class Assignment {
 	@ManyToOne
     @MapsId("assetCode")
     @JoinColumn(name = "asset_code", columnDefinition = "VARCHAR(10)")
-	private Asset assetCode;
+	private Asset asset;
 	
 	@Column(length = 50)
-	private AssetState state;
+	private String state;
 	
 	@Column()
 	private String note;
-	
+
 }
