@@ -69,8 +69,10 @@ public class GlobalExceptionHandler  extends ResponseEntityExceptionHandler {
             HttpStatus status,
             WebRequest request) {
         List<String> errors = new ArrayList<String>();
+        String message="";
         for (FieldError error : ex.getBindingResult().getFieldErrors()) {
             errors.add(error.getField() + ": " + error.getDefaultMessage());
+            message=error.getDefaultMessage();
         }
         for (ObjectError error : ex.getBindingResult().getGlobalErrors()) {
             errors.add(error.getObjectName() + ": " + error.getDefaultMessage());
@@ -78,7 +80,7 @@ public class GlobalExceptionHandler  extends ResponseEntityExceptionHandler {
 
         ResponseErrorMessage apiError =
                 new ResponseErrorMessage(HttpStatus.BAD_REQUEST,
-                        ex.getLocalizedMessage(), errors,new Date());
+                        message, errors,new Date());
         return handleExceptionInternal(
                 ex, apiError, headers, apiError.getStatus(), request);
     }

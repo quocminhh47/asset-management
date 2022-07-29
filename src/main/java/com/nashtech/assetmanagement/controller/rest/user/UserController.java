@@ -6,8 +6,10 @@ import com.nashtech.assetmanagement.dto.request.UserRequestDto;
 import com.nashtech.assetmanagement.dto.response.LocationResponseDTO;
 import com.nashtech.assetmanagement.dto.response.ResponseMessage;
 import com.nashtech.assetmanagement.dto.response.ResponseUserDTO;
+import com.nashtech.assetmanagement.dto.response.UserDto;
 import com.nashtech.assetmanagement.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -24,13 +26,15 @@ public class UserController {
     }
 
     @PostMapping("/admin/api/create")
-    public void createNewUser(@RequestBody @Valid UserRequestDto user){
-        this.userService.createNewUser(user);
+    @ResponseStatus(HttpStatus.OK)
+    public UserDto createNewUser(@RequestBody @Valid UserRequestDto user){
+       return userService.createNewUser(user);
     }
 
     @PutMapping("/admin/api/edit/{id}")
-    public void editUser(@RequestBody @Valid UserRequestDto user, @PathVariable("id") String staffCode){
-        this.userService.editUser(user,staffCode);
+    @ResponseStatus(HttpStatus.OK)
+    public UserDto editUser(@RequestBody @Valid UserRequestDto user, @PathVariable("id") String staffCode){
+        return userService.editUser(user,staffCode);
     }
 
     @GetMapping("/admin/api/location/{staffCode}")
