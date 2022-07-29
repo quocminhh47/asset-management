@@ -3,6 +3,8 @@ package com.nashtech.assetmanagement.service.impl;
 import com.nashtech.assetmanagement.dto.request.RequestCategoryDTO;
 import com.nashtech.assetmanagement.dto.response.ResponseCategoryDTO;
 import com.nashtech.assetmanagement.entities.Category;
+import com.nashtech.assetmanagement.exception.NotUniqueException;
+import com.nashtech.assetmanagement.exception.ResourceNotFoundException;
 import com.nashtech.assetmanagement.mapper.CategoryMapper;
 import com.nashtech.assetmanagement.repositories.CategoryRepository;
 import org.assertj.core.api.Assertions;
@@ -10,7 +12,10 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import java.util.List;
+import java.util.Optional;
 
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
@@ -37,7 +42,7 @@ public class CategoryServiceImplTest {
         when(categoryRepository.findAll()).thenReturn(categories);
         when(categoryMapper.ListCategoriesToListResponseCategories(categories)).thenReturn(expected);
         List<ResponseCategoryDTO> actual =categoryServiceImpl.getAllCategory();
-        Assertions.assertThat(actual).isEqualTo(expected);
+        assertThat(actual).isEqualTo(expected);
     }
     @Test
     public void createCategory_WhenRequestValid_Expect_ReturnCategory(){
@@ -47,7 +52,15 @@ public class CategoryServiceImplTest {
         ResponseCategoryDTO expected=mock(ResponseCategoryDTO.class);
         when(categoryMapper.categoryToResponseCategoryDTO(category)).thenReturn(expected);
         ResponseCategoryDTO actual=categoryServiceImpl.createCategory(requestCategoryDTO);
-        Assertions.assertThat(actual).isEqualTo(expected);
+        assertThat(actual).isEqualTo(expected);
     }
-
+    @Test
+    public void createCategory_WhenCategoryPrefixNotUnique_Expect_ReturnCategory(){
+        RequestCategoryDTO requestCategoryDTO=new RequestCategoryDTO("LT","Laptop");
+        when(categoryRepository.existsCategoriesById("LT")).thenReturn(true);
+        NotUniqueException exception= assertThrows(NotUniqueException.class,
+                () -> categoryServiceImpl.createCategory(requestCategoryDTO));
+        assertThat(exception.getMessage()).isEqualTo("Please enter a different category. " +
+                "prefix is already existed.");
+    }
 }
