@@ -33,7 +33,6 @@ public class UserController {
     }
 
     @PutMapping("/admin/api/edit/{id}")
-    @CrossOrigin
     @ResponseStatus(HttpStatus.OK)
     public UserDto editUser(@RequestBody @Valid UserRequestDto user, @PathVariable("id") String staffCode){
         return userService.editUser(user,staffCode);

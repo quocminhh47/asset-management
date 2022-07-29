@@ -57,7 +57,7 @@ public class Users {
 	@JoinColumn(name = "location_id")
 	private Location location;
 
-	@OneToMany(fetch = FetchType.LAZY, mappedBy = "assignedBy")
+	@OneToMany( mappedBy = "assignedBy")
 	private List<Assignment> assignments;
 
 }
