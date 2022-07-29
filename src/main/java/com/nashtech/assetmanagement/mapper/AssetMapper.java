@@ -11,6 +11,7 @@ import org.modelmapper.TypeToken;
 import org.springframework.stereotype.Component;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Component
 public class AssetMapper {
@@ -25,5 +26,10 @@ public class AssetMapper {
     }
     public Asset RequestAssetToAsset(RequestCreateAsset requestCreateAsset){
         return mapper.map(requestCreateAsset,Asset.class);
+    }
+    public List<ResponseAssetDTO> getAssetListToResponseAssetDTOList(List<Asset> assetList){
+        List<ResponseAssetDTO> responseList = assetList.stream()
+                .map(asset -> mapper.map(asset,ResponseAssetDTO.class)).collect(Collectors.toList());
+        return responseList;
     }
 }

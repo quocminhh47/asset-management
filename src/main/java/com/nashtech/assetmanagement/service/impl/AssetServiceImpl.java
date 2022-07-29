@@ -16,6 +16,8 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
+
 @Service
 @Slf4j
 public class AssetServiceImpl implements AssetService {
@@ -61,6 +63,14 @@ public class AssetServiceImpl implements AssetService {
         asset.setLocation(location);
         asset = assetRepository.save(asset);
         return assetMapper.assetToResponseAssetDTO(asset);
+    }
+
+    @Override
+    public List<ResponseAssetDTO> getAssetByCodeOrName(String text) {
+        List<Asset> assetList = assetRepository.getAssetByAssetCodeContainingIgnoreCaseOrAssetNameContainingIgnoreCase(text,text);
+
+        List<ResponseAssetDTO> responseList = assetMapper.getAssetListToResponseAssetDTOList(assetList);
+        return responseList;
     }
 
 }

@@ -25,7 +25,9 @@ import org.modelmapper.ModelMapper;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -152,7 +154,7 @@ public class UserServiceImplTest {
         List<UserDto> responseList = mock(ArrayList.class);
         when(userRepository.findByStaffCodeAndName("text")).thenReturn(usersList);
         when(userMapper.mapListUserToListUserDto(usersList)).thenReturn(responseList);
-        List<UserDto> result = userService.getUsersByStaffCodeOrName("text");
+        List<UserDto> result = userService.getUsersByStaffCodeOrName("text","location");
         assertThat(result).isEqualTo(responseList);
     }
 

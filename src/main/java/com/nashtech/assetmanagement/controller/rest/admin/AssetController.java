@@ -6,6 +6,7 @@ import com.nashtech.assetmanagement.service.AssetService;
 import com.nashtech.assetmanagement.service.impl.AssetServiceImpl;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
@@ -27,4 +28,9 @@ public class AssetController {
     public ResponseAssetDTO createAsset(@Valid @RequestBody RequestCreateAsset requestCreateAsset){
         return assetService.createAsset(requestCreateAsset);
     }
+    @GetMapping("/search")
+    public ResponseEntity<List<ResponseAssetDTO>> searchAssetByCodeOrName(@RequestParam("text")String text){
+        return ResponseEntity.ok(assetService.getAssetByCodeOrName(text));
+    }
+
 }

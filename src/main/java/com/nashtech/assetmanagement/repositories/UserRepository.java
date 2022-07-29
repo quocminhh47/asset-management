@@ -23,6 +23,7 @@ public interface UserRepository extends JpaRepository<Users, String> {
     @Query(value = " select * from users where lower(staff_code) LIKE %:text% OR lower(concat(first_name,' ',last_name)) LIKE %:text%",nativeQuery = true)
     List<Users> findByStaffCodeAndName(@Param("text") String text);
 
+
 //    @Query(value = "SELECT * FROM users u" +
 //            " where ((u.staff_code like %:text%) or" +
 //            " (concat(u.first_name, u.last_name)) like %:text%)" +

@@ -19,7 +19,7 @@ public interface UserService {
 
     UserDto editUser(UserRequestDto user,String staffCode);
     LocationResponseDTO getLocationByStaffCode(String staffCode);
-    List<UserDto> getUsersByStaffCodeOrName(String text);
+    List<UserDto> getUsersByStaffCodeOrName(String text,String location);
 
     UserPrinciple loadUserByUsername(String userName)
             throws UsernameNotFoundException;
