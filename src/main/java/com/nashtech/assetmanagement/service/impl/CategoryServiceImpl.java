@@ -31,8 +31,8 @@ public class CategoryServiceImpl implements CategoryService {
     @Override
     public ResponseCategoryDTO createCategory(RequestCategoryDTO requestCategoryDTO){
         if (categoryRepository.existsCategoriesById(requestCategoryDTO.getId())){
-            throw new NotUniqueException(" Please enter a different category. " +
-                    "Prefix is already existed.");
+            throw new NotUniqueException("Please enter a different category. " +
+                    "prefix is already existed.");
         }
         Category category=categoryMapper.RequestCategoryToCategory(requestCategoryDTO);
         category=categoryRepository.save(category);

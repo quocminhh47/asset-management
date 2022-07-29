@@ -31,8 +31,8 @@ import java.util.Date;
 import java.util.Optional;
 
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.*;
+
 @ExtendWith(MockitoExtension.class)
 public class UserServiceImplTest {
     @Mock
@@ -130,9 +130,14 @@ public class UserServiceImplTest {
         Role role=mock(Role.class);
         Location location=mock(Location.class);
         Users users=new Users("SD0001","duc","nguyen","ducnguyen","123",null,null,true,
-                UserState.ACTIVE,role,location,null);
+                UserState.INIT,role,location,null);
         Optional<Users> usersOptional=Optional.of(users);
         when(userRepository.findByUserName("duc")).thenReturn(usersOptional);
+        when(passwordEncoder.matches("123",users.getPassword())).thenReturn(true);
+        ResponseMessage expected=new ResponseMessage(HttpStatus.CONFLICT, "The new password must be " +
+                "different from the previous password.", new Date());
+        ResponseMessage actual=userService.changePasswordFirstLogin("duc","123");
+        assertThat(actual.getMessage()).isEqualTo(expected.getMessage());
+        assertThat(actual.getStatus()).isEqualTo(expected.getStatus());
     }
-
 }
