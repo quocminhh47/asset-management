@@ -128,7 +128,7 @@ public class UserServiceImplTest {
         UserRequestDto userRequest = mock(UserRequestDto.class);
         when(userRepository.findByStaffCode("sd0001")).thenReturn(Optional.empty());
         ResourceNotFoundException e = Assertions.assertThrows(ResourceNotFoundException.class,
-                () -> userService.editUser(userRequest,"sd0001"));
+                () -> userServiceImpl.editUser(userRequest,"sd0001"));
         assertThat(e.getMessage()).isEqualTo("Staff code not found");
     }
     @Test
@@ -138,7 +138,7 @@ public class UserServiceImplTest {
         when(userRepository.findByStaffCode("sd0001")).thenReturn(Optional.of(user));
         when(roleRepository.findByName(userRequest.getRoleName())).thenReturn(Optional.empty());
         ResourceNotFoundException e = Assertions.assertThrows(ResourceNotFoundException.class,
-                () -> userService.editUser(userRequest,"sd0001"));
+                () -> userServiceImpl.editUser(userRequest,"sd0001"));
         assertThat(e.getMessage()).isEqualTo("Role name not found");
     }
 
@@ -150,14 +150,14 @@ public class UserServiceImplTest {
         when(userRepository.findByStaffCode("sd0001")).thenReturn(Optional.of(user));
         when(user.getLocation()).thenReturn(location);
         when(locationMapper.locationToLocationDTO(location)).thenReturn(response);
-        LocationResponseDTO result = userService.getLocationByStaffCode("sd0001");
+        LocationResponseDTO result = userServiceImpl.getLocationByStaffCode("sd0001");
         assertThat(result).isEqualTo(response);
     }
     @Test
     void getLocationByStaffCode_ShouldThrowResourceNotFoundEx_WhenStaffCodeIncorrect(){
         when(userRepository.findByStaffCode("sd0001")).thenReturn(Optional.empty());
         ResourceNotFoundException e = Assertions.assertThrows(ResourceNotFoundException.class,
-                () -> userService.getLocationByStaffCode("sd0001"));
+                () -> userServiceImpl.getLocationByStaffCode("sd0001"));
         assertThat(e.getMessage()).isEqualTo("Staff code not found");
     }
     @Test
@@ -166,7 +166,7 @@ public class UserServiceImplTest {
         List<UserDto> responseList = mock(ArrayList.class);
         when(userRepository.findByStaffCodeAndName("text")).thenReturn(usersList);
         when(userMapper.mapListUserToListUserDto(usersList)).thenReturn(responseList);
-        List<UserDto> result = userService.getUsersByStaffCodeOrName("text","location");
+        List<UserDto> result = userServiceImpl.getUsersByStaffCodeOrName("text","location");
         assertThat(result).isEqualTo(responseList);
     }
 
