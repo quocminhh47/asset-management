@@ -1,11 +1,13 @@
 package com.nashtech.assetmanagement.entities;
 
+import com.nashtech.assetmanagement.enums.AssetState;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import javax.persistence.*;
+import java.util.Date;
 
 @Entity
 @Table(name = "assignment")
@@ -33,8 +35,11 @@ public class Assignment {
 	private Asset assetCode;
 	
 	@Column(length = 50)
-	private String state;
+	private AssetState state;
 	
 	@Column()
 	private String note;
+
+	@Column(name = "assigned_date")
+	private Date assignedDate;
 }
