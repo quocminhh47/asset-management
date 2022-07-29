@@ -7,6 +7,8 @@ import com.nashtech.assetmanagement.dto.response.*;
 import com.nashtech.assetmanagement.sercurity.userdetail.UserPrinciple;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 
+import java.util.List;
+
 public interface UserService {
 
     boolean isUsernameExist(String username);
@@ -17,6 +19,7 @@ public interface UserService {
 
     UserDto editUser(UserRequestDto user,String staffCode);
     LocationResponseDTO getLocationByStaffCode(String staffCode);
+    List<UserDto> getUsersByStaffCodeOrName(String text);
 
     UserPrinciple loadUserByUsername(String userName)
             throws UsernameNotFoundException;

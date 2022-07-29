@@ -20,6 +20,8 @@ public interface UserRepository extends JpaRepository<Users, String> {
     Page<Users> findAllByOrderByFirstNameAsc(Pageable pageable, @Param("staffCode") String staffCode, @Param("location") String location);
     @Query(value = "select staff_code from users where staff_code LIKE 'SD%'",nativeQuery = true)
     List<String> findAllStaffCode();
+    @Query(value = " select * from users where lower(staff_code) LIKE %:text% OR lower(concat(first_name,' ',last_name)) LIKE %:text%",nativeQuery = true)
+    List<Users> findByStaffCodeAndName(@Param("text") String text);
 
 //    @Query(value = "SELECT * FROM users u" +
 //            " where ((u.staff_code like %:text%) or" +
@@ -46,10 +48,6 @@ public interface UserRepository extends JpaRepository<Users, String> {
                                 @Param("staffCode") String loggedStaffCode,
                                 @Param("location") String location);
 
-    @Query(value = "select count(*) FROM users WHERE staff_code like 'SD%'",nativeQuery = true)
-    int countUsersByStaffCode();
-    @Query(value = "select count(*) from users where first_name= :firstname AND last_name=:lastname",nativeQuery = true)
-    int countUsersByFirstNameAndLastName(@Param("firstname")String firstName, @Param("lastname")String lastName);
-
+    int countUsersByFirstNameAndLastName(String firstName,String lastName);
     Optional<Users> findByStaffCode(String staffCode);
 }

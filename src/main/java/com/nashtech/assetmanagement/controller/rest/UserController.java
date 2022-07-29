@@ -12,6 +12,7 @@ import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
 import java.net.URI;
+import java.util.List;
 
 @RequestMapping("")
 @RestController
@@ -31,7 +32,10 @@ public class UserController {
     @PutMapping("/admin/api/edit/{id}")
     public ResponseEntity<UserDto> editUser(@RequestBody @Valid UserRequestDto user, @PathVariable("id") String staffCode){
         return ResponseEntity.ok(this.userService.editUser(user,staffCode));
-
+    }
+    @GetMapping("admin/api/searchUser")
+    public ResponseEntity<List<UserDto>> getUserListByStaffCodeOrName(@RequestParam("text")String text){
+        return ResponseEntity.ok(this.userService.getUsersByStaffCodeOrName(text));
     }
 
     @GetMapping("/admin/api/location/{staffCode}")

@@ -43,6 +43,7 @@ import org.springframework.stereotype.Service;
 import java.util.Date;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 @Service
 @Slf4j
@@ -148,6 +149,13 @@ public class UserServiceImpl implements UserService {
         return locationMapper.locationToLocationDTO(location);
     }
 
+
+    @Override
+    public List<UserDto> getUsersByStaffCodeOrName(String text) {
+        List<Users> usersList = userRepository.findByStaffCodeAndName(text.toLowerCase());
+        List<UserDto> userDtoList = userMapper.mapListUserToListUserDto(usersList);
+        return userDtoList;
+    }
 
     @Override
     public ListUsersResponse getAllUserOrderByFirstNameAsc(int pageNo,

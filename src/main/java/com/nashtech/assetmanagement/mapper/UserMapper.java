@@ -3,12 +3,16 @@ package com.nashtech.assetmanagement.mapper;
 import com.nashtech.assetmanagement.dto.request.UserRequestDto;
 import com.nashtech.assetmanagement.dto.response.ResponseUserDTO;
 import com.nashtech.assetmanagement.dto.response.SingleUserResponse;
+import com.nashtech.assetmanagement.dto.response.UserDto;
 import com.nashtech.assetmanagement.entities.Location;
 import com.nashtech.assetmanagement.entities.Role;
 import com.nashtech.assetmanagement.entities.Users;
 import lombok.AllArgsConstructor;
 import org.modelmapper.ModelMapper;
 import org.springframework.stereotype.Component;
+
+import java.util.List;
+import java.util.stream.Collectors;
 
 @Component
 @AllArgsConstructor
@@ -41,4 +45,10 @@ public class UserMapper {
         users.setGender(user.getGender());
         users.setRole(role);
     }
+
+    public List<UserDto> mapListUserToListUserDto(List<Users> usersList){
+        List<UserDto> result = usersList.stream().map(users -> mapper.map(users,UserDto.class)).collect(Collectors.toList());
+        return result;
+    }
+
 }

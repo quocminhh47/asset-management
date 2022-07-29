@@ -33,6 +33,8 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 import static org.mockito.Mockito.*;
@@ -148,6 +150,15 @@ public class UserServiceImplTest {
         ResourceNotFoundException e = Assertions.assertThrows(ResourceNotFoundException.class,
                 () -> userService.getLocationByStaffCode("sd0001"));
         assertThat(e.getMessage()).isEqualTo("Staff code not found");
+    }
+    @Test
+    void getUserByStaffCodeOrName_ShouldReturnUserDtoList_WhenStaffCodeOrNameExist(){
+        List<Users> usersList = mock(ArrayList.class);
+        List<UserDto> responseList = mock(ArrayList.class);
+        when(userRepository.findByStaffCodeAndName("text")).thenReturn(usersList);
+        when(userMapper.mapListUserToListUserDto(usersList)).thenReturn(responseList);
+        List<UserDto> result = userService.getUsersByStaffCodeOrName("text");
+        assertThat(result).isEqualTo(responseList);
     }
 
 
