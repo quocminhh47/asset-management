@@ -2,6 +2,7 @@ package com.nashtech.assetmanagement.exception.handlers;
 
 import com.nashtech.assetmanagement.dto.response.ErrorResponse;
 import com.nashtech.assetmanagement.dto.response.ResponseErrorMessage;
+import com.nashtech.assetmanagement.exception.DateInvalidException;
 import com.nashtech.assetmanagement.exception.NotUniqueException;
 import com.nashtech.assetmanagement.exception.ResourceNotFoundException;
 import com.nashtech.assetmanagement.exception.UnauthorizedException;
@@ -41,6 +42,12 @@ public class GlobalExceptionHandler  extends ResponseEntityExceptionHandler {
     protected ResponseEntity<ErrorResponse> handleUnauthorizedException(RuntimeException exception) {
         ErrorResponse error = new ErrorResponse("401", exception.getMessage());
         return new ResponseEntity<>(error, HttpStatus.UNAUTHORIZED);
+    }
+
+    @ExceptionHandler({DateInvalidException.class, IllegalArgumentException.class})
+    protected ResponseEntity<ErrorResponse> handleDateInvalidException(RuntimeException exception) {
+        ErrorResponse error = new ErrorResponse(HttpStatus.BAD_REQUEST.toString(), exception.getMessage());
+        return new ResponseEntity<>(error, HttpStatus.BAD_REQUEST);
     }
 //    @Override
 //    protected ResponseEntity<Object> handleMethodArgumentNotValid(MethodArgumentNotValidException ex, HttpHeaders headers, HttpStatus status, WebRequest request) {
