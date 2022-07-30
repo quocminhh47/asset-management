@@ -23,7 +23,7 @@ public class AssignmentMapper {
         Assignment assignment = new Assignment();
         assignment.setId(assignmentId);
         assignment.setNote(request.getNote());
-        assignment.setState("AVAILABLE");
+        assignment.setState("Waiting for acceptance");
         return assignment;
     }
 
