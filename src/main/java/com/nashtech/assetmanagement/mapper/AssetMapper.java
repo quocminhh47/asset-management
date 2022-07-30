@@ -1,16 +1,16 @@
 package com.nashtech.assetmanagement.mapper;
 
 
-import com.nashtech.assetmanagement.dto.request.RequestCreateAsset;
-import com.nashtech.assetmanagement.dto.response.ResponseAssetDTO;
-import com.nashtech.assetmanagement.dto.response.ResponseCategoryDTO;
-import com.nashtech.assetmanagement.entities.Asset;
-import com.nashtech.assetmanagement.entities.Category;
+import java.util.List;
+import java.util.stream.Collectors;
+
 import org.modelmapper.ModelMapper;
-import org.modelmapper.TypeToken;
 import org.springframework.stereotype.Component;
 
-import java.util.List;
+import com.nashtech.assetmanagement.dto.request.RequestCreateAsset;
+import com.nashtech.assetmanagement.dto.response.AssetResponseDto;
+import com.nashtech.assetmanagement.dto.response.ResponseAssetDTO;
+import com.nashtech.assetmanagement.entities.Asset;
 
 @Component
 public class AssetMapper {
@@ -26,4 +26,10 @@ public class AssetMapper {
     public Asset RequestAssetToAsset(RequestCreateAsset requestCreateAsset){
         return mapper.map(requestCreateAsset,Asset.class);
     }
+    
+    public List<AssetResponseDto> mapperListAsset(List<Asset> list) {
+		List<AssetResponseDto> result = list.stream().map(item -> mapper.map(item, AssetResponseDto.class))
+				.collect(Collectors.toList());
+		return result;
+	}
 }

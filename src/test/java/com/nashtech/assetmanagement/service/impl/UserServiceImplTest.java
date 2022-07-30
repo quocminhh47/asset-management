@@ -1,8 +1,38 @@
 package com.nashtech.assetmanagement.service.impl;
 
+import static com.nashtech.assetmanagement.utils.AppConstants.DEFAULT_SORT_BY;
+import static com.nashtech.assetmanagement.utils.AppConstants.DEFAULT_SORT_DIRECTION;
+import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
+
+import java.util.Date;
+import java.util.Optional;
+
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import org.mockito.Mockito;
+import org.mockito.junit.jupiter.MockitoExtension;
+import org.modelmapper.ModelMapper;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
+import org.springframework.http.HttpStatus;
+import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.crypto.password.PasswordEncoder;
+
+import com.nashtech.assetmanagement.dto.request.RequestChangePassDto;
 import com.nashtech.assetmanagement.dto.request.UserRequestDto;
 import com.nashtech.assetmanagement.dto.response.ListUsersResponse;
 import com.nashtech.assetmanagement.dto.response.ResponseMessage;
+import com.nashtech.assetmanagement.dto.response.ResponseUserDTO;
 import com.nashtech.assetmanagement.dto.response.UserDto;
 import com.nashtech.assetmanagement.entities.Location;
 import com.nashtech.assetmanagement.entities.Role;
@@ -17,29 +47,6 @@ import com.nashtech.assetmanagement.repositories.RoleRepository;
 import com.nashtech.assetmanagement.repositories.UserRepository;
 import com.nashtech.assetmanagement.sercurity.jwt.JwtUtils;
 import com.nashtech.assetmanagement.service.AuthenticationService;
-import org.junit.jupiter.api.Assertions;
-import org.junit.jupiter.api.DisplayName;
-import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.InjectMocks;
-import org.mockito.Mock;
-import org.mockito.junit.jupiter.MockitoExtension;
-import org.modelmapper.ModelMapper;
-import org.springframework.http.HttpStatus;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Pageable;
-import org.springframework.data.domain.Sort;
-import org.springframework.security.authentication.AuthenticationManager;
-import org.springframework.security.crypto.password.PasswordEncoder;
-
-import java.util.Date;
-import java.util.Optional;
-
-import static com.nashtech.assetmanagement.utils.AppConstants.DEFAULT_SORT_BY;
-import static com.nashtech.assetmanagement.utils.AppConstants.DEFAULT_SORT_DIRECTION;
-import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
-import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
 public class UserServiceImplTest {
@@ -261,4 +268,5 @@ public class UserServiceImplTest {
         assertThat(actual.getMessage()).isEqualTo(expected.getMessage());
         assertThat(actual.getStatus()).isEqualTo(expected.getStatus());
     }
+
 }

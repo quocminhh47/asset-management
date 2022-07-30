@@ -1,14 +1,20 @@
 package com.nashtech.assetmanagement.controller.rest.admin;
 
+import java.util.List;
+
+import javax.validation.Valid;
+
+import org.springframework.http.HttpStatus;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.ResponseStatus;
+import org.springframework.web.bind.annotation.RestController;
+
 import com.nashtech.assetmanagement.dto.request.RequestCategoryDTO;
 import com.nashtech.assetmanagement.dto.response.ResponseCategoryDTO;
 import com.nashtech.assetmanagement.service.CategoryService;
-import org.springframework.http.HttpStatus;
-import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.*;
-
-import javax.validation.Valid;
-import java.util.List;
 
 @RestController
 @RequestMapping("/admin/api/categories")

@@ -1,11 +1,26 @@
 package com.nashtech.assetmanagement.service.impl;
 
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Optional;
+
+import org.modelmapper.ModelMapper;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
+import org.springframework.stereotype.Service;
+
 import com.nashtech.assetmanagement.dto.request.RequestCreateAsset;
+import com.nashtech.assetmanagement.dto.response.AssetResponseDto;
+import com.nashtech.assetmanagement.dto.response.ListAssetResponseDto;
 import com.nashtech.assetmanagement.dto.response.ResponseAssetDTO;
 import com.nashtech.assetmanagement.entities.Asset;
 import com.nashtech.assetmanagement.entities.Category;
 import com.nashtech.assetmanagement.entities.Location;
 import com.nashtech.assetmanagement.entities.Users;
+import com.nashtech.assetmanagement.enums.AssetState;
 import com.nashtech.assetmanagement.exception.ResourceNotFoundException;
 import com.nashtech.assetmanagement.mapper.AssetMapper;
 import com.nashtech.assetmanagement.repositories.AssetRepository;
@@ -31,6 +46,9 @@ public class AssetServiceImpl implements AssetService {
     private final LocationRepository locationRepository;
 
     private final AssetMapper assetMapper;
+
+    @Autowired
+	private ModelMapper modelMapper;
 
     @Autowired
     public AssetServiceImpl(AssetRepository assetRepository, CategoryRepository categoryRepository, UserRepository userRepository, LocationRepository locationRepository, AssetMapper assetMapper) {
@@ -72,4 +90,43 @@ public class AssetServiceImpl implements AssetService {
         return assetMapper.assetToResponseAssetDTO(asset);
     }
 
+    @Override
+	public ListAssetResponseDto getListAsset(String userId, List<String> categoryId, List<String> state, String keyword,
+			Integer page, Integer size) {
+		Pageable pageable = PageRequest.of(page - 1, size, Sort.by(Sort.Direction.ASC, "code"));
+		Page<Asset> pageAsset = null;
+		long totalItems = 0;
+		Optional<Users> optionalUsers = userRepository.findById(userId);
+		if (!optionalUsers.isPresent()) {
+			throw new ResourceNotFoundException(String.format("user.not.found.with.code:%s", userId));
+		}
+		Users user = optionalUsers.get();
+		List<AssetState> assetState = new ArrayList<>();
+
+		if(state.size() == 0 && categoryId.size() == 0) {
+			pageAsset = assetRepository.findByUser(user, pageable);
+			totalItems = pageAsset.getTotalPages();
+		}
+		else if (state.size() > 0) {
+			for (int i = 0; i < state.size(); i++) {
+				assetState.add(AssetState.valueOf(state.get(i)));
+			}
+			if (categoryId.size() == 0) {
+				pageAsset = assetRepository.getListAssetByState(userId, assetState, keyword, pageable);
+				totalItems = pageAsset.getTotalPages();
+			} else {
+				pageAsset = assetRepository.getListAsset(userId, categoryId, assetState, keyword, pageable);
+				totalItems = pageAsset.getTotalPages();
+			}
+		}
+		else if (state.size() == 0) {
+			pageAsset = assetRepository.getListAssetByCategory(userId, categoryId, keyword, pageable);
+			totalItems = pageAsset.getTotalPages();
+		}
+
+		List<Asset> dto = pageAsset.getContent();
+		List<AssetResponseDto> list = assetMapper.mapperListAsset(dto);
+		ListAssetResponseDto result = new ListAssetResponseDto(list, totalItems);
+		return result;
+	}
 }
