@@ -1,9 +1,6 @@
 package com.nashtech.assetmanagement.dto.response;
 
 
-import com.nashtech.assetmanagement.entities.Asset;
-import com.nashtech.assetmanagement.entities.AssignmentId;
-import com.nashtech.assetmanagement.entities.Users;
 import lombok.*;
 
 import java.util.Date;
@@ -12,7 +9,7 @@ import java.util.Date;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-public class AssignmentResponseDTO {
+public class ResponseAssignmentDto {
 
     private String assignedTo;
     private String assignedBy;

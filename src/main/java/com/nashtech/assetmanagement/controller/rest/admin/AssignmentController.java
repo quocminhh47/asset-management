@@ -1,7 +1,7 @@
 package com.nashtech.assetmanagement.controller.rest.admin;
 
 import com.nashtech.assetmanagement.dto.request.RequestAssignmentDTO;
-import com.nashtech.assetmanagement.dto.response.AssignmentResponseDTO;
+import com.nashtech.assetmanagement.dto.response.ResponseAssignmentDto;
 import com.nashtech.assetmanagement.service.AssignmentService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -23,7 +23,7 @@ public class AssignmentController {
     }
 
     @PostMapping("/create")
-    public ResponseEntity<AssignmentResponseDTO> createNewAssignment(@RequestBody RequestAssignmentDTO request){
+    public ResponseEntity<ResponseAssignmentDto> createNewAssignment(@RequestBody RequestAssignmentDTO request){
         return ResponseEntity.created(URI.create("/admin/api/assignment/create"))
                 .body(this.assignmentService.createNewAssignment(request));
     }

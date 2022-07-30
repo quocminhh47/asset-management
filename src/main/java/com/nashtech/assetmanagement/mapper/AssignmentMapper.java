@@ -2,13 +2,11 @@ package com.nashtech.assetmanagement.mapper;
 
 
 import com.nashtech.assetmanagement.dto.request.RequestAssignmentDTO;
-import com.nashtech.assetmanagement.dto.response.AssignmentResponseDTO;
+import com.nashtech.assetmanagement.dto.response.ResponseAssignmentDto;
 import com.nashtech.assetmanagement.entities.Assignment;
 import com.nashtech.assetmanagement.entities.AssignmentId;
 import org.modelmapper.ModelMapper;
 import org.springframework.stereotype.Component;
-
-import java.util.Date;
 
 @Component
 public class AssignmentMapper {
@@ -27,8 +25,8 @@ public class AssignmentMapper {
         return assignment;
     }
 
-    public AssignmentResponseDTO MapAssignmentToResponseDto(Assignment assignment) {
-        AssignmentResponseDTO responseDTO = new AssignmentResponseDTO();
+    public ResponseAssignmentDto MapAssignmentToResponseDto(Assignment assignment) {
+        ResponseAssignmentDto responseDTO = new ResponseAssignmentDto();
         responseDTO.setAssignedBy(assignment.getAssignedBy().getStaffCode());
         responseDTO.setAssignedTo(assignment.getAssignedBy().getStaffCode());
         responseDTO.setAssignedDate(assignment.getId().getAssignedDate());

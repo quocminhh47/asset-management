@@ -1,6 +1,6 @@
 package com.nashtech.assetmanagement.service.impl;
 
-import com.nashtech.assetmanagement.dto.request.UserRequestDto;
+import com.nashtech.assetmanagement.dto.request.RequestUserDto;
 import com.nashtech.assetmanagement.dto.response.LocationResponseDTO;
 import com.nashtech.assetmanagement.dto.response.ListUsersResponse;
 import com.nashtech.assetmanagement.dto.response.ResponseMessage;
@@ -76,7 +76,7 @@ public class UserServiceImplTest {
         Location location = mock(Location.class);
         Role role = mock(Role.class);
         Users user = mock(Users.class);
-        UserRequestDto userRequest = mock(UserRequestDto.class);
+        RequestUserDto userRequest = mock(RequestUserDto.class);
         UserDto userResponse = mock(UserDto.class);
         when(locationRepository.findByName(userRequest.getLocationName())).thenReturn(Optional.of(location));
         when(roleRepository.findByName(userRequest.getRoleName())).thenReturn(Optional.of(role));
@@ -91,7 +91,7 @@ public class UserServiceImplTest {
     @Test
     void createNewUser_ShouldThrowResourceNotFoundEx_WhenRequestRoleNameIncorrect(){
         Location location = mock(Location.class);
-        UserRequestDto userRequest = mock(UserRequestDto.class);
+        RequestUserDto userRequest = mock(RequestUserDto.class);
         when(locationRepository.findByName(userRequest.getLocationName())).thenReturn(Optional.of(location));
         when(roleRepository.findByName(userRequest.getRoleName())).thenReturn(Optional.empty());
         ResourceNotFoundException e = Assertions.assertThrows(ResourceNotFoundException.class,
@@ -101,7 +101,7 @@ public class UserServiceImplTest {
     @Test
     void createNewUser_ShouldThrowResourceNotFoundEx_WhenRequestLocationNameIncorrect(){
         Role role = mock(Role.class);
-        UserRequestDto userRequest = mock(UserRequestDto.class);
+        RequestUserDto userRequest = mock(RequestUserDto.class);
         when(locationRepository.findByName(userRequest.getLocationName())).thenReturn(Optional.empty());
         when(roleRepository.findByName(userRequest.getRoleName())).thenReturn(Optional.of(role));
         ResourceNotFoundException e = Assertions.assertThrows(ResourceNotFoundException.class,
@@ -112,7 +112,7 @@ public class UserServiceImplTest {
     void editUser_ShouldReturnUserDto_WhenStaffCodeAndRequestCorrect(){
         Role role = mock(Role.class);
         Users user = mock(Users.class);
-        UserRequestDto userRequest = mock(UserRequestDto.class);
+        RequestUserDto userRequest = mock(RequestUserDto.class);
         UserDto userResponse = mock(UserDto.class);
         when(userRepository.findByStaffCode("sd0001")).thenReturn(Optional.of(user));
         when(roleRepository.findByName(userRequest.getRoleName())).thenReturn(Optional.of(role));
@@ -122,7 +122,7 @@ public class UserServiceImplTest {
     }
     @Test
     void editUser_ShouldThrowResourceNotFoundEx_WhenStaffCodeIncorrect(){
-        UserRequestDto userRequest = mock(UserRequestDto.class);
+        RequestUserDto userRequest = mock(RequestUserDto.class);
         when(userRepository.findByStaffCode("sd0001")).thenReturn(Optional.empty());
         ResourceNotFoundException e = Assertions.assertThrows(ResourceNotFoundException.class,
                 () -> userServiceImpl.editUser(userRequest,"sd0001"));
@@ -130,7 +130,7 @@ public class UserServiceImplTest {
     }
     @Test
     void editUser_ShouldThrowResourceNotFoundEx_WhenRequestRoleIncorrect(){
-        UserRequestDto userRequest = mock(UserRequestDto.class);
+        RequestUserDto userRequest = mock(RequestUserDto.class);
         Users user = mock(Users.class);
         when(userRepository.findByStaffCode("sd0001")).thenReturn(Optional.of(user));
         when(roleRepository.findByName(userRequest.getRoleName())).thenReturn(Optional.empty());

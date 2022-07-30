@@ -2,7 +2,7 @@ package com.nashtech.assetmanagement.controller.rest.user;
 
 import com.nashtech.assetmanagement.dto.request.RequestChangePassDto;
 import com.nashtech.assetmanagement.dto.request.RequestFirstLogin;
-import com.nashtech.assetmanagement.dto.request.UserRequestDto;
+import com.nashtech.assetmanagement.dto.request.RequestUserDto;
 import com.nashtech.assetmanagement.dto.response.LocationResponseDTO;
 import com.nashtech.assetmanagement.dto.response.ResponseMessage;
 import com.nashtech.assetmanagement.dto.response.ResponseUserDTO;
@@ -28,13 +28,13 @@ public class UserController {
 
     @PostMapping("/admin/api/create")
     @ResponseStatus(HttpStatus.OK)
-    public UserDto createNewUser(@RequestBody @Valid UserRequestDto user){
+    public UserDto createNewUser(@RequestBody @Valid RequestUserDto user){
        return userService.createNewUser(user);
     }
 
     @PutMapping("/admin/api/edit/{id}")
     @ResponseStatus(HttpStatus.OK)
-    public UserDto editUser(@RequestBody @Valid UserRequestDto user, @PathVariable("id") String staffCode){
+    public UserDto editUser(@RequestBody @Valid RequestUserDto user, @PathVariable("id") String staffCode){
         return userService.editUser(user,staffCode);
     }
 

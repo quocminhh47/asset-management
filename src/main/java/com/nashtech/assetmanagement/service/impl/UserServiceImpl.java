@@ -2,7 +2,7 @@ package com.nashtech.assetmanagement.service.impl;
 
 import com.nashtech.assetmanagement.dto.request.RequestChangePassDto;
 import com.nashtech.assetmanagement.dto.request.RequestLoginDTO;
-import com.nashtech.assetmanagement.dto.request.UserRequestDto;
+import com.nashtech.assetmanagement.dto.request.RequestUserDto;
 import com.nashtech.assetmanagement.dto.response.*;
 import com.nashtech.assetmanagement.entities.Location;
 import com.nashtech.assetmanagement.entities.Role;
@@ -95,7 +95,7 @@ public class UserServiceImpl implements UserService {
                 token);
     }
     @Override
-    public UserDto createNewUser(UserRequestDto user) {
+    public UserDto createNewUser(RequestUserDto user) {
 
         Optional<Location> location = locationRepository.findByName(user.getLocationName());
         Optional<Role> role = roleRepository.findByName(user.getRoleName());
@@ -119,7 +119,7 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public UserDto editUser(UserRequestDto user, String staffCode) {
+    public UserDto editUser(RequestUserDto user, String staffCode) {
         Optional<Users> usersOptional = userRepository.findByStaffCode(staffCode);
         Optional<Role> roleOptional = roleRepository.findByName(user.getRoleName());
         if (usersOptional.isEmpty()){

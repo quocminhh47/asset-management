@@ -1,6 +1,6 @@
 package com.nashtech.assetmanagement.mapper;
 
-import com.nashtech.assetmanagement.dto.request.UserRequestDto;
+import com.nashtech.assetmanagement.dto.request.RequestUserDto;
 import com.nashtech.assetmanagement.dto.response.ResponseUserDTO;
 import com.nashtech.assetmanagement.dto.response.SingleUserResponse;
 import com.nashtech.assetmanagement.dto.response.UserDto;
@@ -27,7 +27,7 @@ public class UserMapper {
         return mapper.map(users, ResponseUserDTO.class);
     }
 
-    public Users MapToUser(UserRequestDto dto, Role role, Location location){
+    public Users MapToUser(RequestUserDto dto, Role role, Location location){
         Users newUser = new Users();
         newUser.setFirstName(dto.getFirstName());
         newUser.setLastName(dto.getLastName());
@@ -39,7 +39,7 @@ public class UserMapper {
         return newUser;
     }
 
-    public void requestDtoToUser(Users users, UserRequestDto user,Role role) {
+    public void requestDtoToUser(Users users, RequestUserDto user, Role role) {
         users.setBirthDate(user.getBirthDate());
         users.setJoinedDate(user.getJoinedDate());
         users.setGender(user.getGender());

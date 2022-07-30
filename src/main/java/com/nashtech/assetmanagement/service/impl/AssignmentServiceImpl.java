@@ -1,7 +1,7 @@
 package com.nashtech.assetmanagement.service.impl;
 
 import com.nashtech.assetmanagement.dto.request.RequestAssignmentDTO;
-import com.nashtech.assetmanagement.dto.response.AssignmentResponseDTO;
+import com.nashtech.assetmanagement.dto.response.ResponseAssignmentDto;
 import com.nashtech.assetmanagement.entities.Asset;
 import com.nashtech.assetmanagement.entities.Assignment;
 import com.nashtech.assetmanagement.entities.Users;
@@ -32,7 +32,7 @@ public class AssignmentServiceImpl implements AssignmentService {
     }
 
     @Override
-    public AssignmentResponseDTO createNewAssignment(RequestAssignmentDTO request) {
+    public ResponseAssignmentDto createNewAssignment(RequestAssignmentDTO request) {
         Optional<Asset> asset = assetRepository.findById(request.getAssetCode());
         if(asset.isEmpty()){
             throw new ResourceNotFoundException("AssetCode not found");
