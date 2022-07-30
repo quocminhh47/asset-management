@@ -269,29 +269,4 @@ public class UserServiceImplTest {
         assertThat(actual.getStatus()).isEqualTo(expected.getStatus());
     }
 
-    @Test
-	public void changePassword_shouldReturnResponseUserDTO_whenUserIdExist() {
-		Users entity = mock(Users.class);
-		RequestChangePassDto requestDto = mock(RequestChangePassDto.class);
-		ResponseUserDTO expected = mock(ResponseUserDTO.class);
-		
-		when(userRepository.findById("SD001")).thenReturn(Optional.of(entity));
-		when(userRepository.save(entity)).thenReturn(entity);
-		when(modelMapper.map(entity, ResponseUserDTO.class)).thenReturn(expected);
-		
-		ResponseUserDTO actual = userServiceImpl.changePassword(requestDto);
-		
-		verify(entity).setPassword(passwordEncoder.encode(requestDto.getNewPassword()));
-		assertThat(actual).isEqualTo(expected);
-	}
-	
-	@Test
-	public void changePassword_shouldThrowsExceptionNotFound_whenNotFound() {
-		RequestChangePassDto requestDto = mock(RequestChangePassDto.class);
-		Mockito.when(userRepository.findById("SD001")).thenReturn(Optional.ofNullable(null));
-		Exception exception = assertThrows(ResourceNotFoundException.class, () -> {
-			userServiceImpl.changePassword(requestDto);
-		});
-		assertThat(exception.getMessage()).isEqualTo("user.not.found.with.staff.code:SD001");
-	}
 }
