@@ -8,6 +8,22 @@ INSERT INTO public.location(code, name)
 VALUES ('HN', 'HA NOI');
 INSERT INTO public.location(code, name)
 VALUES ('DN', 'DA NANG');
+
+--category
+INSERT INTO public.category(id, name, total_quantity)
+VALUES ('LT','LAPTOP',2);
+INSERT INTO public.category(id, name, total_quantity)
+VALUES ('PC','Personal computer',1);
+
+--asset--
+INSERT INTO public.asset(asset_code, asset_name, installed_date, specification, state, category_id, location_id)
+VALUES ('LT0001','Laptop HP','2000-07-22 07:00:00.000000','laptop hp in 30/7','AVAILABLE','LT','HCM');
+INSERT INTO public.asset(asset_code, asset_name, installed_date, specification, state, category_id, location_id)
+VALUES ('LT0002','Laptop HP','2000-07-22 07:00:00.000000','laptop hp in 30/7','AVAILABLE','LT','HN');
+INSERT INTO public.asset(asset_code, asset_name, installed_date, specification, state, category_id, location_id)
+VALUES ('PC0001','Personal Computer HP','2000-07-22 07:00:00.000000','PC hp in 30/7','AVAILABLE','PC','HCM');
+
+
 --admin--
 INSERT INTO public.users (staff_code, birth_date, first_name, gender, joined_date, last_name, password, username,
                           location_id, role_id, state)
@@ -191,4 +207,3 @@ INSERT INTO users(staff_code,birth_date,first_name,gender,joined_date,last_name,
 VALUES ('SD0008','2000-01-01 00:00:00','Pham','False','2022-01-01 00:00:00','Quoc','$2a$12$s4kBd2orOFTrguMyfogm4O.6AXExpzUnK2x3REaA8xRq4enKt/JAa','INIT','pquoc','HCM',1);
 INSERT INTO users(staff_code,birth_date,first_name,gender,joined_date,last_name,password,state,username,location_id,role_id)
 VALUES ('SD0009','2000-01-01 00:00:00','Nguyen','True','2022-01-01 00:00:00','Trai','$2a$12$s4kBd2orOFTrguMyfogm4O.6AXExpzUnK2x3REaA8xRq4enKt/JAa','INIT','ntrai','HCM',1);
-

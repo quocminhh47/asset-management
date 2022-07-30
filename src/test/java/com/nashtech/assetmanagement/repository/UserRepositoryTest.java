@@ -1,5 +1,6 @@
 package com.nashtech.assetmanagement.repository;
 
+import com.nashtech.assetmanagement.entities.Location;
 import com.nashtech.assetmanagement.repositories.UserRepository;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -9,6 +10,7 @@ import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.jdbc.Sql;
 
 import java.util.List;
+import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
@@ -22,8 +24,8 @@ public class UserRepositoryTest {
 
     @Test
     void findByStaffCodeAndName_ShouldReturnListUser_WhenStaffCodeAndNameExist(){
-        assertEquals(1,userRepository.findByStaffCodeAndName("p ").size());
-        assertEquals(9, userRepository.findByStaffCodeAndName("sd").size());
+        assertEquals(1,userRepository.findByStaffCodeOrNameAndLocationCode("p ","HN").size());
+        assertEquals(7, userRepository.findByStaffCodeOrNameAndLocationCode("sd","HCM").size());
     }
     @Test
     void findStaffCodeList_ShouldReturnStaffCodeList_WhenStaffCodeBeginWithSDExist(){
@@ -34,6 +36,5 @@ public class UserRepositoryTest {
             assertEquals("SD",result.substring(0,2));
         }
     }
-
 
 }

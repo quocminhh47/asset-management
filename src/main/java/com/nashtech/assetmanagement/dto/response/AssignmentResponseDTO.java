@@ -6,6 +6,8 @@ import com.nashtech.assetmanagement.entities.AssignmentId;
 import com.nashtech.assetmanagement.entities.Users;
 import lombok.*;
 
+import java.util.Date;
+
 @Getter
 @Setter
 @NoArgsConstructor
@@ -17,5 +19,5 @@ public class AssignmentResponseDTO {
     private String assetCode;
     private String state;
     private String note;
-
+    private Date assignedDate;
 }

@@ -44,8 +44,8 @@ public class UserController {
     }
 
     @GetMapping("admin/api/searchUser/{location}")
-    public ResponseEntity<List<UserDto>> getUserListByStaffCodeOrName(@RequestParam("text")String text,@PathVariable("location")String location){
-        return ResponseEntity.ok(this.userService.getUsersByStaffCodeOrName(text,location));
+    public ResponseEntity<List<UserDto>> getUserListByStaffCodeOrName(@RequestParam("text")String text,@PathVariable("location")String locationCode){
+        return ResponseEntity.ok(this.userService.getUsersByStaffCodeOrNameAndLocationCode(text,locationCode));
     }
 
     @PostMapping("/user/api/first-login")

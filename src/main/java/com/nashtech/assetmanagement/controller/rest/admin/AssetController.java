@@ -3,7 +3,6 @@ package com.nashtech.assetmanagement.controller.rest.admin;
 import com.nashtech.assetmanagement.dto.request.RequestCreateAsset;
 import com.nashtech.assetmanagement.dto.response.ResponseAssetDTO;
 import com.nashtech.assetmanagement.service.AssetService;
-import com.nashtech.assetmanagement.service.impl.AssetServiceImpl;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -28,9 +27,9 @@ public class AssetController {
     public ResponseAssetDTO createAsset(@Valid @RequestBody RequestCreateAsset requestCreateAsset){
         return assetService.createAsset(requestCreateAsset);
     }
-    @GetMapping("/search")
-    public ResponseEntity<List<ResponseAssetDTO>> searchAssetByCodeOrName(@RequestParam("text")String text){
-        return ResponseEntity.ok(assetService.getAssetByCodeOrName(text));
+    @GetMapping("/searchAsset/{location}")
+    public ResponseEntity<List<ResponseAssetDTO>> searchAssetByCodeOrName(@RequestParam("text")String text,@PathVariable("location") String locationCode){
+        return ResponseEntity.ok(assetService.getAssetByCodeOrNameAndLocationCode(text,locationCode));
     }
 
 }

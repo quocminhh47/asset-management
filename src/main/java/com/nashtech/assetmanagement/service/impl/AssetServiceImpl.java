@@ -17,6 +17,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Optional;
 
 @Service
 @Slf4j
@@ -66,9 +67,12 @@ public class AssetServiceImpl implements AssetService {
     }
 
     @Override
-    public List<ResponseAssetDTO> getAssetByCodeOrName(String text) {
-        List<Asset> assetList = assetRepository.getAssetByAssetCodeContainingIgnoreCaseOrAssetNameContainingIgnoreCase(text,text);
-
+    public List<ResponseAssetDTO> getAssetByCodeOrNameAndLocationCode(String text, String locationCode) {
+        Optional<Location> locationOptional = locationRepository.findById(locationCode);
+        if(locationOptional.isEmpty()){
+            throw new ResourceNotFoundException("Location code not found");
+        }
+        List<Asset> assetList = assetRepository.findAssetByNameOrCodeAndLocationCode(text.toLowerCase(),locationCode);
         List<ResponseAssetDTO> responseList = assetMapper.getAssetListToResponseAssetDTOList(assetList);
         return responseList;
     }

@@ -18,7 +18,6 @@ import com.nashtech.assetmanagement.repositories.UserRepository;
 import com.nashtech.assetmanagement.sercurity.jwt.JwtUtils;
 import com.nashtech.assetmanagement.sercurity.userdetail.UserPrinciple;
 import com.nashtech.assetmanagement.service.AuthenticationService;
-import com.nashtech.assetmanagement.service.RoleService;
 import com.nashtech.assetmanagement.service.UserService;
 import com.nashtech.assetmanagement.utils.UserGenerateUtil;
 import lombok.AllArgsConstructor;
@@ -43,7 +42,6 @@ import org.springframework.stereotype.Service;
 import java.util.Date;
 import java.util.List;
 import java.util.Optional;
-import java.util.stream.Collectors;
 
 @Service
 @Slf4j
@@ -151,8 +149,12 @@ public class UserServiceImpl implements UserService {
 
 
     @Override
-    public List<UserDto> getUsersByStaffCodeOrName(String text,String location) {
-        List<Users> usersList = userRepository.findByStaffCodeAndName(text.toLowerCase());
+    public List<UserDto> getUsersByStaffCodeOrNameAndLocationCode(String text,String locationCode) {
+        Optional<Location> location = locationRepository.findById(locationCode);
+        if(location.isEmpty()){
+            throw new ResourceNotFoundException("Location code not found");
+        }
+        List<Users> usersList = userRepository.findByStaffCodeOrNameAndLocationCode(text.toLowerCase(),locationCode);
         List<UserDto> userDtoList = userMapper.mapListUserToListUserDto(usersList);
         return userDtoList;
     }

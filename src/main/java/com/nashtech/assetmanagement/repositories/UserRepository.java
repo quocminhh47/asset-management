@@ -20,9 +20,10 @@ public interface UserRepository extends JpaRepository<Users, String> {
     Page<Users> findAllByOrderByFirstNameAsc(Pageable pageable, @Param("staffCode") String staffCode, @Param("location") String location);
     @Query(value = "select staff_code from users where staff_code LIKE 'SD%'",nativeQuery = true)
     List<String> findAllStaffCode();
-    @Query(value = " select * from users where lower(staff_code) LIKE %:text% OR lower(concat(first_name,' ',last_name)) LIKE %:text%",nativeQuery = true)
-    List<Users> findByStaffCodeAndName(@Param("text") String text);
-
+    @Query(value = " select * from users where" +
+            " (lower(staff_code) LIKE %:text% OR lower(concat(first_name,' ',last_name)) LIKE %:text%)" +
+            "and location_id=:locationCode",nativeQuery = true)
+    List<Users> findByStaffCodeOrNameAndLocationCode(@Param("text") String text,String locationCode);
 
     @Query(value = "SELECT * FROM users u" +
             " where ((LOWER(u.staff_code) like %:text%) or" +

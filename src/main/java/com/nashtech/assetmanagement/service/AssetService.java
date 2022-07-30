@@ -8,5 +8,5 @@ import java.util.List;
 public interface AssetService {
     ResponseAssetDTO createAsset(RequestCreateAsset requestCreateAsset);
 
-    List<ResponseAssetDTO> getAssetByCodeOrName(String text);
+    List<ResponseAssetDTO> getAssetByCodeOrNameAndLocationCode(String text, String locationCode);
 }

@@ -38,8 +38,6 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.Optional;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 import static com.nashtech.assetmanagement.utils.AppConstants.DEFAULT_SORT_BY;
 import static com.nashtech.assetmanagement.utils.AppConstants.DEFAULT_SORT_DIRECTION;
@@ -163,9 +161,11 @@ public class UserServiceImplTest {
     void getUserByStaffCodeOrName_ShouldReturnUserDtoList_WhenStaffCodeOrNameExist(){
         List<Users> usersList = mock(ArrayList.class);
         List<UserDto> responseList = mock(ArrayList.class);
-        when(userRepository.findByStaffCodeAndName("text")).thenReturn(usersList);
+        Location location = mock(Location.class);
+        when(locationRepository.findById("HCM")).thenReturn(Optional.of(location));
+        when(userRepository.findByStaffCodeOrNameAndLocationCode("text","HCM")).thenReturn(usersList);
         when(userMapper.mapListUserToListUserDto(usersList)).thenReturn(responseList);
-        List<UserDto> result = userServiceImpl.getUsersByStaffCodeOrName("text","location");
+        List<UserDto> result = userServiceImpl.getUsersByStaffCodeOrNameAndLocationCode("text","HCM");
         assertThat(result).isEqualTo(responseList);
     }
 
