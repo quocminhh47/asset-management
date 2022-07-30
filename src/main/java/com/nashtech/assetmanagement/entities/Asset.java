@@ -29,10 +29,10 @@ public class Asset{
 
 	@Id
 	@Column(name = "asset_code",length = 10)
-	private String assetCode;
+	private String code;
 	
 	@Column(name = "asset_name",length = 200)
-	private String assetName;
+	private String name;
 	
 	@Column
 	private String specification;

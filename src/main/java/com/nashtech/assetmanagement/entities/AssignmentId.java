@@ -1,11 +1,20 @@
 package com.nashtech.assetmanagement.entities;
 
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
+
 import javax.persistence.Column;
 import javax.persistence.Embeddable;
 import java.io.Serializable;
-import java.util.Date;
+//import java.util.Date;
+import java.sql.Date;
 
 @Embeddable
+@Getter @Setter
+@AllArgsConstructor
+@NoArgsConstructor
 public class AssignmentId implements Serializable{
 
 	private static final long serialVersionUID = 1L;
@@ -17,5 +26,6 @@ public class AssignmentId implements Serializable{
     String assetCode;
     
     @SuppressWarnings("unused")
+    @Column(name = "assigned_date")
 	private Date assignedDate;
 }
