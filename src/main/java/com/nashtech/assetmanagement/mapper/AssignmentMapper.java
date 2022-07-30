@@ -5,16 +5,14 @@ import com.nashtech.assetmanagement.dto.request.RequestAssignmentDTO;
 import com.nashtech.assetmanagement.dto.response.ResponseAssignmentDto;
 import com.nashtech.assetmanagement.entities.Assignment;
 import com.nashtech.assetmanagement.entities.AssignmentId;
+import lombok.AllArgsConstructor;
 import org.modelmapper.ModelMapper;
 import org.springframework.stereotype.Component;
 
 @Component
+@AllArgsConstructor
 public class AssignmentMapper {
     private final ModelMapper mapper;
-
-    public AssignmentMapper(ModelMapper mapper) {
-        this.mapper=mapper;
-    }
 
     public Assignment MapRequestAssignmentToAssignment(RequestAssignmentDTO request){
         AssignmentId assignmentId = new AssignmentId(request.getAssignedTo(), request.getAssetCode(), request.getAssignedDate());

@@ -1,23 +1,21 @@
 package com.nashtech.assetmanagement.service.impl;
 
-import com.nashtech.assetmanagement.dto.request.RequestCategoryDTO;
-import com.nashtech.assetmanagement.dto.response.ResponseCategoryDTO;
-import com.nashtech.assetmanagement.entities.Category;
-import com.nashtech.assetmanagement.exception.NotUniqueException;
-import com.nashtech.assetmanagement.exception.ResourceNotFoundException;
-import com.nashtech.assetmanagement.mapper.CategoryMapper;
-import com.nashtech.assetmanagement.repositories.CategoryRepository;
-import org.assertj.core.api.Assertions;
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Test;
-
-import java.util.List;
-import java.util.Optional;
-
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
+
+import java.util.List;
+
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+
+import com.nashtech.assetmanagement.dto.request.RequestCategoryDTO;
+import com.nashtech.assetmanagement.dto.response.ResponseCategoryDTO;
+import com.nashtech.assetmanagement.entities.Category;
+import com.nashtech.assetmanagement.exception.NotUniqueException;
+import com.nashtech.assetmanagement.mapper.CategoryMapper;
+import com.nashtech.assetmanagement.repositories.CategoryRepository;
 
 public class CategoryServiceImplTest {
 
