@@ -2,14 +2,13 @@ package com.nashtech.assetmanagement.service;
 
 import java.util.List;
 
-import com.nashtech.assetmanagement.dto.response.AssetResponseDto;
+import com.nashtech.assetmanagement.dto.request.RequestCreateAsset;
 import com.nashtech.assetmanagement.dto.response.ListAssetResponseDto;
+import com.nashtech.assetmanagement.dto.response.ResponseAssetDTO;
 
 public interface AssetService {
-	
-	ListAssetResponseDto getListAsset(String userId, int pageNumber, int size, 
-			String categoryId, String assetcode, String assetname, List<String> state);
+    ResponseAssetDTO createAsset(RequestCreateAsset requestCreateAsset);
 
-	AssetResponseDto getOne(String assetId);
-
+	ListAssetResponseDto getListAsset(String userId, List<String> categoryId, List<String> state, String keyword, Integer page,
+			Integer size);
 }

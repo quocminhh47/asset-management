@@ -23,9 +23,9 @@ public class Location {
 	@Column(length = 100, nullable = false)
 	private String name;
 
-	@OneToMany(fetch = FetchType.LAZY, mappedBy = "location")
+	@OneToMany( mappedBy = "location")
 	private List<Asset> assets;
 	
-	@OneToMany(fetch = FetchType.LAZY, mappedBy = "location")
+	@OneToMany( mappedBy = "location")
 	private List<Users> users;
 }

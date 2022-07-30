@@ -22,9 +22,9 @@ public interface UserRepository extends JpaRepository<Users, String> {
     List<String> findAllStaffCode();
 
     @Query(value = "SELECT * FROM users u" +
-            " where (( LOWER(u.staff_code) like %:text%) or" +
-            " (concat(u.first_name, u.last_name)) like %:text%)" +
-            "and u.location_id = :location and u.staff_code != :loggedStaffCode",
+            " where ((LOWER(u.staff_code) like %:text%) or" +
+            " LOWER((concat(u.first_name, u.last_name))) like %:text%)" +
+            "and LOWER(u.location_id) = :location and u.staff_code != :loggedStaffCode",
             nativeQuery = true)
     Page<Users> searchByStaffCodeOrName(@Param("text") String text,
                                         @Param("loggedStaffCode") String loggedStaffCode,

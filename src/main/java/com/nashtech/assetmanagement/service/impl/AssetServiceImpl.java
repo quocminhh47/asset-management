@@ -12,114 +12,116 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
+import com.nashtech.assetmanagement.dto.request.RequestCreateAsset;
 import com.nashtech.assetmanagement.dto.response.AssetResponseDto;
 import com.nashtech.assetmanagement.dto.response.ListAssetResponseDto;
+import com.nashtech.assetmanagement.dto.response.ResponseAssetDTO;
 import com.nashtech.assetmanagement.entities.Asset;
 import com.nashtech.assetmanagement.entities.Category;
+import com.nashtech.assetmanagement.entities.Location;
 import com.nashtech.assetmanagement.entities.Users;
 import com.nashtech.assetmanagement.enums.AssetState;
 import com.nashtech.assetmanagement.exception.ResourceNotFoundException;
 import com.nashtech.assetmanagement.mapper.AssetMapper;
 import com.nashtech.assetmanagement.repositories.AssetRepository;
 import com.nashtech.assetmanagement.repositories.CategoryRepository;
+import com.nashtech.assetmanagement.repositories.LocationRepository;
 import com.nashtech.assetmanagement.repositories.UserRepository;
 import com.nashtech.assetmanagement.service.AssetService;
-import com.nashtech.assetmanagement.utils.TotalPages;
+import com.nashtech.assetmanagement.utils.GenerateRandomNumber;
+
+import lombok.extern.slf4j.Slf4j;
 
 @Service
+@Slf4j
 public class AssetServiceImpl implements AssetService {
 
-	@Autowired
+    private final AssetRepository assetRepository;
+
+    private final CategoryRepository categoryRepository;
+
+    private final LocationRepository locationRepository;
+
+    private final AssetMapper assetMapper;
+    
+    @Autowired
 	private ModelMapper modelMapper;
-
-	@Autowired
-	private AssetRepository assetRepository;
-
-	@Autowired
-	private CategoryRepository categoryRepository;
 
 	@Autowired
 	private UserRepository userRepository;
 
-	@Autowired
-	private AssetMapper assetMapper;
+    @Autowired
+    public AssetServiceImpl(AssetRepository assetRepository, CategoryRepository categoryRepository, LocationRepository locationRepository, AssetMapper assetMapper) {
+        this.assetRepository = assetRepository;
+        this.categoryRepository = categoryRepository;
+        this.locationRepository = locationRepository;
+        this.assetMapper = assetMapper;
+    }
 
-	@Override
-	public ListAssetResponseDto getListAsset(String userId, int pageNumber, int size, String categoryId,
-			String assetCode, String assetName, List<String> state) {
-		Pageable pageable = PageRequest.of(pageNumber - 1, size, Sort.by(Sort.Direction.ASC, "assetCode"));
+    public String generateAssetCode(String prefix) {
+        String code;
+        do {
+            code = prefix + GenerateRandomNumber.randomNumber();
+        } while (assetRepository.existsAssetByCode(code));
+        return code;
+    }
+
+    @Override
+    public ResponseAssetDTO createAsset(RequestCreateAsset requestCreateAsset) {
+        Asset asset = assetMapper.RequestAssetToAsset(requestCreateAsset);
+        asset.setCode(generateAssetCode(requestCreateAsset.getCategoryId()));
+        Category category =
+                categoryRepository.findById(requestCreateAsset.getCategoryId())
+                        .orElseThrow(
+                                () -> new ResourceNotFoundException(
+                                        "Can not find category has code:" + requestCreateAsset.getCategoryId()));
+        asset.setCategory(category);
+        Location location =
+                locationRepository.findById(requestCreateAsset.getLocationId())
+                        .orElseThrow(() -> new ResourceNotFoundException("Can not find " +
+                                "category has code:" + requestCreateAsset.getLocationId()));
+        asset.setLocation(location);
+        asset = assetRepository.save(asset);
+        return assetMapper.assetToResponseAssetDTO(asset);
+    }
+
+    @Override
+	public ListAssetResponseDto getListAsset(String userId, List<String> categoryId, List<String> state, String keyword,
+			Integer page, Integer size) {
+		Pageable pageable = PageRequest.of(page - 1, size, Sort.by(Sort.Direction.ASC, "code"));
 		Page<Asset> pageAsset = null;
 		long totalItems = 0;
 		Optional<Users> optionalUsers = userRepository.findById(userId);
-
 		if (!optionalUsers.isPresent()) {
-			throw new ResourceNotFoundException(String.format("User not found with staff code : %s", userId));
+			throw new ResourceNotFoundException(String.format("user.not.found.with.code:%s", userId));
 		}
-
 		Users user = optionalUsers.get();
-
 		List<AssetState> assetState = new ArrayList<>();
-		if (state.size() > 0) {
+
+		if(state.size() == 0 && categoryId.size() == 0) {
+			pageAsset = assetRepository.findByUser(user, pageable);
+			totalItems = pageAsset.getTotalPages();
+		}
+		else if (state.size() > 0) {
 			for (int i = 0; i < state.size(); i++) {
 				assetState.add(AssetState.valueOf(state.get(i)));
 			}
-		}
-
-		if (categoryId.equals("")) {
-			if (state.size() == 0) {
-				pageAsset = assetRepository.findByUserAndAssetCodeContainingIgnoreCaseOrAssetNameContainingIgnoreCase(
-						user, assetCode, assetName, pageable);
-				totalItems = assetRepository
-						.countByUserAndAssetCodeContainingIgnoreCaseOrAssetNameContainingIgnoreCase(user, assetCode,
-								assetName);
+			if (categoryId.size() == 0) {
+				pageAsset = assetRepository.getListAssetByState(userId, assetState, keyword, pageable);
+				totalItems = pageAsset.getTotalPages();
 			} else {
-				pageAsset = assetRepository
-						.findByStateInAndUserAndAssetCodeContainingIgnoreCaseOrAssetNameContainingIgnoreCase(
-								assetState, user, assetCode, assetName, pageable);
-				totalItems = assetRepository
-						.countByStateInAndUserAndAssetCodeContainingIgnoreCaseOrAssetNameContainingIgnoreCase(
-								assetState, user, assetCode, assetName);
-			}
-		} else {
-			Optional<Category> optionalCategory = categoryRepository.findById(categoryId);
-			if (!optionalCategory.isPresent()) {
-				throw new ResourceNotFoundException(
-						String.format("Category not found with category code : %s", categoryId));
-			} else {
-				Category category = optionalCategory.get();
-				if (state.size() != 0) {
-					pageAsset = assetRepository
-							.findByStateInAndUserAndCategoryAndAssetCodeContainingIgnoreCaseOrAssetNameContainingIgnoreCase(
-									assetState, user, category, assetCode, assetName, pageable);
-
-					totalItems = assetRepository
-							.countByStateInAndUserAndCategoryAndAssetCodeContainingIgnoreCaseOrAssetNameContainingIgnoreCase(
-									assetState, user, category, assetCode, assetName);
-				} else {
-					pageAsset = assetRepository
-							.findByUserAndCategoryAndAssetCodeContainingIgnoreCaseOrAssetNameContainingIgnoreCase(user,
-									category, assetCode, assetName, pageable);
-					totalItems = assetRepository
-							.countByUserAndCategoryAndAssetCodeContainingIgnoreCaseOrAssetNameContainingIgnoreCase(
-									user, category, assetCode, assetName);
-				}
+				pageAsset = assetRepository.getListAsset(userId, categoryId, assetState, keyword, pageable);
+				totalItems = pageAsset.getTotalPages();
 			}
 		}
-
+		else if (state.size() == 0) {
+			pageAsset = assetRepository.getListAssetByCategory(userId, categoryId, keyword, pageable);
+			totalItems = pageAsset.getTotalPages();
+		}
+		
 		List<Asset> dto = pageAsset.getContent();
 		List<AssetResponseDto> list = assetMapper.mapperListAsset(dto);
-		ListAssetResponseDto result = new ListAssetResponseDto(list, TotalPages.totalPages(totalItems, size));
+		ListAssetResponseDto result = new ListAssetResponseDto(list, totalItems);
 		return result;
-	}
-
-	@Override
-	public AssetResponseDto getOne(String assetId) {
-		Optional<Asset> optional = assetRepository.findById(assetId);
-		if (!optional.isPresent()) {
-			throw new ResourceNotFoundException(String.format("Asset not found with asset code : %s", assetId));
-		}
-		Asset asset = optional.get();
-		AssetResponseDto dto = modelMapper.map(asset, AssetResponseDto.class);
-		return dto;
 	}
 }

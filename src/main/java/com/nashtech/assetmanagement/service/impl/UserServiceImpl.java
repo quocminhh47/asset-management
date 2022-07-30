@@ -56,16 +56,16 @@ public class UserServiceImpl implements UserService {
     private final AuthenticationManager authenticationManager;
     private final JwtUtils jwtUtils;
     private final PasswordEncoder passwordEncoder;
-    private final RoleService roleService;
     private final AuthenticationService authenticationService;
     private final LocationRepository locationRepository;
     private final LocationMapper locationMapper;
     private final ModelMapper modelMapper;
 
     @Autowired
-    public UserServiceImpl(UserRepository userRepository, UsersContent usersContent, RoleRepository roleRepository, UserMapper userMapper, AuthenticationManager authenticationManager, JwtUtils jwtUtils,
-                           PasswordEncoder passwordEncoder, RoleService roleService,
-                           LocationRepository locationRepository, LocationMapper locationMapper, AuthenticationService authenticationService, ModelMapper modelMapper) {
+    public UserServiceImpl(UserRepository userRepository, UsersContent usersContent, RoleRepository roleRepository, UserMapper userMapper,
+                           AuthenticationManager authenticationManager, JwtUtils jwtUtils, PasswordEncoder passwordEncoder,
+                           LocationRepository locationRepository, LocationMapper locationMapper, AuthenticationService authenticationService,
+                           ModelMapper modelMapper) {
         this.userRepository = userRepository;
         this.usersContent = usersContent;
         this.roleRepository = roleRepository;
@@ -73,7 +73,6 @@ public class UserServiceImpl implements UserService {
         this.authenticationManager = authenticationManager;
         this.jwtUtils = jwtUtils;
         this.passwordEncoder = passwordEncoder;
-        this.roleService = roleService;
         this.authenticationService = authenticationService;
         this.locationRepository = locationRepository;
         this.locationMapper = locationMapper;
@@ -97,31 +96,45 @@ public class UserServiceImpl implements UserService {
                 token);
     }
     @Override
-    public void createNewUser(UserRequestDto user) {
-        if (!locationRepository.existsByName(user.getLocationName())){
+    public UserDto createNewUser(UserRequestDto user) {
+
+        Optional<Location> location = locationRepository.findByName(user.getLocationName());
+        Optional<Role> role = roleRepository.findByName(user.getRoleName());
+        if (location.isEmpty()){
             throw new ResourceNotFoundException("Location name not found");
         }
-        Location location = locationRepository.findByName(user.getLocationName());
-        Users newUser = UserMapper.MapToUser(user,roleService.getRole(user.getRoleName()),location);
-        newUser.setState(UserState.INIT);
+        if (role.isEmpty()){
+            throw new ResourceNotFoundException("Role name not found");
+        }
+        Users newUser = userMapper.MapToUser(user,role.get(),location.get());
         List<String> staffCodeList = userRepository.findAllStaffCode();
         int biggestStaffCode = UserGenerateUtil.getBiggestStaffCode(staffCodeList);
-        newUser.setStaffCode(UserGenerateUtil.generateStaffCode(biggestStaffCode));
         int sameName = userRepository.countUsersByFirstNameAndLastName(newUser.getFirstName(),newUser.getLastName());
+        newUser.setState(UserState.INIT);
+        newUser.setStaffCode(UserGenerateUtil.generateStaffCode(biggestStaffCode));
         newUser.setUserName(UserGenerateUtil.generateUserName(newUser.getFirstName(),newUser.getLastName(),sameName));
         newUser.setPassword(new BCryptPasswordEncoder().encode(UserGenerateUtil.generatePassword(newUser.getUserName(),newUser.getBirthDate())));
         userRepository.save(newUser);
+        UserDto responseUser = modelMapper.map(newUser,UserDto.class);
+        return responseUser;
     }
 
     @Override
-    public void editUser(UserRequestDto user, String staffCode) {
+    public UserDto editUser(UserRequestDto user, String staffCode) {
         Optional<Users> usersOptional = userRepository.findByStaffCode(staffCode);
+        Optional<Role> roleOptional = roleRepository.findByName(user.getRoleName());
         if (usersOptional.isEmpty()){
             throw new ResourceNotFoundException("Staff code not found");
         }
-        Users users = usersOptional.get();
-        userMapper.requestDtoToUser(users,user,roleService.getRole(user.getRoleName()));
-        userRepository.save(users);
+        if (roleOptional.isEmpty()){
+            throw new ResourceNotFoundException("Role name not found");
+        }
+        Users editUser = usersOptional.get();
+        Role role = roleOptional.get();
+        userMapper.requestDtoToUser(editUser,user,role);
+        userRepository.save(editUser);
+        UserDto responseUser = modelMapper.map(editUser,UserDto.class);
+        return responseUser;
     }
 
     @Override
@@ -143,7 +156,7 @@ public class UserServiceImpl implements UserService {
                                                            String sortDirection) {
 
         Pageable pageable = PageRequest.of(pageNo, pageSize, defaultSorting(sortBy, sortDirection));
-
+//        Pageable pageable = null; -> test
         Users user = authenticationService.getUser();
         String loggedStaffCode = user.getStaffCode();
         String location = user.getLocation().getCode();
@@ -159,11 +172,15 @@ public class UserServiceImpl implements UserService {
                                                                    String sortDirection,
                                                                    String searchText) {
         Pageable pageable = PageRequest.of(pageNo, pageSize, defaultSorting(sortBy, sortDirection));
+//                Pageable pageable = null;
         Users user = authenticationService.getUser();
         String loggedStaffCode = user.getStaffCode();
         String location = user.getLocation().getCode();
         Page<Users> users = userRepository.searchByStaffCodeOrName(
-                searchText.replaceAll(" ", ""), loggedStaffCode.replaceAll(" ", ""), location, pageable);
+                searchText.replaceAll(" ", "").toLowerCase(),
+                loggedStaffCode.replaceAll(" ", "").toLowerCase(),
+                location.toLowerCase(),
+                pageable);
 
         return usersContent.getUsersContent(users);
     }
@@ -184,7 +201,7 @@ public class UserServiceImpl implements UserService {
                                                String sortDirection,
                                                String roleName) {
         Role role = roleRepository.findByName(roleName)
-                .orElseThrow(() -> new ResourceNotFoundException("Role " + roleName + " not found"));
+                .orElseThrow(() -> new ResourceNotFoundException("Role." + roleName + ".not.found"));
 
         Users user = authenticationService.getUser();
         String loggedStaffCode = user.getStaffCode();

@@ -23,7 +23,7 @@ public class UserMapper {
         return mapper.map(users, ResponseUserDTO.class);
     }
 
-    public static Users MapToUser(UserRequestDto dto, Role role, Location location){
+    public Users MapToUser(UserRequestDto dto, Role role, Location location){
         Users newUser = new Users();
         newUser.setFirstName(dto.getFirstName());
         newUser.setLastName(dto.getLastName());

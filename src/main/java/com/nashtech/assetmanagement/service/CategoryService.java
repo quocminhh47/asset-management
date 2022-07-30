@@ -1,11 +1,12 @@
 package com.nashtech.assetmanagement.service;
 
+import com.nashtech.assetmanagement.dto.request.RequestCategoryDTO;
+import com.nashtech.assetmanagement.dto.response.ResponseCategoryDTO;
+
 import java.util.List;
 
-import com.nashtech.assetmanagement.dto.response.CategoryResponseDto;
-
 public interface CategoryService {
+    List<ResponseCategoryDTO> getAllCategory();
 
-	List<CategoryResponseDto> getListCategories();
-
+    ResponseCategoryDTO createCategory(RequestCategoryDTO requestCategoryDTO);
 }

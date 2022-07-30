@@ -2,28 +2,39 @@ package com.nashtech.assetmanagement.controller.rest.admin;
 
 import java.util.List;
 
-import org.springframework.beans.factory.annotation.Autowired;
+import javax.validation.Valid;
+
 import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.nashtech.assetmanagement.dto.response.CategoryResponseDto;
+import com.nashtech.assetmanagement.dto.request.RequestCategoryDTO;
+import com.nashtech.assetmanagement.dto.response.ResponseCategoryDTO;
 import com.nashtech.assetmanagement.service.CategoryService;
 
-@CrossOrigin(origins = "*", maxAge = 3600)
 @RestController
 @RequestMapping("/admin/api/categories")
 public class CategoryController {
 
-	@Autowired
-	private CategoryService categoryService;
+    private final CategoryService categoryService;
 
-	@GetMapping
-	public ResponseEntity<List<CategoryResponseDto>> getListCategories() {
-		List<CategoryResponseDto> result = categoryService.getListCategories();
-		return new ResponseEntity<List<CategoryResponseDto>>(result, HttpStatus.OK);
-	}
+    public CategoryController(CategoryService categoryService) {
+        this.categoryService = categoryService;
+    }
+
+    @PostMapping
+    @ResponseStatus(HttpStatus.OK)
+    public ResponseCategoryDTO createCategory(@Valid @RequestBody RequestCategoryDTO requestCategoryDTO){
+        return categoryService.createCategory(requestCategoryDTO);
+    }
+
+    @GetMapping
+    @ResponseStatus(HttpStatus.OK)
+    public List<ResponseCategoryDTO> getAllCategories(){
+        return categoryService.getAllCategory();
+    }
 }
