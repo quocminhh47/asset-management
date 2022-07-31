@@ -18,4 +18,5 @@ public class RequestCreateAsset {
     private AssetState state;
     private Date installedDate;
     private String locationId;
+    private String userId;
 }
