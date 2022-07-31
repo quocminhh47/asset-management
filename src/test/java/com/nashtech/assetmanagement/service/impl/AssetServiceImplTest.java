@@ -10,13 +10,11 @@ import com.nashtech.assetmanagement.mapper.AssetMapper;
 import com.nashtech.assetmanagement.repositories.AssetRepository;
 import com.nashtech.assetmanagement.repositories.CategoryRepository;
 import com.nashtech.assetmanagement.repositories.LocationRepository;
-import com.nashtech.assetmanagement.utils.GenerateRandomNumber;
+import com.nashtech.assetmanagement.repositories.UserRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
 
-import java.time.LocalDateTime;
-import java.util.Date;
 import java.util.Optional;
 
 import static org.mockito.Mockito.*;
@@ -25,6 +23,8 @@ import static org.assertj.core.api.Assertions.assertThat;
 public class AssetServiceImplTest {
 
     private AssetRepository assetRepository;
+
+    private UserRepository userRepository;
 
     private CategoryRepository categoryRepository;
 
@@ -43,12 +43,12 @@ public class AssetServiceImplTest {
         categoryRepository=mock(CategoryRepository.class);
         assetServiceImpl=new AssetServiceImpl(assetRepository
                 ,categoryRepository,
-                locationRepository,assetMapper);
+                userRepository, locationRepository,assetMapper);
     }
     @Test
     public void createAsset_WhenRequestValid_Expect_ReturnAsset(){
         RequestCreateAsset requestCreateAsset=new RequestCreateAsset("Lap top",
-                "LT","good", AssetState.AVAILABLE,null,"HN");
+                "LT","good", AssetState.AVAILABLE,null,"HN","SD0001");
         when(assetMapper.RequestAssetToAsset(requestCreateAsset)).thenReturn(asset);
         Category category=mock(Category.class);
         Optional<Category> categoryOptional=Optional.of(category);
