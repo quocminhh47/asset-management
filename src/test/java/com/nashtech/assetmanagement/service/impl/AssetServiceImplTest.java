@@ -5,6 +5,7 @@ import com.nashtech.assetmanagement.dto.response.ResponseAssetDTO;
 import com.nashtech.assetmanagement.entities.Asset;
 import com.nashtech.assetmanagement.entities.Category;
 import com.nashtech.assetmanagement.entities.Location;
+import com.nashtech.assetmanagement.entities.Users;
 import com.nashtech.assetmanagement.enums.AssetState;
 import com.nashtech.assetmanagement.mapper.AssetMapper;
 import com.nashtech.assetmanagement.repositories.AssetRepository;
@@ -41,6 +42,7 @@ public class AssetServiceImplTest {
         assetMapper=mock(AssetMapper.class);
         locationRepository=mock(LocationRepository.class);
         categoryRepository=mock(CategoryRepository.class);
+        userRepository=mock(UserRepository.class);
         assetServiceImpl=new AssetServiceImpl(assetRepository
                 ,categoryRepository,
                 userRepository, locationRepository,assetMapper);
@@ -49,11 +51,15 @@ public class AssetServiceImplTest {
     public void createAsset_WhenRequestValid_Expect_ReturnAsset(){
         RequestCreateAsset requestCreateAsset=new RequestCreateAsset("Lap top",
                 "LT","good", AssetState.AVAILABLE,null,"HN","SD0001");
+       // RequestCreateAsset requestCreateAsset=mock(RequestCreateAsset.class);
         when(assetMapper.RequestAssetToAsset(requestCreateAsset)).thenReturn(asset);
         Category category=mock(Category.class);
         Optional<Category> categoryOptional=Optional.of(category);
         Location location=mock(Location.class);
         Optional<Location> locationOptional=Optional.of(location);
+        Users users=mock(Users.class);
+        Optional<Users> usersOptional=Optional.of(users);
+        when(userRepository.findById("SD0001")).thenReturn(usersOptional);
         when(categoryRepository.findById("LT")).thenReturn(categoryOptional);
         when(locationRepository.findById("HN")).thenReturn(locationOptional);
         when(assetRepository.save(asset)).thenReturn(asset);
@@ -62,10 +68,10 @@ public class AssetServiceImplTest {
         ResponseAssetDTO actual=assetServiceImpl.createAsset(requestCreateAsset);
         ArgumentCaptor<String> assetCodeCapture =
                 ArgumentCaptor.forClass(java.lang.String.class);
-
         verify(asset).setCode(assetCodeCapture.capture());
         verify(asset).setLocation(location);
         verify(asset).setCategory(category);
+        verify(asset).setUser(users );
         assertThat(actual).isEqualTo(expected);
     }
 }
