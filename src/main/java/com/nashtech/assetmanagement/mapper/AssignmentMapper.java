@@ -2,7 +2,7 @@ package com.nashtech.assetmanagement.mapper;
 
 
 import com.nashtech.assetmanagement.dto.request.RequestAssignmentDTO;
-import com.nashtech.assetmanagement.dto.response.ResponseAssignmentDto;
+import com.nashtech.assetmanagement.dto.response.AssignmentDto;
 import com.nashtech.assetmanagement.entities.Assignment;
 import com.nashtech.assetmanagement.entities.AssignmentId;
 import lombok.AllArgsConstructor;
@@ -14,7 +14,7 @@ import org.springframework.stereotype.Component;
 public class AssignmentMapper {
     private final ModelMapper mapper;
 
-    public Assignment MapRequestAssignmentToAssignment(RequestAssignmentDTO request){
+    public Assignment MapRequestAssignmentToAssignment(RequestAssignmentDTO request) {
         AssignmentId assignmentId = new AssignmentId(request.getAssignedTo(), request.getAssetCode(), request.getAssignedDate());
         Assignment assignment = new Assignment();
         assignment.setId(assignmentId);
@@ -23,14 +23,17 @@ public class AssignmentMapper {
         return assignment;
     }
 
-    public ResponseAssignmentDto MapAssignmentToResponseDto(Assignment assignment) {
-        ResponseAssignmentDto responseDTO = new ResponseAssignmentDto();
-        responseDTO.setAssignedBy(assignment.getAssignedBy().getStaffCode());
-        responseDTO.setAssignedTo(assignment.getAssignedBy().getStaffCode());
-        responseDTO.setAssignedDate(assignment.getId().getAssignedDate());
+    public AssignmentDto MapAssignmentToResponseDto(Assignment assignment) {
+        AssignmentDto responseDTO = new AssignmentDto();
+        responseDTO.setAssetCode(assignment.getAsset().getCode());
+        responseDTO.setAssetName(assignment.getAsset().getName());
+        responseDTO.setAssetSpecification(assignment.getAsset().getSpecification());
+        responseDTO.setAssignedToUsername(assignment.getAssignedTo().getUserName());
+        responseDTO.setAssignedByUsername(assignment.getAssignedBy().getUserName());
+        responseDTO.setIdAssignedDate(assignment.getId().getAssignedDate());
         responseDTO.setNote(assignment.getNote());
         responseDTO.setState(assignment.getState());
-        responseDTO.setAssetCode(assignment.getAsset().getCode());
+
         return responseDTO;
     }
 }

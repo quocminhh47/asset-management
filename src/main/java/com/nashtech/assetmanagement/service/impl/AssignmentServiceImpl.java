@@ -1,10 +1,19 @@
 package com.nashtech.assetmanagement.service.impl;
 
+import com.nashtech.assetmanagement.dto.request.RequestAssignmentDTO;
+import com.nashtech.assetmanagement.dto.response.AssignmentDto;
 import com.nashtech.assetmanagement.dto.response.ListAssignmentResponse;
+import com.nashtech.assetmanagement.entities.Asset;
 import com.nashtech.assetmanagement.entities.Assignment;
+import com.nashtech.assetmanagement.entities.Users;
+import com.nashtech.assetmanagement.enums.AssetState;
 import com.nashtech.assetmanagement.exception.DateInvalidException;
+import com.nashtech.assetmanagement.exception.ResourceNotFoundException;
 import com.nashtech.assetmanagement.mapper.AssignmentContent;
+import com.nashtech.assetmanagement.mapper.AssignmentMapper;
+import com.nashtech.assetmanagement.repositories.AssetRepository;
 import com.nashtech.assetmanagement.repositories.AssignmentRepository;
+import com.nashtech.assetmanagement.repositories.UserRepository;
 import com.nashtech.assetmanagement.service.AssignmentService;
 import com.nashtech.assetmanagement.utils.StateConverter;
 import lombok.AllArgsConstructor;
@@ -13,22 +22,9 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
-import com.nashtech.assetmanagement.dto.request.RequestAssignmentDTO;
-import com.nashtech.assetmanagement.dto.response.ResponseAssignmentDto;
-import com.nashtech.assetmanagement.entities.Asset;
-import com.nashtech.assetmanagement.entities.Assignment;
-import com.nashtech.assetmanagement.entities.Users;
-import com.nashtech.assetmanagement.enums.AssetState;
-import com.nashtech.assetmanagement.exception.ResourceNotFoundException;
-import com.nashtech.assetmanagement.mapper.AssignmentMapper;
-import com.nashtech.assetmanagement.repositories.AssetRepository;
-import com.nashtech.assetmanagement.repositories.AssignmentRepository;
-import com.nashtech.assetmanagement.repositories.UserRepository;
-import com.nashtech.assetmanagement.service.AssignmentService;
-import org.springframework.stereotype.Service;
 
-import java.util.Optional;
 import java.sql.Date;
+import java.util.Optional;
 
 @Service
 @AllArgsConstructor
@@ -36,11 +32,9 @@ public class AssignmentServiceImpl implements AssignmentService {
 
     private final AssignmentRepository assignmentRepository;
     private final AssignmentContent assignmentContent;
-
-
-        private final UserRepository userRepository;
-        private final AssetRepository assetRepository;
-        private final AssignmentMapper assignmentMapper;
+    private final UserRepository userRepository;
+    private final AssetRepository assetRepository;
+    private final AssignmentMapper assignmentMapper;
 
 
 
@@ -95,8 +89,8 @@ public class AssignmentServiceImpl implements AssignmentService {
                 System.out.println(assignedDate);
                 Date dateNow = new Date(new java.util.Date().getTime());
                 System.out.println(dateNow);
-                if(assignedDate.after(dateNow)) throw new DateInvalidException(
-                        "Date.is.must.before.today:"+ dateNow.toString().replaceAll(" ", "."));
+                if (assignedDate.after(dateNow)) throw new DateInvalidException(
+                        "Date.is.must.before.today:" + dateNow.toString().replaceAll(" ", "."));
             } catch (IllegalArgumentException e) {
                 e.printStackTrace();
                 throw new IllegalArgumentException("Date.format.is.not.valid", e);
@@ -143,26 +137,22 @@ public class AssignmentServiceImpl implements AssignmentService {
                 : Sort.by(sortBy).descending();
     }
 
-
-
-
-
-
     @Override
-    public ResponseAssignmentDto createNewAssignment(RequestAssignmentDTO request) {
+    public AssignmentDto createNewAssignment(RequestAssignmentDTO request) {
         Optional<Asset> asset = assetRepository.findById(request.getAssetCode());
-        if(asset.isEmpty()){
+        if (asset.isEmpty()) {
             throw new ResourceNotFoundException("AssetCode not found");
         }
         Optional<Users> assignTo = userRepository.findById(request.getAssignedTo());
-        if(assignTo.isEmpty()){
+        if (assignTo.isEmpty()) {
             throw new ResourceNotFoundException("Assign to User not found");
         }
         Optional<Users> assignBy = userRepository.findById(request.getAssignedBy());
-        if (assignBy.isEmpty()){
+        if (assignBy.isEmpty()) {
             throw new ResourceNotFoundException("Assign by User not found");
         }
         asset.get().setState(AssetState.ASSIGNED);
+        asset.get().setUser(assignTo.get());
         Assignment assignment = assignmentMapper.MapRequestAssignmentToAssignment(request);
         assignment.setAssignedTo(assignTo.get());
         assignment.setAssignedBy(assignBy.get());

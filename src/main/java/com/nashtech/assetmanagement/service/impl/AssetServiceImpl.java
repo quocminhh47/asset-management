@@ -3,6 +3,7 @@ package com.nashtech.assetmanagement.service.impl;
 import com.nashtech.assetmanagement.dto.request.RequestCreateAsset;
 import com.nashtech.assetmanagement.dto.response.AssetResponseDto;
 import com.nashtech.assetmanagement.dto.response.ListAssetResponseDto;
+import com.nashtech.assetmanagement.dto.response.ResponseAssetAndCategory;
 import com.nashtech.assetmanagement.dto.response.ResponseAssetDTO;
 import com.nashtech.assetmanagement.entities.Asset;
 import com.nashtech.assetmanagement.entities.Category;
@@ -26,9 +27,6 @@ import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
-
 import java.util.List;
 import java.util.Optional;
 
@@ -79,8 +77,8 @@ public class AssetServiceImpl implements AssetService {
                         .orElseThrow(() -> new ResourceNotFoundException("Can not find " +
                                 "category has code: " + requestCreateAsset.getLocationId()));
         asset.setLocation(location);
-        Users users=
-                userRepository.findById(requestCreateAsset.getUserId()).orElseThrow(()->new ResourceNotFoundException("Can not find " +
+        Users users =
+                userRepository.findById(requestCreateAsset.getUserId()).orElseThrow(() -> new ResourceNotFoundException("Can not find " +
                         "user has id: " + requestCreateAsset.getUserId()));
         asset.setUser(users);
         asset = assetRepository.save(asset);
@@ -88,52 +86,51 @@ public class AssetServiceImpl implements AssetService {
     }
 
     @Override
-	public ListAssetResponseDto getListAsset(String userId, List<String> categoryId, List<String> state, String keyword,
-			Integer page, Integer size) {
-		Pageable pageable = PageRequest.of(page - 1, size, Sort.by(Sort.Direction.ASC, "code"));
-		Page<Asset> pageAsset = null;
-		long totalItems = 0;
-		Optional<Users> optionalUsers = userRepository.findById(userId);
-		if (!optionalUsers.isPresent()) {
-			throw new ResourceNotFoundException(String.format("user.not.found.with.code:%s", userId));
-		}
-		Users user = optionalUsers.get();
-		List<AssetState> assetState = new ArrayList<>();
+    public ListAssetResponseDto getListAsset(String userId, List<String> categoryId, List<String> state, String keyword,
+                                             Integer page, Integer size) {
+        Pageable pageable = PageRequest.of(page - 1, size, Sort.by(Sort.Direction.ASC, "code"));
+        Page<Asset> pageAsset = null;
+        long totalItems = 0;
+        Optional<Users> optionalUsers = userRepository.findById(userId);
+        if (!optionalUsers.isPresent()) {
+            throw new ResourceNotFoundException(String.format("user.not.found.with.code:%s", userId));
+        }
+        Users user = optionalUsers.get();
+        List<AssetState> assetState = new ArrayList<>();
 
-		if(state.size() == 0 && categoryId.size() == 0) {
-			pageAsset = assetRepository.findByUser(user, pageable);
-			totalItems = pageAsset.getTotalPages();
-		}
-		else if (state.size() > 0) {
-			for (int i = 0; i < state.size(); i++) {
-				assetState.add(AssetState.valueOf(state.get(i)));
-			}
-			if (categoryId.size() == 0) {
-				pageAsset = assetRepository.getListAssetByState(userId, assetState, keyword, pageable);
-				totalItems = pageAsset.getTotalPages();
-			} else {
-				pageAsset = assetRepository.getListAsset(userId, categoryId, assetState, keyword, pageable);
-				totalItems = pageAsset.getTotalPages();
-			}
-		}
-		else if (state.size() == 0) {
-			pageAsset = assetRepository.getListAssetByCategory(userId, categoryId, keyword, pageable);
-			totalItems = pageAsset.getTotalPages();
-		}
+        if (state.size() == 0 && categoryId.size() == 0) {
+            pageAsset = assetRepository.findByUser(user, pageable);
+            totalItems = pageAsset.getTotalPages();
+        } else if (state.size() > 0) {
+            for (int i = 0; i < state.size(); i++) {
+                assetState.add(AssetState.valueOf(state.get(i)));
+            }
+            if (categoryId.size() == 0) {
+                pageAsset = assetRepository.getListAssetByState(userId, assetState, keyword, pageable);
+                totalItems = pageAsset.getTotalPages();
+            } else {
+                pageAsset = assetRepository.getListAsset(userId, categoryId, assetState, keyword, pageable);
+                totalItems = pageAsset.getTotalPages();
+            }
+        } else if (state.size() == 0) {
+            pageAsset = assetRepository.getListAssetByCategory(userId, categoryId, keyword, pageable);
+            totalItems = pageAsset.getTotalPages();
+        }
 
-		List<Asset> dto = pageAsset.getContent();
-		List<AssetResponseDto> list = assetMapper.mapperListAsset(dto);
-		ListAssetResponseDto result = new ListAssetResponseDto(list, totalItems);
-		return result;
-	}
+        List<Asset> dto = pageAsset.getContent();
+        List<AssetResponseDto> list = assetMapper.mapperListAsset(dto);
+        ListAssetResponseDto result = new ListAssetResponseDto(list, totalItems);
+        return result;
+    }
+
     @Override
-    public List<ResponseAssetDTO> getAssetByCodeOrNameAndLocationCode(String text, String locationCode) {
+    public List<ResponseAssetAndCategory> getAssetByCodeOrNameAndLocationCode(String text, String locationCode) {
         Optional<Location> locationOptional = locationRepository.findById(locationCode);
-        if(locationOptional.isEmpty()){
+        if (locationOptional.isEmpty()) {
             throw new ResourceNotFoundException("Location code not found");
         }
-        List<Asset> assetList = assetRepository.findAssetByNameOrCodeAndLocationCode(text.toLowerCase(),locationCode);
-        List<ResponseAssetDTO> responseList = assetMapper.getAssetListToResponseAssetDTOList(assetList);
+        List<Asset> assetList = assetRepository.findAssetByNameOrCodeAndLocationCode(text.toLowerCase(), locationCode);
+        List<ResponseAssetAndCategory> responseList = assetMapper.getAssetListToResponseAssetDTOList(assetList);
         return responseList;
     }
 

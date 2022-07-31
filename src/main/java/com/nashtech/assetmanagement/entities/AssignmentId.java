@@ -8,24 +8,25 @@ import lombok.Setter;
 import javax.persistence.Column;
 import javax.persistence.Embeddable;
 import java.io.Serializable;
-import java.util.Date;
+import java.sql.Date;
 //import java.sql.Date;
 
 @Embeddable
-@Getter @Setter
+@Getter
+@Setter
 @AllArgsConstructor
 @NoArgsConstructor
-public class AssignmentId implements Serializable{
+public class AssignmentId implements Serializable {
 
-	private static final long serialVersionUID = 1L;
+    private static final long serialVersionUID = 1L;
 
-	@Column(name = "assigned_to", columnDefinition = "VARCHAR(10)")
+    @Column(name = "assigned_to", columnDefinition = "VARCHAR(10)")
     String assignedTo;
 
     @Column(name = "asset_code", columnDefinition = "VARCHAR(10)")
     String assetCode;
-    
+
     @SuppressWarnings("unused")
     @Column(name = "assigned_date")
-	private Date assignedDate;
+    private Date assignedDate;
 }
