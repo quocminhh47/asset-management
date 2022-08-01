@@ -21,12 +21,6 @@ public class UserRepositoryTest {
     private UserRepository userRepository;
 
     @Test
-    void findByStaffCodeAndName_ShouldReturnListUser_WhenStaffCodeAndNameExist() {
-        assertEquals(1, userRepository.findByStaffCodeOrNameAndLocationCode("p ", "HN").size());
-        assertEquals(7, userRepository.findByStaffCodeOrNameAndLocationCode("sd", "HCM").size());
-    }
-
-    @Test
     void findStaffCodeList_ShouldReturnStaffCodeList_WhenStaffCodeBeginWithSDExist() {
         List<String> staffCode = userRepository.findAllStaffCode();
         assertEquals(9, staffCode.size());
