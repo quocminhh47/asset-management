@@ -4,6 +4,7 @@ import com.nashtech.assetmanagement.dto.request.RequestChangePassDto;
 import com.nashtech.assetmanagement.dto.request.RequestLoginDTO;
 import com.nashtech.assetmanagement.dto.request.UserRequestDto;
 import com.nashtech.assetmanagement.dto.response.*;
+import com.nashtech.assetmanagement.entities.Users;
 import com.nashtech.assetmanagement.sercurity.userdetail.UserPrinciple;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 
@@ -43,5 +44,9 @@ public interface UserService {
 
     ResponseMessage changePasswordFirstLogin(String userName, String newPassword);
     ResponseUserDTO changePassword(RequestChangePassDto dto);
+
+    void checkExistsByAssignedToOrAssignedBy(String staffCode);
+    
+    ResponseUserDTO disableStaff(String staffCode);
 
 }

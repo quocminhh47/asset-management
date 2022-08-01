@@ -34,10 +34,12 @@ import com.nashtech.assetmanagement.entities.Location;
 import com.nashtech.assetmanagement.entities.Role;
 import com.nashtech.assetmanagement.entities.Users;
 import com.nashtech.assetmanagement.enums.UserState;
+import com.nashtech.assetmanagement.exception.DateInvalidException;
 import com.nashtech.assetmanagement.exception.ResourceNotFoundException;
 import com.nashtech.assetmanagement.mapper.LocationMapper;
 import com.nashtech.assetmanagement.mapper.UserMapper;
 import com.nashtech.assetmanagement.mapper.UsersContent;
+import com.nashtech.assetmanagement.repositories.AssignmentRepository;
 import com.nashtech.assetmanagement.repositories.LocationRepository;
 import com.nashtech.assetmanagement.repositories.RoleRepository;
 import com.nashtech.assetmanagement.repositories.UserRepository;
@@ -66,6 +68,9 @@ public class UserServiceImpl implements UserService {
 	private final LocationRepository locationRepository;
 	private final LocationMapper locationMapper;
 	private final ModelMapper modelMapper;
+
+	@Autowired
+	private AssignmentRepository assignmentRepository;
 
 	@Autowired
 	public UserServiceImpl(UserRepository userRepository, UsersContent usersContent, RoleRepository roleRepository,
@@ -256,5 +261,30 @@ public class UserServiceImpl implements UserService {
 			ResponseUserDTO repDto = modelMapper.map(user, ResponseUserDTO.class);
 			return repDto;
 		}
+	}
+
+	@Override
+	public void checkExistsByAssignedToOrAssignedBy(String staffCode) {
+		Optional<Users> optional = userRepository.findById(staffCode);
+		if (!optional.isPresent()) {
+			throw new ResourceNotFoundException(String.format("not.found.with.code:%s", staffCode));
+		}
+		Users user = optional.get();
+		boolean existInAssignment = assignmentRepository.existsByAssignedToOrAssignedBy(user, user);
+		if (existInAssignment) {
+			throw new DateInvalidException("exist.valid.assignments");
+		} 
+	}
+
+	public ResponseUserDTO disableStaff(String staffCode) {
+		Optional<Users> optional = userRepository.findById(staffCode);
+		if (!optional.isPresent()) {
+			throw new ResourceNotFoundException(String.format("not.found.with.code:%s", staffCode));
+		}
+		Users user = optional.get();
+		user.setState(UserState.INACTIVE);
+		userRepository.save(user);
+		ResponseUserDTO dto = modelMapper.map(user, ResponseUserDTO.class);
+		return dto;
 	}
 }

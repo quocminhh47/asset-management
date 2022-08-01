@@ -1,20 +1,31 @@
 package com.nashtech.assetmanagement.service.impl;
 
-import com.nashtech.assetmanagement.dto.response.ListAssignmentResponse;
-import com.nashtech.assetmanagement.entities.Assignment;
-import com.nashtech.assetmanagement.exception.DateInvalidException;
-import com.nashtech.assetmanagement.mapper.AssignmentContent;
-import com.nashtech.assetmanagement.repositories.AssignmentRepository;
-import com.nashtech.assetmanagement.service.AssignmentService;
-import com.nashtech.assetmanagement.utils.StateConverter;
-import lombok.AllArgsConstructor;
+import java.sql.Date;
+import java.util.List;
+import java.util.Optional;
+
+import org.modelmapper.ModelMapper;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
-import java.sql.Date;
+import com.nashtech.assetmanagement.dto.response.AssignmentDto;
+import com.nashtech.assetmanagement.dto.response.ListAssignmentResponse;
+import com.nashtech.assetmanagement.entities.Asset;
+import com.nashtech.assetmanagement.entities.Assignment;
+import com.nashtech.assetmanagement.exception.DateInvalidException;
+import com.nashtech.assetmanagement.exception.ResourceNotFoundException;
+import com.nashtech.assetmanagement.mapper.AssignmentContent;
+import com.nashtech.assetmanagement.mapper.AssignmentMapper;
+import com.nashtech.assetmanagement.repositories.AssetRepository;
+import com.nashtech.assetmanagement.repositories.AssignmentRepository;
+import com.nashtech.assetmanagement.service.AssignmentService;
+import com.nashtech.assetmanagement.utils.StateConverter;
+
+import lombok.AllArgsConstructor;
 
 @Service
 @AllArgsConstructor
@@ -22,6 +33,15 @@ public class AssignmentServiceImpl implements AssignmentService {
 
     private final AssignmentRepository assignmentRepository;
     private final AssignmentContent assignmentContent;
+    
+    @Autowired 
+    private AssetRepository assetRepository;
+    
+    @Autowired
+    private ModelMapper modelMapper;
+    
+    @Autowired
+    private AssignmentMapper assignmentMapper;
 
 
 /*    @Override
@@ -123,5 +143,18 @@ public class AssignmentServiceImpl implements AssignmentService {
                 : Sort.by(sortBy).descending();
     }
 
-
+    @Override
+	public List<AssignmentDto> getListAssignmentByAssetCode(String assetCode) {
+    	
+    	Optional<Asset> optionalAsset = assetRepository.findById(assetCode);
+    	if(!optionalAsset.isPresent()) {
+    		throw new ResourceNotFoundException(String.format("asset.not.found.with.code:%s", assetCode));
+    	}
+    	Asset asset = optionalAsset.get();
+    	List<Assignment> list = assignmentRepository.findByAsset(asset);
+    	List<AssignmentDto> resultList = assignmentMapper.mapperListAssignment(list);
+    	return resultList;
+    	
+    }
+    
 }

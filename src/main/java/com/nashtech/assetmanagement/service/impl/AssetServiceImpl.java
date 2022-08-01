@@ -1,5 +1,16 @@
 package com.nashtech.assetmanagement.service.impl;
 
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Optional;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
+import org.springframework.stereotype.Service;
+
 import com.nashtech.assetmanagement.dto.request.RequestCreateAsset;
 import com.nashtech.assetmanagement.dto.response.AssetResponseDto;
 import com.nashtech.assetmanagement.dto.response.ListAssetResponseDto;
@@ -17,17 +28,8 @@ import com.nashtech.assetmanagement.repositories.LocationRepository;
 import com.nashtech.assetmanagement.repositories.UserRepository;
 import com.nashtech.assetmanagement.service.AssetService;
 import com.nashtech.assetmanagement.utils.GenerateRandomNumber;
-import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Pageable;
-import org.springframework.data.domain.Sort;
-import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
+import lombok.extern.slf4j.Slf4j;
 
 @Service
 @Slf4j
@@ -117,7 +119,7 @@ public class AssetServiceImpl implements AssetService {
 			pageAsset = assetRepository.getListAssetByCategory(userId, categoryId, keyword, pageable);
 			totalItems = pageAsset.getTotalPages();
 		}
-
+		
 		List<Asset> dto = pageAsset.getContent();
 		List<AssetResponseDto> list = assetMapper.mapperListAsset(dto);
 		ListAssetResponseDto result = new ListAssetResponseDto(list, totalItems);

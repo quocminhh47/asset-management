@@ -21,13 +21,13 @@ public class AssignmentDto {
     @JsonProperty("assignedBy")
     private String assignedByUsername;
 
-
     @JsonProperty("assignedDate")
     private Date IdAssignedDate;
-
+    
     private String state;
 
     private String note;
 
     private String assetSpecification;
+    
 }
