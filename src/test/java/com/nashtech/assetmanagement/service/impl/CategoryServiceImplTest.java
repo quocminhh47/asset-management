@@ -56,9 +56,20 @@ public class CategoryServiceImplTest {
     public void createCategory_WhenCategoryPrefixNotUnique_Expect_ReturnCategory(){
         RequestCategoryDTO requestCategoryDTO=new RequestCategoryDTO("LT","Laptop");
         when(categoryRepository.existsCategoriesById("LT")).thenReturn(true);
+        when(categoryRepository.existsCategoriesByName("Laptop")).thenReturn(false);
         NotUniqueException exception= assertThrows(NotUniqueException.class,
                 () -> categoryServiceImpl.createCategory(requestCategoryDTO));
-        assertThat(exception.getMessage()).isEqualTo("Please enter a different category. " +
-                "prefix is already existed.");
+        assertThat(exception.getMessage()).isEqualTo("Prefix is already existed. Please enter a " +
+                "different prefix.");
+    }
+    @Test
+    public void createCategory_WhenCategoryNotUnique_Expect_ReturnCategory(){
+        RequestCategoryDTO requestCategoryDTO=new RequestCategoryDTO("LT","Laptop");
+        when(categoryRepository.existsCategoriesById("LT")).thenReturn(false);
+        when(categoryRepository.existsCategoriesByName("Laptop")).thenReturn(true);
+        NotUniqueException exception= assertThrows(NotUniqueException.class,
+                () -> categoryServiceImpl.createCategory(requestCategoryDTO));
+        assertThat(exception.getMessage()).isEqualTo("Category is already existed. Please enter a " +
+                "different category.");
     }
 }
