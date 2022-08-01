@@ -57,7 +57,7 @@ public class UserController {
         return new ResponseEntity<>(responseMessage,responseMessage.getStatus());
     }
     @PostMapping("/user/api/change-password")
-    public ResponseEntity<ResponseUserDTO> changePassword(@RequestBody RequestChangePassDto requestChangePassDto){
+    public ResponseEntity<ResponseUserDTO> changePassword(@Valid @RequestBody RequestChangePassDto requestChangePassDto){
         return ResponseEntity.ok(userService.changePassword(requestChangePassDto));
     }
 }
