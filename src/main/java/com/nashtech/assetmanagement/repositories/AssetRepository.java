@@ -21,7 +21,7 @@ public interface AssetRepository extends JpaRepository<Asset, String>{
 			+ "and (e.state in :state) and (e.category.id in :category)")
 	Page<Asset> getListAsset(@Param("user") String user, @Param("category") List<String> category, @Param("state") List<AssetState> state ,
 			@Param("search") String search, Pageable pageable);
-
+    
 	@Query("select e from Asset e where  e.user.staffCode = :user "
 			+ "and ( lower(e.code) like lower(concat('%', :search, '%')) or (lower(e.name) like lower(concat('%', :search, '%'))))"
 			+ "and (e.category.id in :category)")

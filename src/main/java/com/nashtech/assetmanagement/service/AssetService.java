@@ -8,10 +8,10 @@ import com.nashtech.assetmanagement.dto.response.ResponseAssetDTO;
 import java.util.List;
 
 public interface AssetService {
-    ResponseAssetDTO createAsset(RequestCreateAsset requestCreateAsset);
+	ResponseAssetDTO createAsset(RequestCreateAsset requestCreateAsset);
+	
+	ListAssetResponseDto getListAsset(String userId, List<String> categoryId, List<String> state, String keyword,
+			String sortBy, String sortDirection, Integer page, Integer size);
 
-    ListAssetResponseDto getListAsset(String userId, List<String> categoryId, List<String> state, String keyword, Integer page,
-                                      Integer size);
-
-    List<ResponseAssetAndCategory> getAssetByCodeOrNameAndLocationCode(String text, String locationCode);
+	List<ResponseAssetAndCategory> getAssetByCodeOrNameAndLocationCode(String text, String locationCode);
 }
