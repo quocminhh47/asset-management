@@ -10,7 +10,6 @@ import org.springframework.web.bind.annotation.*;
 
 @RestController
 @AllArgsConstructor
-//@CrossOrigin(origins = "http://localhost:3000")
 @RequestMapping("/admin/api/users")
 public class UsersManagementController {
 
@@ -36,16 +35,17 @@ public class UsersManagementController {
         return userService.getAllUserOrderByFirstNameAsc(pageNo, pageSize, sortBy,sortDirection);
     }
 
+
     @GetMapping("/searching")
     @ResponseStatus(HttpStatus.OK)
     public ListUsersResponse getAllStaffOrderByFirstNameAsc(
             @RequestParam("textPattern") String searchText,
+            @RequestParam("role") String roleName,
             @RequestParam(
                     value = "pageNo", defaultValue = AppConstants.DEFAULT_PAGE_NUMBER, required = false)
                     int pageNo,
             @RequestParam(
                     value = "pageSize", defaultValue = "20", required = false)
-//                    value = "pageSize", defaultValue = AppConstants.DEFAULT_PAGE_SIZE, required = false)
                     int pageSize,
             @RequestParam(
                     value = "sortBy", defaultValue = "first_name", required = false)
@@ -54,7 +54,7 @@ public class UsersManagementController {
                     value = "sortDirection", defaultValue = AppConstants.DEFAULT_SORT_DIRECTION, required = false)
                     String sortDirection
     ) {
-        return userService.getAllUsersBySearchingStaffCodeOrName(pageNo, pageSize, sortBy,sortDirection, searchText);
+        return userService.getAllUsersBySearchingStaffCodeOrNameOrRole(pageNo, pageSize, sortBy,sortDirection, searchText, roleName);
     }
 
 

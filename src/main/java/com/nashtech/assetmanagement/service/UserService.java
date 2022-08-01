@@ -35,6 +35,15 @@ public interface UserService {
                                                             String sortDirection,
                                                             String searchText);
 
+    //filter + searching
+    ListUsersResponse getAllUsersBySearchingStaffCodeOrNameOrRole(int pageNo,
+                                                                  int pageSize,
+                                                                  String sortBy,
+                                                                  String sortDirection,
+                                                                  String searchText,
+                                                                  String roleName);
+
+
 
     ListUsersResponse getAllUsersByRole(int pageNo,
                                                             int pageSize,

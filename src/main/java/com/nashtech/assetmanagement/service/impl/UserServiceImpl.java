@@ -195,6 +195,43 @@ public class UserServiceImpl implements UserService {
 	}
 
 	@Override
+	public ListUsersResponse getAllUsersBySearchingStaffCodeOrNameOrRole(int pageNo,
+																		 int pageSize,
+																		 String sortBy,
+																		 String sortDirection,
+																		 String searchText,
+																		 String roleName) {
+
+		Users user = authenticationService.getUser();
+		String loggedStaffCode = user.getStaffCode();
+		String location = user.getLocation().getCode();
+		Pageable pageable = PageRequest.of(pageNo, pageSize, defaultSorting(sortBy, sortDirection));
+		Page<Users> users;
+		System.out.println(roleName);
+		if (roleName.equalsIgnoreCase("all")) {
+			System.out.println("role all");
+			users = userRepository.searchByStaffCodeOrName(
+					searchText.replaceAll(" ", "").toLowerCase(),
+					loggedStaffCode.replaceAll(" ", "").toLowerCase(),
+					location.toLowerCase(),
+					pageable);
+
+		}
+		else {
+			Role role = roleRepository.findByName(roleName.toUpperCase()).orElseThrow(
+					() -> new ResourceNotFoundException("Role." + roleName +".not.found"));
+			users = userRepository.searchByStaffCodeOrNameWithRole(
+					searchText.replaceAll(" ","").toLowerCase(),
+					loggedStaffCode.replaceAll(" ","").toLowerCase(),
+					location.toLowerCase(),
+					role.getId(),
+					pageable);
+
+		}
+		return usersContent.getUsersContent(users);
+	}
+
+	@Override
 	public UserPrinciple loadUserByUsername(String userName) throws UsernameNotFoundException {
 		Users user = userRepository.findByUserName(userName)
 				.orElseThrow(() -> new ResourceNotFoundException("Did not find user has username = " + userName));

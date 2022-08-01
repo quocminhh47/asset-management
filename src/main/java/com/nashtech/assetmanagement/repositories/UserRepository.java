@@ -46,4 +46,17 @@ public interface UserRepository extends JpaRepository<Users, String> {
 
     int countUsersByFirstNameAndLastName(String firstName,String lastName);
     Optional<Users> findByStaffCode(String staffCode);
+
+    @Query(value = "SELECT * FROM users u" +
+            " where ((LOWER(u.staff_code) like %:text%) or" +
+            " LOWER((concat(u.first_name, ' ', u.last_name))) like %:text%)" +
+            "and LOWER(u.location_id) = :location " +
+            "and u.staff_code != :loggedStaffCode " +
+            "and u.role_id = :roleId",
+            nativeQuery = true)
+    Page<Users> searchByStaffCodeOrNameWithRole(@Param("text") String text,
+                                                @Param("loggedStaffCode") String loggedStaffCode,
+                                                @Param(("location")) String adminLocation,
+                                                @Param(("roleId")) Long roleId,
+                                                Pageable pageable);
 }
