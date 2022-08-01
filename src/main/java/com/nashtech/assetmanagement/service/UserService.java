@@ -2,10 +2,12 @@ package com.nashtech.assetmanagement.service;
 
 import com.nashtech.assetmanagement.dto.request.RequestChangePassDto;
 import com.nashtech.assetmanagement.dto.request.RequestLoginDTO;
-import com.nashtech.assetmanagement.dto.request.UserRequestDto;
+import com.nashtech.assetmanagement.dto.request.RequestUserDto;
 import com.nashtech.assetmanagement.dto.response.*;
 import com.nashtech.assetmanagement.sercurity.userdetail.UserPrinciple;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
+
+import java.util.List;
 
 public interface UserService {
 
@@ -13,10 +15,11 @@ public interface UserService {
 
 
     ResponseSignInDTO signIn(RequestLoginDTO requestLoginDTO);
-    UserDto createNewUser(UserRequestDto user);
+    UserDto createNewUser(RequestUserDto user);
 
-    UserDto editUser(UserRequestDto user,String staffCode);
+    UserDto editUser(RequestUserDto user, String staffCode);
     LocationResponseDTO getLocationByStaffCode(String staffCode);
+    List<UserDto> getUsersByStaffCodeOrNameAndLocationCode(String text,String locationCode);
 
     UserPrinciple loadUserByUsername(String userName)
             throws UsernameNotFoundException;

@@ -1,5 +1,7 @@
 package com.nashtech.assetmanagement.service;
 
+import com.nashtech.assetmanagement.dto.request.RequestAssignmentDTO;
+import com.nashtech.assetmanagement.dto.response.AssignmentDto;
 import com.nashtech.assetmanagement.dto.response.ListAssignmentResponse;
 
 public interface AssignmentService {
@@ -25,4 +27,6 @@ public interface AssignmentService {
     ListAssignmentResponse getAssignmentsBySearching(int pageNo,
                                                      int pageSize,
                                                      String textSearch);
+
+    AssignmentDto createNewAssignment(RequestAssignmentDTO request);
 }
