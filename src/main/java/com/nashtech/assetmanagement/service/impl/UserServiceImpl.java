@@ -312,10 +312,10 @@ public class UserServiceImpl implements UserService {
 	}
 
 	@Override
-	public void checkExistsByAssignedToOrAssignedBy(String staffCode) {
+	public void checkExistsAssignment(String staffCode) {
 		Optional<Users> optional = userRepository.findById(staffCode);
 		if (!optional.isPresent()) {
-			throw new ResourceNotFoundException(String.format("not.found.with.code:%s", staffCode));
+			throw new ResourceNotFoundException(String.format("staff.not.found.with.code:%s", staffCode));
 		}
 		Users user = optional.get();
 		boolean existInAssignment = assignmentRepository.existsByAssignedToOrAssignedBy(user, user);
@@ -327,7 +327,7 @@ public class UserServiceImpl implements UserService {
 	public ResponseUserDTO disableStaff(String staffCode) {
 		Optional<Users> optional = userRepository.findById(staffCode);
 		if (!optional.isPresent()) {
-			throw new ResourceNotFoundException(String.format("not.found.with.code:%s", staffCode));
+			throw new ResourceNotFoundException(String.format("staff.not.found.with.code:%s", staffCode));
 		}
 		Users user = optional.get();
 		user.setState(UserState.INACTIVE);

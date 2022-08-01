@@ -76,7 +76,7 @@ public class UsersManagementController {
 
 	@GetMapping("/check/{staffCode}")
 	public void checkExistsByAssigned(@PathVariable("staffCode") String staffCode) {
-		userService.checkExistsByAssignedToOrAssignedBy(staffCode);
+		userService.checkExistsAssignment(staffCode);
 	}
 
 	@GetMapping("/disable/{staffCode}")

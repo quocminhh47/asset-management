@@ -1,14 +1,20 @@
 package com.nashtech.assetmanagement.service;
 
+import java.util.List;
+
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
+
 import com.nashtech.assetmanagement.dto.request.RequestChangePassDto;
 import com.nashtech.assetmanagement.dto.request.RequestLoginDTO;
 import com.nashtech.assetmanagement.dto.request.RequestUserDto;
-import com.nashtech.assetmanagement.dto.response.*;
-import com.nashtech.assetmanagement.entities.Users;
+import com.nashtech.assetmanagement.dto.response.ListUsersResponse;
+import com.nashtech.assetmanagement.dto.response.LocationResponseDTO;
+import com.nashtech.assetmanagement.dto.response.ResponseMessage;
+import com.nashtech.assetmanagement.dto.response.ResponseSignInDTO;
+import com.nashtech.assetmanagement.dto.response.ResponseUserDTO;
+import com.nashtech.assetmanagement.dto.response.SingleUserResponse;
+import com.nashtech.assetmanagement.dto.response.UserDto;
 import com.nashtech.assetmanagement.sercurity.userdetail.UserPrinciple;
-import org.springframework.security.core.userdetails.UsernameNotFoundException;
-
-import java.util.List;
 
 public interface UserService {
 
@@ -57,7 +63,7 @@ public interface UserService {
     ResponseMessage changePasswordFirstLogin(String userName, String newPassword);
     ResponseUserDTO changePassword(RequestChangePassDto dto);
 
-    void checkExistsByAssignedToOrAssignedBy(String staffCode);
+    void checkExistsAssignment(String staffCode);
     
     ResponseUserDTO disableStaff(String staffCode);
 
