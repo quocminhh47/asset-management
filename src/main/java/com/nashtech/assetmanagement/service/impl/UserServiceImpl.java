@@ -23,8 +23,6 @@ import org.springframework.stereotype.Service;
 import com.nashtech.assetmanagement.dto.request.RequestChangePassDto;
 import com.nashtech.assetmanagement.dto.request.RequestLoginDTO;
 import com.nashtech.assetmanagement.dto.request.RequestUserDto;
-import com.nashtech.assetmanagement.dto.response.*;
-import com.nashtech.assetmanagement.dto.request.UserRequestDto;
 import com.nashtech.assetmanagement.dto.response.ListUsersResponse;
 import com.nashtech.assetmanagement.dto.response.LocationResponseDTO;
 import com.nashtech.assetmanagement.dto.response.ResponseMessage;
@@ -102,17 +100,6 @@ public class UserServiceImpl implements UserService {
 		return new ResponseSignInDTO(userPrinciple.getStaffCode(), userPrinciple.getUsername(),
 				userPrinciple.getState(), userPrinciple.getAuthorities(), token);
 	}
-    @Override
-    public ResponseSignInDTO signIn(RequestLoginDTO requestLoginDTO) {
-        Authentication authentication =
-                authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(requestLoginDTO.getUserName(), requestLoginDTO.getPassword()));
-        SecurityContextHolder.getContext().setAuthentication(authentication);
-        String token = jwtUtils.generateJwtToken(authentication);
-        UserPrinciple userPrinciple = (UserPrinciple) authentication.getPrincipal();
-        return new ResponseSignInDTO(userPrinciple.getStaffCode(),
-                userPrinciple.getUsername(),userPrinciple.getState(), userPrinciple.getAuthorities(),
-                token);
-    }
 
     @Override
     public UserDto createNewUser(RequestUserDto user) {
@@ -139,23 +126,6 @@ public class UserServiceImpl implements UserService {
 		return responseUser;
 	}
 
-	@Override
-	public UserDto editUser(UserRequestDto user, String staffCode) {
-		Optional<Users> usersOptional = userRepository.findByStaffCode(staffCode);
-		Optional<Role> roleOptional = roleRepository.findByName(user.getRoleName());
-		if (usersOptional.isEmpty()) {
-			throw new ResourceNotFoundException("Staff code not found");
-		}
-		if (roleOptional.isEmpty()) {
-			throw new ResourceNotFoundException("Role name not found");
-		}
-		Users editUser = usersOptional.get();
-		Role role = roleOptional.get();
-		userMapper.requestDtoToUser(editUser, user, role);
-		userRepository.save(editUser);
-		UserDto responseUser = modelMapper.map(editUser, UserDto.class);
-		return responseUser;
-	}
     @Override
     public UserDto editUser(RequestUserDto user, String staffCode) {
         Optional<Users> usersOptional = userRepository.findByStaffCode(staffCode);
