@@ -13,6 +13,7 @@ import java.util.Date;
 import java.util.List;
 import java.util.Optional;
 
+import com.nashtech.assetmanagement.dto.response.*;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -31,11 +32,6 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 
 import com.nashtech.assetmanagement.dto.request.RequestChangePassDto;
 import com.nashtech.assetmanagement.dto.request.RequestUserDto;
-import com.nashtech.assetmanagement.dto.response.ListUsersResponse;
-import com.nashtech.assetmanagement.dto.response.LocationResponseDTO;
-import com.nashtech.assetmanagement.dto.response.ResponseMessage;
-import com.nashtech.assetmanagement.dto.response.ResponseUserDTO;
-import com.nashtech.assetmanagement.dto.response.UserDto;
 import com.nashtech.assetmanagement.entities.Location;
 import com.nashtech.assetmanagement.entities.Role;
 import com.nashtech.assetmanagement.entities.Users;
@@ -99,6 +95,43 @@ public class UserServiceImplTest {
         UserDto result = userServiceImpl.createNewUser(userRequest);
         assertThat(result).isEqualTo(userResponse);
     }
+
+    @Test
+    void givenSearchCondition_whenGetUsersBySearchOrFilter_thenReturnListUsersResponse() {
+    	//given
+		Users user = mock(Users.class);
+		Location location = mock(Location.class);
+		ListUsersResponse expectedResponse = mock(ListUsersResponse.class);
+		when(authenticationService.getUser()).thenReturn(user);
+		when(user.getStaffCode()).thenReturn("SD001");
+		when(user.getLocation()).thenReturn(location);
+		when(location.getCode()).thenReturn("HCM");
+		Sort sort = mock(Sort.class);
+		Pageable pageable = PageRequest.of(0,1, defaultSorting("fistName", "ASC"));
+		Page<Users> usersPage = mock(Page.class);
+		List<String> roles = mock(List.class);
+		when(userRepository.searchByStaffCodeOrNameWithRole(
+				"SD".replaceAll(" ","").toLowerCase(),
+				"SD001".replaceAll(" ","").toLowerCase(),
+				"HCM".toLowerCase(),
+				roles,
+				pageable
+				)).thenReturn(usersPage);
+		when(usersContent.getUsersContent(usersPage)).thenReturn(expectedResponse);
+
+		//when
+		ListUsersResponse actualResponse =
+				userServiceImpl.getAllUsersBySearchingStaffCodeOrNameOrRole(
+						0,
+						1,
+						"fistName",
+						"ASC",
+						"SD",
+						roles);
+
+		//then
+		assertThat(actualResponse).isEqualTo(expectedResponse);
+	}
     @Test
     void createNewUser_ShouldThrowResourceNotFoundEx_WhenRequestRoleNameIncorrect(){
         Location location = mock(Location.class);
@@ -180,104 +213,6 @@ public class UserServiceImplTest {
         assertThat(result).isEqualTo(responseList);
     }
 
-
-	// -----------------US574 start--------------
-	@DisplayName("Get users order by first name asc when give sorting parameters")
-	@Test
-	void givenPageParameters_whenGetAllUserOrderByFirstNameAsc_thenReturnListUsersResponse() {
-		// given
-		ListUsersResponse expectedResponse = mock(ListUsersResponse.class);
-		;
-		Users user = mock(Users.class);
-		Pageable pageable = PageRequest.of(0, 1, defaultSorting(DEFAULT_SORT_BY, DEFAULT_SORT_DIRECTION));
-		when(authenticationService.getUser()).thenReturn(user);
-		when(user.getStaffCode()).thenReturn("SD0001");
-		Location location = mock(Location.class);
-		when(user.getLocation()).thenReturn(location);
-		when(user.getLocation().getCode()).thenReturn("HCM");
-		Page<Users> usersPage = mock(Page.class);
-		when(userRepository.findAllByOrderByFirstNameAsc(pageable, "SD0001", "HCM")).thenReturn(usersPage);
-		when(usersContent.getUsersContent(usersPage)).thenReturn(expectedResponse);
-
-		// when
-		ListUsersResponse actualResponse = userServiceImpl.getAllUserOrderByFirstNameAsc(0, 1, DEFAULT_SORT_BY,
-				DEFAULT_SORT_DIRECTION);
-		// then
-		assertThat(actualResponse).isEqualTo(expectedResponse);
-	}
-
-	@DisplayName("Get users by searching staffcode or fullname when give sorting parameters")
-	@Test
-	void givenSortingParameters_whenGetAllUsersBySearchingStaffCodeOrName_thenReturnListUsersResponse() {
-		// given
-		ListUsersResponse expectedResponse = mock(ListUsersResponse.class);
-
-		Users user = mock(Users.class);
-		Location location = mock(Location.class);
-		Pageable pageable = PageRequest.of(0, 1, defaultSorting(DEFAULT_SORT_BY, DEFAULT_SORT_DIRECTION));
-		when(authenticationService.getUser()).thenReturn(user);
-		when(user.getStaffCode()).thenReturn("SD0001");
-		when(user.getLocation()).thenReturn(location);
-		when(user.getLocation().getCode()).thenReturn("HN");
-		Page<Users> usersPage = mock(Page.class);
-		when(userRepository.searchByStaffCodeOrName("SD0002".replaceAll(" ", "").toLowerCase(),
-				"SD0001".replaceAll(" ", "").toLowerCase(), "HN".toLowerCase(), pageable)).thenReturn(usersPage);
-		when(usersContent.getUsersContent(usersPage)).thenReturn(expectedResponse);
-
-		// when
-		ListUsersResponse actualResponse = userServiceImpl.getAllUsersBySearchingStaffCodeOrName(0, 1, DEFAULT_SORT_BY,
-				DEFAULT_SORT_DIRECTION, "SD0002");
-
-		// then
-		assertThat(actualResponse).isEqualTo(expectedResponse);
-
-	}
-
-	@DisplayName("Get users by role when give sorting parameters positive case")
-	@Test
-	void givenValidRoleAndSortingParameters_whenGetUsersByRole_thenReturnListUsersResponse() {
-		// given
-		Role existRole = mock(Role.class);
-		Users userLogged = mock(Users.class);
-		Location location = mock(Location.class);
-		Page<Users> usersPage = mock(Page.class);
-		ListUsersResponse expectedResponse = mock(ListUsersResponse.class);
-
-		when(roleRepository.findByName("ADMIN")).thenReturn(Optional.of(existRole));
-		when(authenticationService.getUser()).thenReturn(userLogged);
-		when(userLogged.getStaffCode()).thenReturn("SD001");
-		when(userLogged.getLocation()).thenReturn(location);
-		when(location.getCode()).thenReturn("HCM");
-		Pageable pageable = PageRequest.of(0, 1, defaultSorting(DEFAULT_SORT_BY, DEFAULT_SORT_DIRECTION));
-		when(userRepository.findUsersByRole(pageable, existRole, "SD001", "HCM")).thenReturn(usersPage);
-		when(usersContent.getUsersContent(usersPage)).thenReturn(expectedResponse);
-
-		// when
-		ListUsersResponse actualResponse = userServiceImpl.getAllUsersByRole(0, 1, DEFAULT_SORT_BY,
-				DEFAULT_SORT_DIRECTION, "ADMIN");
-		// then
-		assertThat(actualResponse).isEqualTo(expectedResponse);
-	}
-
-	@DisplayName("Get users by role when give sorting parameters negative case")
-	@Test
-	void givenInvalidRole_whenGetUsersByRole_thenThrowsException() {
-		// given
-		when(roleRepository.findByName("NON_EXIST_ROLE")).thenReturn(Optional.empty());
-		// when
-		ResourceNotFoundException exception = Assertions.assertThrows(ResourceNotFoundException.class,
-				() -> userServiceImpl.getAllUsersByRole(0, 1, DEFAULT_SORT_BY, DEFAULT_SORT_DIRECTION,
-						"NON_EXIST_ROLE"));
-		// then
-		assertThat(exception.getMessage()).isEqualTo("Role." + "NON_EXIST_ROLE" + ".not.found");
-	}
-
-	public Sort defaultSorting(String sortBy, String sortDirection) {
-		return sortDirection.equalsIgnoreCase(Sort.Direction.ASC.name()) ? Sort.by(sortBy).ascending()
-				: Sort.by(sortBy).descending();
-	}
-
-	// -----------------US574 end--------------
 
 	@Test
 	void changePasswordFirstLogin_WhenUserStateIsNotINIT_Expect_ReturnResponseMessage() {
@@ -395,6 +330,11 @@ public class UserServiceImplTest {
 		ResponseUserDTO actual = userServiceImpl.disableStaff("SD001");
 		verify(entity).setState(UserState.INACTIVE);
 		assertThat(actual).isEqualTo(expected);
+	}
+
+	public Sort defaultSorting(String sortBy, String sortDirection) {
+		return sortDirection.equalsIgnoreCase(Sort.Direction.ASC.name()) ? Sort.by(sortBy).ascending()
+				: Sort.by(sortBy).descending();
 	}
 
 }

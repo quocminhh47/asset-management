@@ -171,33 +171,6 @@ public class UserServiceImpl implements UserService {
         return userDtoList;
     }
 
-	@Override
-	public ListUsersResponse getAllUserOrderByFirstNameAsc(int pageNo, int pageSize, String sortBy,
-			String sortDirection) {
-
-		Pageable pageable = PageRequest.of(pageNo, pageSize, defaultSorting(sortBy, sortDirection));
-//        Pageable pageable = null; -> test
-		Users user = authenticationService.getUser();
-		String loggedStaffCode = user.getStaffCode();
-		String location = user.getLocation().getCode();
-		Page<Users> users = userRepository.findAllByOrderByFirstNameAsc(pageable, loggedStaffCode, location);
-
-		return usersContent.getUsersContent(users);
-	}
-
-	@Override
-	public ListUsersResponse getAllUsersBySearchingStaffCodeOrName(int pageNo, int pageSize, String sortBy,
-			String sortDirection, String searchText) {
-		Pageable pageable = PageRequest.of(pageNo, pageSize, defaultSorting(sortBy, sortDirection));
-//                Pageable pageable = null;
-		Users user = authenticationService.getUser();
-		String loggedStaffCode = user.getStaffCode();
-		String location = user.getLocation().getCode();
-		Page<Users> users = userRepository.searchByStaffCodeOrName(searchText.replaceAll(" ", "").toLowerCase(),
-				loggedStaffCode.replaceAll(" ", "").toLowerCase(), location.toLowerCase(), pageable);
-
-		return usersContent.getUsersContent(users);
-	}
 
 	@Override
 	public ListUsersResponse getAllUsersBySearchingStaffCodeOrNameOrRole(int pageNo,
@@ -205,34 +178,21 @@ public class UserServiceImpl implements UserService {
 																		 String sortBy,
 																		 String sortDirection,
 																		 String searchText,
-																		 String roleName) {
+																		 List<String> rolesName) {
 
 		Users user = authenticationService.getUser();
 		String loggedStaffCode = user.getStaffCode();
 		String location = user.getLocation().getCode();
 		Pageable pageable = PageRequest.of(pageNo, pageSize, defaultSorting(sortBy, sortDirection));
-		Page<Users> users;
-		System.out.println(roleName);
-		if (roleName.equalsIgnoreCase("all")) {
-			System.out.println("role all");
-			users = userRepository.searchByStaffCodeOrName(
-					searchText.replaceAll(" ", "").toLowerCase(),
-					loggedStaffCode.replaceAll(" ", "").toLowerCase(),
-					location.toLowerCase(),
-					pageable);
 
-		}
-		else {
-			Role role = roleRepository.findByName(roleName.toUpperCase()).orElseThrow(
-					() -> new ResourceNotFoundException("Role." + roleName +".not.found"));
-			users = userRepository.searchByStaffCodeOrNameWithRole(
-					searchText.replaceAll(" ","").toLowerCase(),
-					loggedStaffCode.replaceAll(" ","").toLowerCase(),
-					location.toLowerCase(),
-					role.getId(),
-					pageable);
+		Page<Users> users = userRepository.searchByStaffCodeOrNameWithRole(
+				searchText.toLowerCase(),
+				loggedStaffCode.replaceAll(" ",""),
+				location.toLowerCase(),
+				rolesName,
+				pageable
+		);
 
-		}
 		return usersContent.getUsersContent(users);
 	}
 
@@ -243,20 +203,6 @@ public class UserServiceImpl implements UserService {
 		return UserPrinciple.build(user);
 	}
 
-	@Override
-	public ListUsersResponse getAllUsersByRole(int pageNo, int pageSize, String sortBy, String sortDirection,
-			String roleName) {
-		Role role = roleRepository.findByName(roleName)
-				.orElseThrow(() -> new ResourceNotFoundException("Role." + roleName + ".not.found"));
-
-		Users user = authenticationService.getUser();
-		String loggedStaffCode = user.getStaffCode();
-		String location = user.getLocation().getCode();
-		Pageable pageable = PageRequest.of(pageNo, pageSize, defaultSorting(sortBy, sortDirection));
-		Page<Users> users = userRepository.findUsersByRole(pageable, role, loggedStaffCode, location);
-
-		return usersContent.getUsersContent(users);
-	}
 
 	@Override
 	public SingleUserResponse getUserDetailInfo(String staffCode) {
