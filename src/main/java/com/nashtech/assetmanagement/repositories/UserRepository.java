@@ -25,38 +25,21 @@ public interface UserRepository extends JpaRepository<Users, String> {
             "and location_id=:locationCode",nativeQuery = true)
     List<Users> findByStaffCodeOrNameAndLocationCode(@Param("text") String text,String locationCode);
 
-    @Query(value = "SELECT * FROM users u" +
-            " where ((LOWER(u.staff_code) like %:text%) or" +
-            " LOWER((concat(u.first_name, u.last_name))) like %:text%)" +
-            "and LOWER(u.location_id) = :location and u.staff_code != :loggedStaffCode",
-            nativeQuery = true)
-    Page<Users> searchByStaffCodeOrName(@Param("text") String text,
-                                        @Param("loggedStaffCode") String loggedStaffCode,
-                                        @Param(("location")) String adminLocation,
-                                        Pageable pageable);
-
-    @Query(value = "select u from Users u " +
-            "where u.role = :role and " +
-            "not u.staffCode = :staffCode " +
-            "and u.location.code = :location")
-    Page<Users> findUsersByRole(Pageable pageable,
-                                @Param("role") Role role,
-                                @Param("staffCode") String loggedStaffCode,
-                                @Param("location") String location);
 
     int countUsersByFirstNameAndLastName(String firstName,String lastName);
     Optional<Users> findByStaffCode(String staffCode);
 
-    @Query(value = "SELECT * FROM users u" +
-            " where ((LOWER(u.staff_code) like %:text%) or" +
-            " LOWER((concat(u.first_name, ' ', u.last_name))) like %:text%)" +
-            "and LOWER(u.location_id) = :location " +
-            "and u.staff_code != :loggedStaffCode " +
-            "and u.role_id = :roleId",
-            nativeQuery = true)
+
+    @Query(value = "select u from Users u " +
+            "where ( lower(u.staffCode) like concat('%', :text, '%') or " +
+            "lower( concat(u.firstName, ' ', u.lastName) ) like concat('%', :text, '%'))" +
+            "and lower(u.location.code) = :location " +
+            "and upper(u.role.name) in :roles " +
+            "and u.staffCode <> :loggedStaffCode " +
+            "and u.state <> 'INACTIVE'" , nativeQuery = false)
     Page<Users> searchByStaffCodeOrNameWithRole(@Param("text") String text,
                                                 @Param("loggedStaffCode") String loggedStaffCode,
-                                                @Param(("location")) String adminLocation,
-                                                @Param(("roleId")) Long roleId,
+                                                @Param("location") String adminLocation,
+                                                @Param("roles") List<String> roles,
                                                 Pageable pageable);
 }

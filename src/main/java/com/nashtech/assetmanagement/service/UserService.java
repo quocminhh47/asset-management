@@ -31,16 +31,6 @@ public interface UserService {
     UserPrinciple loadUserByUsername(String userName)
             throws UsernameNotFoundException;
 
-    ListUsersResponse getAllUserOrderByFirstNameAsc(int pageNo,
-                                                    int pageSize,
-                                                    String sortBy,
-                                                    String sortDirection);
-
-    ListUsersResponse getAllUsersBySearchingStaffCodeOrName(int pageNo,
-                                                            int pageSize,
-                                                            String sortBy,
-                                                            String sortDirection,
-                                                            String searchText);
 
     //filter + searching
     ListUsersResponse getAllUsersBySearchingStaffCodeOrNameOrRole(int pageNo,
@@ -48,15 +38,10 @@ public interface UserService {
                                                                   String sortBy,
                                                                   String sortDirection,
                                                                   String searchText,
-                                                                  String roleName);
+                                                                  List<String> roles);
 
 
-
-    ListUsersResponse getAllUsersByRole(int pageNo,
-                                                            int pageSize,
-                                                            String sortBy,
-                                                            String sortDirection,
-                                                            String searchText);
+    
 
     SingleUserResponse getUserDetailInfo(String staffCode);
 

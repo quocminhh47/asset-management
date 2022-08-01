@@ -17,6 +17,8 @@ import com.nashtech.assetmanagement.utils.AppConstants;
 
 import lombok.AllArgsConstructor;
 
+import java.util.List;
+
 @RestController
 @AllArgsConstructor
 @RequestMapping("/admin/api/users")
@@ -24,23 +26,11 @@ public class UsersManagementController {
 
 	private final UserService userService;
 
-	@GetMapping("/all")
-	@ResponseStatus(HttpStatus.OK)
-	public ListUsersResponse getAllStaffOrderByFirstNameAsc(
-			@RequestParam(value = "pageNo", defaultValue = AppConstants.DEFAULT_PAGE_NUMBER, required = false) int pageNo,
-			@RequestParam(value = "pageSize", defaultValue = "20", required = false)
-//                    value = "pageSize", defaultValue = AppConstants.DEFAULT_PAGE_SIZE, required = false)
-			int pageSize, @RequestParam(value = "sortBy", defaultValue = "firstName", required = false) String sortBy,
-			@RequestParam(value = "sortDirection", defaultValue = AppConstants.DEFAULT_SORT_DIRECTION, required = false) String sortDirection) {
-		return userService.getAllUserOrderByFirstNameAsc(pageNo, pageSize, sortBy, sortDirection);
-	}
-
-
-    @GetMapping("/searching")
+    @GetMapping("/all")
     @ResponseStatus(HttpStatus.OK)
     public ListUsersResponse getAllStaffOrderByFirstNameAsc(
-            @RequestParam("textPattern") String searchText,
-            @RequestParam("role") String roleName,
+            @RequestParam(value = "textPattern", defaultValue = "" ) String searchText,
+            @RequestParam("role") List<String> roles,
             @RequestParam(
                     value = "pageNo", defaultValue = AppConstants.DEFAULT_PAGE_NUMBER, required = false)
                     int pageNo,
@@ -48,25 +38,14 @@ public class UsersManagementController {
                     value = "pageSize", defaultValue = "20", required = false)
                     int pageSize,
             @RequestParam(
-                    value = "sortBy", defaultValue = "first_name", required = false)
+                    value = "sortBy", defaultValue = "firstName", required = false)
                     String sortBy,
             @RequestParam(
                     value = "sortDirection", defaultValue = AppConstants.DEFAULT_SORT_DIRECTION, required = false)
                     String sortDirection
     ) {
-        return userService.getAllUsersBySearchingStaffCodeOrNameOrRole(pageNo, pageSize, sortBy,sortDirection, searchText, roleName);
+        return userService.getAllUsersBySearchingStaffCodeOrNameOrRole(pageNo, pageSize, sortBy,sortDirection, searchText, roles);
     }
-
-	@GetMapping("/filter/{role}")
-	@ResponseStatus(HttpStatus.OK)
-	public ListUsersResponse getAllStaffOrderByRole(@PathVariable("role") String roleName,
-			@RequestParam(value = "pageNo", defaultValue = AppConstants.DEFAULT_PAGE_NUMBER, required = false) int pageNo,
-			@RequestParam(value = "pageSize", defaultValue = "20", required = false)
-//                    value = "pageSize", defaultValue = AppConstants.DEFAULT_PAGE_SIZE, required = false)
-			int pageSize, @RequestParam(value = "sortBy", defaultValue = "firstName", required = false) String sortBy,
-			@RequestParam(value = "sortDirection", defaultValue = AppConstants.DEFAULT_SORT_DIRECTION, required = false) String sortDirection) {
-		return userService.getAllUsersByRole(pageNo, pageSize, sortBy, sortDirection, roleName);
-	}
 
 	@GetMapping("/{staffCode}")
 	@ResponseStatus(HttpStatus.OK)
