@@ -5,5 +5,6 @@ import org.springframework.data.jpa.repository.JpaRepository;
 
 public interface CategoryRepository extends JpaRepository<Category, String>{
 
-    public boolean existsCategoriesById(String id);
+    boolean existsCategoriesById(String id);
+    boolean existsCategoriesByName(String name);
 }
