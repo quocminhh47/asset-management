@@ -4,12 +4,13 @@ import static com.nashtech.assetmanagement.utils.AppConstants.DEFAULT_SORT_BY;
 import static com.nashtech.assetmanagement.utils.AppConstants.DEFAULT_SORT_DIRECTION;
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 import java.util.Optional;
 
 import org.junit.jupiter.api.Assertions;
@@ -19,8 +20,6 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.mockito.junit.jupiter.MockitoSettings;
-import org.mockito.quality.Strictness;
 import org.modelmapper.ModelMapper;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -32,8 +31,8 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 
 import com.nashtech.assetmanagement.dto.request.RequestChangePassDto;
 import com.nashtech.assetmanagement.dto.request.RequestUserDto;
-import com.nashtech.assetmanagement.dto.response.LocationResponseDTO;
 import com.nashtech.assetmanagement.dto.response.ListUsersResponse;
+import com.nashtech.assetmanagement.dto.response.LocationResponseDTO;
 import com.nashtech.assetmanagement.dto.response.ResponseMessage;
 import com.nashtech.assetmanagement.dto.response.ResponseUserDTO;
 import com.nashtech.assetmanagement.dto.response.UserDto;
@@ -41,40 +40,17 @@ import com.nashtech.assetmanagement.entities.Location;
 import com.nashtech.assetmanagement.entities.Role;
 import com.nashtech.assetmanagement.entities.Users;
 import com.nashtech.assetmanagement.enums.UserState;
+import com.nashtech.assetmanagement.exception.DateInvalidException;
 import com.nashtech.assetmanagement.exception.ResourceNotFoundException;
 import com.nashtech.assetmanagement.mapper.LocationMapper;
 import com.nashtech.assetmanagement.mapper.UserMapper;
 import com.nashtech.assetmanagement.mapper.UsersContent;
+import com.nashtech.assetmanagement.repositories.AssignmentRepository;
 import com.nashtech.assetmanagement.repositories.LocationRepository;
 import com.nashtech.assetmanagement.repositories.RoleRepository;
 import com.nashtech.assetmanagement.repositories.UserRepository;
 import com.nashtech.assetmanagement.sercurity.jwt.JwtUtils;
 import com.nashtech.assetmanagement.service.AuthenticationService;
-import org.junit.jupiter.api.Assertions;
-import org.junit.jupiter.api.DisplayName;
-import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.InjectMocks;
-import org.mockito.Mock;
-import org.mockito.junit.jupiter.MockitoExtension;
-import org.modelmapper.ModelMapper;
-import org.springframework.http.HttpStatus;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Pageable;
-import org.springframework.data.domain.Sort;
-import org.springframework.security.authentication.AuthenticationManager;
-import org.springframework.security.crypto.password.PasswordEncoder;
-
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
-import java.util.Optional;
-
-import static com.nashtech.assetmanagement.utils.AppConstants.DEFAULT_SORT_BY;
-import static com.nashtech.assetmanagement.utils.AppConstants.DEFAULT_SORT_DIRECTION;
-import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
-import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
 public class UserServiceImplTest {
@@ -102,6 +78,9 @@ public class UserServiceImplTest {
 	ModelMapper modelMapper;
 	@InjectMocks
 	UserServiceImpl userServiceImpl;
+	
+	@Mock
+	AssignmentRepository assignmentRepository;
 
     @Test
     void createNewUser_ShouldReturnUserDto_WhenRequestValid(){
@@ -370,6 +349,52 @@ public class UserServiceImplTest {
 			userServiceImpl.changePassword(requestDto);
 		});
 		assertThat(exception.getMessage()).isEqualTo("user.not.found.with.staff.code:" + requestDto.getStaffCode());
+	}
+	
+//	=================================#578 disable user===========================================
+
+	@Test
+	public void checkExistsAssignment_shouldReturnException_whenUserIdExist() {
+		Users entity = mock(Users.class);
+		when(userRepository.findById("SD001")).thenReturn(Optional.of(entity));
+		when(assignmentRepository.existsByAssignedToOrAssignedBy(entity, entity)).thenReturn(true);
+		Exception exception = assertThrows(DateInvalidException.class, () -> {
+			userServiceImpl.checkExistsAssignment("SD001");
+		});
+		assertThat(exception.getMessage()).isEqualTo("exist.valid.assignments");
+	}
+
+	@Test
+	public void checkExistsAssignment_shouldThrowsExceptionNotFound_whenUserIdNotExist() {
+		when(userRepository.findById("SD001")).thenReturn(Optional.empty());
+		Exception exception = assertThrows(ResourceNotFoundException.class, () -> {
+			userServiceImpl.checkExistsAssignment("SD001");
+		});
+		assertThat(exception.getMessage()).isEqualTo("staff.not.found.with.code:SD001");
+	}
+
+	@Test
+	public void disableStaff_shouldThrowsExceptionNotFound_whenUserIdNotExist() {
+		when(userRepository.findById("SD001")).thenReturn(Optional.empty());
+		Exception exception = assertThrows(ResourceNotFoundException.class, () -> {
+			userServiceImpl.checkExistsAssignment("SD001");
+		});
+		assertThat(exception.getMessage()).isEqualTo("staff.not.found.with.code:SD001");
+	}
+
+	@Test
+	public void disableStaff_shouldReturnResponseDto_whenUserIdExist() {
+		
+		Users entity = mock(Users.class);
+		ResponseUserDTO expected = mock(ResponseUserDTO.class);
+		
+		when(userRepository.findById("SD001")).thenReturn(Optional.of(entity));
+		when(userRepository.save(entity)).thenReturn(entity);
+		when(modelMapper.map(entity, ResponseUserDTO.class)).thenReturn(expected);
+		
+		ResponseUserDTO actual = userServiceImpl.disableStaff("SD001");
+		verify(entity).setState(UserState.INACTIVE);
+		assertThat(actual).isEqualTo(expected);
 	}
 
 }

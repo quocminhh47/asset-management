@@ -1,5 +1,15 @@
 package com.nashtech.assetmanagement.service.impl;
 
+import java.sql.Date;
+import java.util.List;
+import java.util.Optional;
+
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
+import org.springframework.stereotype.Service;
+
 import com.nashtech.assetmanagement.dto.request.RequestAssignmentDTO;
 import com.nashtech.assetmanagement.dto.response.AssignmentDto;
 import com.nashtech.assetmanagement.dto.response.ListAssignmentResponse;
@@ -16,15 +26,8 @@ import com.nashtech.assetmanagement.repositories.AssignmentRepository;
 import com.nashtech.assetmanagement.repositories.UserRepository;
 import com.nashtech.assetmanagement.service.AssignmentService;
 import com.nashtech.assetmanagement.utils.StateConverter;
-import lombok.AllArgsConstructor;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Pageable;
-import org.springframework.data.domain.Sort;
-import org.springframework.stereotype.Service;
 
-import java.sql.Date;
-import java.util.Optional;
+import lombok.AllArgsConstructor;
 
 @Service
 @AllArgsConstructor
@@ -159,5 +162,18 @@ public class AssignmentServiceImpl implements AssignmentService {
         assignment.setAsset(asset.get());
         assignmentRepository.save(assignment);
         return assignmentMapper.MapAssignmentToResponseDto(assignment);
+    }
+
+    @Override
+    public List<AssignmentDto> getListAssignmentByAssetCode(String assetCode) {
+    	Optional<Asset> optionalAsset = assetRepository.findById(assetCode);
+    	if(!optionalAsset.isPresent()) {
+    		throw new ResourceNotFoundException(String.format("asset.not.found.with.code:%s", assetCode));
+    	}
+    	Asset asset = optionalAsset.get();
+    	List<Assignment> list = assignmentRepository.findByAsset(asset);
+    	List<AssignmentDto> resultList = assignmentMapper.mapperListAssignment(list);
+    	return resultList;
+    	
     }
 }

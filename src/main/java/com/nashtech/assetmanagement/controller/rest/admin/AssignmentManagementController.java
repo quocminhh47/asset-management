@@ -1,16 +1,25 @@
 package com.nashtech.assetmanagement.controller.rest.admin;
 
+import java.net.URI;
+import java.util.List;
+
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.ResponseStatus;
+import org.springframework.web.bind.annotation.RestController;
+
 import com.nashtech.assetmanagement.dto.request.RequestAssignmentDTO;
 import com.nashtech.assetmanagement.dto.response.AssignmentDto;
 import com.nashtech.assetmanagement.dto.response.ListAssignmentResponse;
 import com.nashtech.assetmanagement.service.AssignmentService;
 import com.nashtech.assetmanagement.utils.AppConstants;
-import lombok.AllArgsConstructor;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.*;
 
-import java.net.URI;
+import lombok.AllArgsConstructor;
 
 @RestController
 @AllArgsConstructor
@@ -66,4 +75,9 @@ public class AssignmentManagementController {
                 .body(this.assignmentService.createNewAssignment(request));
     }
 
+    // get assignment by asset code.
+    @GetMapping
+	public ResponseEntity<List<AssignmentDto>> getListAssignmentByAsset(@RequestParam(required = true, name = "assetId") String assetId) {
+		return new ResponseEntity<List<AssignmentDto>>(assignmentService.getListAssignmentByAssetCode(assetId), HttpStatus.OK);
+	}
 }
