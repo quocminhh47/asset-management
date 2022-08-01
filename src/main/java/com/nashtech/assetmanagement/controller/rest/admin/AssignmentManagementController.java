@@ -1,15 +1,19 @@
 package com.nashtech.assetmanagement.controller.rest.admin;
 
+import java.net.URI;
 import java.util.List;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.nashtech.assetmanagement.dto.request.RequestAssignmentDTO;
 import com.nashtech.assetmanagement.dto.response.AssignmentDto;
 import com.nashtech.assetmanagement.dto.response.ListAssignmentResponse;
 import com.nashtech.assetmanagement.service.AssignmentService;
@@ -29,16 +33,16 @@ public class AssignmentManagementController {
     public ListAssignmentResponse getAssignmentListOrderByDefaultOrFilter(
             @RequestParam(
                     value = "pageNo", defaultValue = AppConstants.DEFAULT_PAGE_NUMBER, required = false)
-                    int pageNo,
+            int pageNo,
             @RequestParam(
                     value = "pageSize", defaultValue = "20", required = false)
-                    int pageSize,
+            int pageSize,
             @RequestParam(
                     value = "sortBy", defaultValue = "assetCode", required = false)
-                    String sortBy,
+            String sortBy,
             @RequestParam(
                     value = "sortDirection", defaultValue = AppConstants.DEFAULT_SORT_DIRECTION, required = false)
-                    String sortDirection,
+            String sortDirection,
             @RequestParam(value = "state", defaultValue = "", required = false) String state,
             @RequestParam(value = "assigned-date", required = false) String assignedDate
     ) {
@@ -56,13 +60,19 @@ public class AssignmentManagementController {
     public ListAssignmentResponse getAssignmentListOrderBySearching(
             @RequestParam(
                     value = "pageNo", defaultValue = AppConstants.DEFAULT_PAGE_NUMBER, required = false)
-                    int pageNo,
+            int pageNo,
             @RequestParam(
                     value = "pageSize", defaultValue = "20", required = false)
-                    int pageSize,
+            int pageSize,
             @RequestParam(value = "text", defaultValue = "", required = false) String text
     ) {
         return assignmentService.getAssignmentsBySearching(pageNo, pageSize, text);
+    }
+
+    @PostMapping("/create")
+    public ResponseEntity<AssignmentDto> createNewAssignment(@RequestBody RequestAssignmentDTO request) {
+        return ResponseEntity.created(URI.create("/admin/api/assignment/create"))
+                .body(this.assignmentService.createNewAssignment(request));
     }
 
     // get assignment by asset code.

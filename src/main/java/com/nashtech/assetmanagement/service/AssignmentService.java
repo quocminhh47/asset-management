@@ -2,6 +2,7 @@ package com.nashtech.assetmanagement.service;
 
 import java.util.List;
 
+import com.nashtech.assetmanagement.dto.request.RequestAssignmentDTO;
 import com.nashtech.assetmanagement.dto.response.AssignmentDto;
 import com.nashtech.assetmanagement.dto.response.ListAssignmentResponse;
 
@@ -29,5 +30,7 @@ public interface AssignmentService {
                                                      int pageSize,
                                                      String textSearch);
 
-	List<AssignmentDto> getListAssignmentByAssetCode(String assetCode);
+    AssignmentDto createNewAssignment(RequestAssignmentDTO request);
+    
+    List<AssignmentDto> getListAssignmentByAssetCode(String assetCode);
 }

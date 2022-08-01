@@ -2,7 +2,7 @@ package com.nashtech.assetmanagement.controller.rest.user;
 
 import com.nashtech.assetmanagement.dto.request.RequestChangePassDto;
 import com.nashtech.assetmanagement.dto.request.RequestFirstLogin;
-import com.nashtech.assetmanagement.dto.request.UserRequestDto;
+import com.nashtech.assetmanagement.dto.request.RequestUserDto;
 import com.nashtech.assetmanagement.dto.response.LocationResponseDTO;
 import com.nashtech.assetmanagement.dto.response.ResponseMessage;
 import com.nashtech.assetmanagement.dto.response.ResponseUserDTO;
@@ -14,6 +14,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
+import java.util.List;
 
 @RequestMapping("")
 @RestController
@@ -27,19 +28,24 @@ public class UserController {
 
     @PostMapping("/admin/api/create")
     @ResponseStatus(HttpStatus.OK)
-    public UserDto createNewUser(@RequestBody @Valid UserRequestDto user){
+    public UserDto createNewUser(@RequestBody @Valid RequestUserDto user){
        return userService.createNewUser(user);
     }
 
     @PutMapping("/admin/api/edit/{id}")
     @ResponseStatus(HttpStatus.OK)
-    public UserDto editUser(@RequestBody @Valid UserRequestDto user, @PathVariable("id") String staffCode){
+    public UserDto editUser(@RequestBody @Valid RequestUserDto user, @PathVariable("id") String staffCode){
         return userService.editUser(user,staffCode);
     }
 
     @GetMapping("/admin/api/location/{staffCode}")
     public ResponseEntity<LocationResponseDTO> getLocationByStaffCode(@PathVariable("staffCode")String id){
         return ResponseEntity.ok(this.userService.getLocationByStaffCode(id));
+    }
+
+    @GetMapping("admin/api/searchUser/{location}")
+    public ResponseEntity<List<UserDto>> getUserListByStaffCodeOrName(@RequestParam("text")String text,@PathVariable("location")String locationCode){
+        return ResponseEntity.ok(this.userService.getUsersByStaffCodeOrNameAndLocationCode(text,locationCode));
     }
 
     @PostMapping("/user/api/first-login")
@@ -51,7 +57,7 @@ public class UserController {
         return new ResponseEntity<>(responseMessage,responseMessage.getStatus());
     }
     @PostMapping("/user/api/change-password")
-    public ResponseEntity<ResponseUserDTO> changePassword(@RequestBody RequestChangePassDto requestChangePassDto){
+    public ResponseEntity<ResponseUserDTO> changePassword(@Valid @RequestBody RequestChangePassDto requestChangePassDto){
         return ResponseEntity.ok(userService.changePassword(requestChangePassDto));
     }
 }

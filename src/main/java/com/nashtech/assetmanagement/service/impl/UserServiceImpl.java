@@ -22,7 +22,7 @@ import org.springframework.stereotype.Service;
 
 import com.nashtech.assetmanagement.dto.request.RequestChangePassDto;
 import com.nashtech.assetmanagement.dto.request.RequestLoginDTO;
-import com.nashtech.assetmanagement.dto.request.UserRequestDto;
+import com.nashtech.assetmanagement.dto.request.RequestUserDto;
 import com.nashtech.assetmanagement.dto.response.ListUsersResponse;
 import com.nashtech.assetmanagement.dto.response.LocationResponseDTO;
 import com.nashtech.assetmanagement.dto.response.ResponseMessage;
@@ -106,8 +106,8 @@ public class UserServiceImpl implements UserService {
 				userPrinciple.getState(), userPrinciple.getAuthorities(), token);
 	}
 
-	@Override
-	public UserDto createNewUser(UserRequestDto user) {
+    @Override
+    public UserDto createNewUser(RequestUserDto user) {
 
 		Optional<Location> location = locationRepository.findByName(user.getLocationName());
 		Optional<Role> role = roleRepository.findByName(user.getRoleName());
@@ -131,23 +131,23 @@ public class UserServiceImpl implements UserService {
 		return responseUser;
 	}
 
-	@Override
-	public UserDto editUser(UserRequestDto user, String staffCode) {
-		Optional<Users> usersOptional = userRepository.findByStaffCode(staffCode);
-		Optional<Role> roleOptional = roleRepository.findByName(user.getRoleName());
-		if (usersOptional.isEmpty()) {
-			throw new ResourceNotFoundException("Staff code not found");
-		}
-		if (roleOptional.isEmpty()) {
-			throw new ResourceNotFoundException("Role name not found");
-		}
-		Users editUser = usersOptional.get();
-		Role role = roleOptional.get();
-		userMapper.requestDtoToUser(editUser, user, role);
-		userRepository.save(editUser);
-		UserDto responseUser = modelMapper.map(editUser, UserDto.class);
-		return responseUser;
-	}
+    @Override
+    public UserDto editUser(RequestUserDto user, String staffCode) {
+        Optional<Users> usersOptional = userRepository.findByStaffCode(staffCode);
+        Optional<Role> roleOptional = roleRepository.findByName(user.getRoleName());
+        if (usersOptional.isEmpty()){
+            throw new ResourceNotFoundException("Staff code not found");
+        }
+        if (roleOptional.isEmpty()){
+            throw new ResourceNotFoundException("Role name not found");
+        }
+        Users editUser = usersOptional.get();
+        Role role = roleOptional.get();
+        userMapper.requestDtoToUser(editUser,user,role);
+        userRepository.save(editUser);
+        UserDto responseUser = modelMapper.map(editUser,UserDto.class);
+        return responseUser;
+    }
 
 	@Override
 	public LocationResponseDTO getLocationByStaffCode(String staffCode) {
@@ -159,6 +159,17 @@ public class UserServiceImpl implements UserService {
 		Location location = users.getLocation();
 		return locationMapper.locationToLocationDTO(location);
 	}
+
+    @Override
+    public List<UserDto> getUsersByStaffCodeOrNameAndLocationCode(String text,String locationCode) {
+        Optional<Location> location = locationRepository.findById(locationCode);
+        if(location.isEmpty()){
+            throw new ResourceNotFoundException("Location code not found");
+        }
+        List<Users> usersList = userRepository.findByStaffCodeOrNameAndLocationCode(text.toLowerCase(),locationCode);
+        List<UserDto> userDtoList = userMapper.mapListUserToListUserDto(usersList);
+        return userDtoList;
+    }
 
 	@Override
 	public ListUsersResponse getAllUserOrderByFirstNameAsc(int pageNo, int pageSize, String sortBy,
@@ -185,6 +196,43 @@ public class UserServiceImpl implements UserService {
 		Page<Users> users = userRepository.searchByStaffCodeOrName(searchText.replaceAll(" ", "").toLowerCase(),
 				loggedStaffCode.replaceAll(" ", "").toLowerCase(), location.toLowerCase(), pageable);
 
+		return usersContent.getUsersContent(users);
+	}
+
+	@Override
+	public ListUsersResponse getAllUsersBySearchingStaffCodeOrNameOrRole(int pageNo,
+																		 int pageSize,
+																		 String sortBy,
+																		 String sortDirection,
+																		 String searchText,
+																		 String roleName) {
+
+		Users user = authenticationService.getUser();
+		String loggedStaffCode = user.getStaffCode();
+		String location = user.getLocation().getCode();
+		Pageable pageable = PageRequest.of(pageNo, pageSize, defaultSorting(sortBy, sortDirection));
+		Page<Users> users;
+		System.out.println(roleName);
+		if (roleName.equalsIgnoreCase("all")) {
+			System.out.println("role all");
+			users = userRepository.searchByStaffCodeOrName(
+					searchText.replaceAll(" ", "").toLowerCase(),
+					loggedStaffCode.replaceAll(" ", "").toLowerCase(),
+					location.toLowerCase(),
+					pageable);
+
+		}
+		else {
+			Role role = roleRepository.findByName(roleName.toUpperCase()).orElseThrow(
+					() -> new ResourceNotFoundException("Role." + roleName +".not.found"));
+			users = userRepository.searchByStaffCodeOrNameWithRole(
+					searchText.replaceAll(" ","").toLowerCase(),
+					loggedStaffCode.replaceAll(" ","").toLowerCase(),
+					location.toLowerCase(),
+					role.getId(),
+					pageable);
+
+		}
 		return usersContent.getUsersContent(users);
 	}
 
