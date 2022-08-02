@@ -2,7 +2,6 @@ package com.nashtech.assetmanagement.service.impl;
 
 import com.nashtech.assetmanagement.dto.request.RequestAssignmentDTO;
 import com.nashtech.assetmanagement.dto.response.AssignmentDto;
-import com.nashtech.assetmanagement.dto.response.ListAssignmentResponse;
 import com.nashtech.assetmanagement.entities.Asset;
 import com.nashtech.assetmanagement.entities.Assignment;
 import com.nashtech.assetmanagement.entities.Users;
@@ -11,14 +10,18 @@ import com.nashtech.assetmanagement.mapper.AssignmentMapper;
 import com.nashtech.assetmanagement.repositories.AssetRepository;
 import com.nashtech.assetmanagement.repositories.AssignmentRepository;
 import com.nashtech.assetmanagement.repositories.UserRepository;
+import com.nashtech.assetmanagement.utils.StateConverter;
 import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 
+import java.sql.Date;
+import java.util.Arrays;
+import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 import static org.mockito.Mockito.mock;
@@ -44,36 +47,29 @@ class AssignmentServiceImplTest {
 
     }
 
-    @DisplayName("Test for search assignments by asset code or asset name or assignee's username")
-    @Test
-    void givenTextSearch_whenGetAssignmentsBySearching_thenReturnListAssignmentResponse() {
-        //given
-        ListAssignmentResponse expectedResponse = mock(ListAssignmentResponse.class);
-        Pageable pageable = PageRequest.of(0, 1);
-        Page<Assignment> assignmentPage = mock(Page.class);
-        String textSearch = "LA100001";
-        when(assignmentRepository.searchByAssetCodeOrAssetNameOrUsernameAssignee(
-                textSearch.replaceAll(" ", "").toLowerCase(), pageable))
-                .thenReturn(assignmentPage);
-        when(assignmentContent.getAssignmentResponse(assignmentPage)).thenReturn(expectedResponse);
-
-        //when
-        ListAssignmentResponse actualResponse = assignmentServiceImpl.getAssignmentsBySearching(0, 1, textSearch);
-        //then
-        assertThat(actualResponse).isEqualTo(expectedResponse);
-    }
-
 //    @Test
-//    void givenInvalidAssignedDate_whenGetAllAssignmentByStateOrAssignedDate_thenThrowsException() {
-//        //when
-//        String assignedDateStr = "2030-12-30";
+//    void givenStateAndTextAndDate_whenGetAssignmentsByCondition_thenReturnListAssignmentResponse() {
+//        //given
+//        String[] arrayState = new String[] {"accepted" , "declined"};
+//
+//        List<String> states = Arrays.asList(arrayState);
+//        List<String> assignmentState = states.stream()
+//                .map(StateConverter::getAssignmentState)
+//                .collect(Collectors.toList());
+//
+//        assertThat(assignmentState.get(0)).isEqualTo("Accepted");
+//        assertThat(assignmentState.get(1)).isEqualTo("Declined");
+//        assertThat(assignmentState.size()).isEqualTo(2);
+//
+//        Pageable pageable = PageRequest.of(0,1);
+//        Page<Assignment> assignmentPage = mock(Page.class);
 //        Date assignedDate = mock(Date.class);
+//        String assignedDateStr = "2022-06-07";
 //        assignedDate = Date.valueOf(assignedDateStr);
-//        //when
-//        DateInvalidException exception = Assertions.assertThrows(DateInvalidException.class,
-//                () -> assignmentServiceImpl.getAllAssignmentByStateOrAssignedDate(0,1, ))
+//        Date dateNow = new Date(new java.util.Date().getTime());
 //
 //    }
+
 
     @Test
     void createNewAssignment_ShouldReturnResponseAssignmentDto_WhenRequestValid() {

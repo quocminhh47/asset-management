@@ -9,7 +9,6 @@ import javax.persistence.Column;
 import javax.persistence.Embeddable;
 import java.io.Serializable;
 import java.sql.Date;
-//import java.sql.Date;
 
 @Embeddable
 @Getter
@@ -26,7 +25,6 @@ public class AssignmentId implements Serializable {
     @Column(name = "asset_code", columnDefinition = "VARCHAR(10)")
     String assetCode;
 
-    @SuppressWarnings("unused")
     @Column(name = "assigned_date")
     private Date assignedDate;
 }
