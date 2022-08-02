@@ -111,8 +111,8 @@ public class UserServiceImplTest {
 		Page<Users> usersPage = mock(Page.class);
 		List<String> roles = mock(List.class);
 		when(userRepository.searchByStaffCodeOrNameWithRole(
-				"SD".replaceAll(" ","").toLowerCase(),
-				"SD001".replaceAll(" ","").toLowerCase(),
+				"SD".toLowerCase(),
+				"SD001".replaceAll(" ",""),
 				"HCM".toLowerCase(),
 				roles,
 				pageable
