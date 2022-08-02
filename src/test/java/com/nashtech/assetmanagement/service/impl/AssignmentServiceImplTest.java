@@ -1,16 +1,13 @@
 package com.nashtech.assetmanagement.service.impl;
 
-import com.nashtech.assetmanagement.dto.request.RequestAssignmentDTO;
-import com.nashtech.assetmanagement.dto.response.AssignmentDto;
-import com.nashtech.assetmanagement.dto.response.ListAssignmentResponse;
-import com.nashtech.assetmanagement.entities.Asset;
-import com.nashtech.assetmanagement.entities.Assignment;
-import com.nashtech.assetmanagement.entities.Users;
-import com.nashtech.assetmanagement.mapper.AssignmentContent;
-import com.nashtech.assetmanagement.mapper.AssignmentMapper;
-import com.nashtech.assetmanagement.repositories.AssetRepository;
-import com.nashtech.assetmanagement.repositories.AssignmentRepository;
-import com.nashtech.assetmanagement.repositories.UserRepository;
+import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
+
+import java.util.List;
+import java.util.Optional;
+
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -18,11 +15,18 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 
-import java.util.Optional;
-
-import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
+import com.nashtech.assetmanagement.dto.request.RequestAssignmentDTO;
+import com.nashtech.assetmanagement.dto.response.AssignmentDto;
+import com.nashtech.assetmanagement.dto.response.ListAssignmentResponse;
+import com.nashtech.assetmanagement.entities.Asset;
+import com.nashtech.assetmanagement.entities.Assignment;
+import com.nashtech.assetmanagement.entities.Users;
+import com.nashtech.assetmanagement.exception.ResourceNotFoundException;
+import com.nashtech.assetmanagement.mapper.AssignmentContent;
+import com.nashtech.assetmanagement.mapper.AssignmentMapper;
+import com.nashtech.assetmanagement.repositories.AssetRepository;
+import com.nashtech.assetmanagement.repositories.AssignmentRepository;
+import com.nashtech.assetmanagement.repositories.UserRepository;
 
 class AssignmentServiceImplTest {
 
@@ -95,4 +99,28 @@ class AssignmentServiceImplTest {
         assertThat(result).isEqualTo(response);
     }
 
+    //==============#579================
+    @Test
+    void getListAssignmentByAsset_ShouldReturnListAssignmentDto_WhenAssetIdExist() {
+    	Asset entity = mock(Asset.class);
+		List<Assignment> listEntity = mock(List.class);
+		List<AssignmentDto> expected = mock(List.class);
+    	when(assetRepository.findById("Laptop001")).thenReturn(Optional.of(entity));
+    	when(assignmentRepository.findByAsset(entity)).thenReturn(listEntity);
+    	when(assignmentMapper.mapperListAssignment(listEntity)).thenReturn(expected);
+    	
+    	List<AssignmentDto> actual = assignmentServiceImpl.getListAssignmentByAssetCode("Laptop001");
+    	assertThat(actual).isEqualTo(expected);
+    }
+    
+    @Test
+    void getListAssignmentByAsset_ShouldReturnListAssignmentDto_WhenAssetIdNotExist() {
+    	when(assetRepository.findById("Laptop001")).thenReturn(Optional.empty());
+    	Exception exception = assertThrows(ResourceNotFoundException.class, () -> {
+    		assignmentServiceImpl.getListAssignmentByAssetCode("Laptop001");
+		});
+    	assertThat(exception.getMessage()).isEqualTo("asset.not.found.with.code:Laptop001");
+    }
+    
+    
 }
