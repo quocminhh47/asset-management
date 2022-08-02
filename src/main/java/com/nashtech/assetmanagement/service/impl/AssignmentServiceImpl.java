@@ -55,7 +55,9 @@ public class AssignmentServiceImpl implements AssignmentService {
         if (!assignedDateStr.replaceAll(" ", "").isBlank()) {
             try {
                 assignedDate = Date.valueOf(assignedDateStr); //pattern: yyyy/mm/dd
+
                 Date dateNow = new Date(new java.util.Date().getTime());
+
                 if (assignedDate.after(dateNow)) throw new DateInvalidException(
                         "Date.is.must.before.today:" + dateNow.toString().replaceAll(" ", "."));
                 assignmentPage = assignmentRepository.getAssignmentByConditions(
@@ -92,7 +94,6 @@ public class AssignmentServiceImpl implements AssignmentService {
             throw new ResourceNotFoundException("Assign by User not found");
         }
         asset.get().setState(AssetState.ASSIGNED);
-        asset.get().setUser(assignTo.get());
         Assignment assignment = assignmentMapper.MapRequestAssignmentToAssignment(request);
         assignment.setAssignedTo(assignTo.get());
         assignment.setAssignedBy(assignBy.get());

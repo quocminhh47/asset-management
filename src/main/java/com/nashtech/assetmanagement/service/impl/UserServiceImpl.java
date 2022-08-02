@@ -120,7 +120,8 @@ public class UserServiceImpl implements UserService {
 		Users newUser = userMapper.MapToUser(user, role.get(), location.get());
 		List<String> staffCodeList = userRepository.findAllStaffCode();
 		int biggestStaffCode = UserGenerateUtil.getBiggestStaffCode(staffCodeList);
-		int sameName = userRepository.countUsersByFirstNameAndLastName(newUser.getFirstName(), newUser.getLastName());
+		String pattern = newUser.getLastName().substring(0,1);
+		int sameName = userRepository.countUsersByFirstNameAndLastNameLikeIgnoreCase(newUser.getFirstName(), (pattern+"%"));
 		newUser.setState(UserState.INIT);
 		newUser.setStaffCode(UserGenerateUtil.generateStaffCode(biggestStaffCode));
 		newUser.setUserName(UserGenerateUtil.generateUserName(newUser.getFirstName(), newUser.getLastName(), sameName));

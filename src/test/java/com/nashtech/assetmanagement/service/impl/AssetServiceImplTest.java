@@ -8,11 +8,14 @@ import com.nashtech.assetmanagement.entities.Category;
 import com.nashtech.assetmanagement.entities.Location;
 import com.nashtech.assetmanagement.entities.Users;
 import com.nashtech.assetmanagement.enums.AssetState;
+import com.nashtech.assetmanagement.exception.ResourceNotFoundException;
 import com.nashtech.assetmanagement.mapper.AssetMapper;
 import com.nashtech.assetmanagement.repositories.AssetRepository;
 import com.nashtech.assetmanagement.repositories.CategoryRepository;
 import com.nashtech.assetmanagement.repositories.LocationRepository;
 import com.nashtech.assetmanagement.repositories.UserRepository;
+import org.assertj.core.api.AssertionsForClassTypes;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
@@ -90,6 +93,13 @@ public class AssetServiceImplTest {
         when(assetMapper.getAssetListToResponseAssetDTOList(assetList)).thenReturn(responseList);
         List<ResponseAssetAndCategory> result = assetServiceImpl.getAssetByCodeOrNameAndLocationCode("text", "locationCode");
         assertThat(result).isEqualTo(responseList);
+    }
+    @Test
+    void getAssetList_ShouldThrowResourceNotFoundEx_WhenLocationCodeIncorrect(){
+        when(locationRepository.findById("HCM")).thenReturn(Optional.empty());
+        ResourceNotFoundException e = Assertions.assertThrows(ResourceNotFoundException.class,
+                () -> assetServiceImpl.getAssetByCodeOrNameAndLocationCode("text","HCM"));
+        AssertionsForClassTypes.assertThat(e.getMessage()).isEqualTo("Location code not found");
     }
 
 }
