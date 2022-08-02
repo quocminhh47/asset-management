@@ -111,8 +111,8 @@ public class UserServiceImplTest {
 		Page<Users> usersPage = mock(Page.class);
 		List<String> roles = mock(List.class);
 		when(userRepository.searchByStaffCodeOrNameWithRole(
-				"SD".replaceAll(" ","").toLowerCase(),
-				"SD001".replaceAll(" ","").toLowerCase(),
+				"SD".toLowerCase(),
+				"SD001".replaceAll(" ",""),
 				"HCM".toLowerCase(),
 				roles,
 				pageable
@@ -201,7 +201,8 @@ public class UserServiceImplTest {
                 () -> userServiceImpl.getLocationByStaffCode("sd0001"));
         assertThat(e.getMessage()).isEqualTo("Staff code not found");
     }
-    @Test
+    //US584-create new assignment
+	@Test
     void getUserByStaffCodeOrName_ShouldReturnUserDtoList_WhenStaffCodeOrNameExist(){
         List<Users> usersList = mock(ArrayList.class);
         List<UserDto> responseList = mock(ArrayList.class);
@@ -213,6 +214,13 @@ public class UserServiceImplTest {
         assertThat(result).isEqualTo(responseList);
     }
 
+	@Test
+	void getUserByStaffCodeOrName_ShouldThrowResourceNotFoundEx_WhenLocationCodeIncorrect(){
+		when(locationRepository.findById("HCM")).thenReturn(Optional.empty());
+		ResourceNotFoundException e = Assertions.assertThrows(ResourceNotFoundException.class,
+				() -> userServiceImpl.getUsersByStaffCodeOrNameAndLocationCode("text","HCM"));
+		assertThat(e.getMessage()).isEqualTo("Location code not found");
+	}
 
 	@Test
 	void changePasswordFirstLogin_WhenUserStateIsNotINIT_Expect_ReturnResponseMessage() {

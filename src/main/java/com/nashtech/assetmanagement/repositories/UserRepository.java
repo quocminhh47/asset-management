@@ -26,7 +26,7 @@ public interface UserRepository extends JpaRepository<Users, String> {
     List<Users> findByStaffCodeOrNameAndLocationCode(@Param("text") String text,String locationCode);
 
 
-    int countUsersByFirstNameAndLastName(String firstName,String lastName);
+    int countUsersByFirstNameAndLastNameLikeIgnoreCase(String firstName,String lastName);
     Optional<Users> findByStaffCode(String staffCode);
 
 

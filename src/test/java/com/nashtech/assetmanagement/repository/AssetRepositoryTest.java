@@ -1,6 +1,7 @@
 package com.nashtech.assetmanagement.repository;
 
 
+import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
@@ -47,10 +48,12 @@ public class AssetRepositoryTest {
     void findAssetByNameOrCodeAndLocationCode_ShouldReturnListAsset_WhenNameAndLocationCodeCorrect() {
         List<Asset> assetListByCode = assetRepository.findAssetByNameOrCodeAndLocationCode("lt", "HCM");
         String patternCode = "(.*[Ll][Tt].*)";
-        assertTrue(assetListByCode.get(0).getCode().matches(patternCode));
+        assertTrue(assetListByCode.get(0).getCode().matches(patternCode)||assetListByCode.get(0).getName().matches(patternCode));
+        assertThat(assetListByCode.get(0).getLocation().getCode()).isEqualTo("HCM");
         List<Asset> assetListByName = assetRepository.findAssetByNameOrCodeAndLocationCode("lap", "HCM");
         String patternName = (".*[Ll][Aa][Pp].*");
-        assertTrue(assetListByName.get(0).getName().matches(patternName));
+        assertTrue(assetListByName.get(0).getName().matches(patternName)||assetListByName.get(0).getCode().matches(patternName));
+        assertThat(assetListByName.get(0).getLocation().getCode()).isEqualTo("HCM");
     }
 
     //=============US 579=============

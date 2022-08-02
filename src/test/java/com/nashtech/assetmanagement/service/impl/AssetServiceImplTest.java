@@ -11,6 +11,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
+import org.assertj.core.api.AssertionsForClassTypes;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -89,19 +91,25 @@ public class AssetServiceImplTest {
 		assertThat(actual).isEqualTo(expected);
 	}
 
-	// US584-CreateNewAssignment
-	@Test
-	void getAssetList_ShouldReturnResponseAssetDtoList_WhenAssetExist() {
-		Location location = mock(Location.class);
-		List<Asset> assetList = mock(ArrayList.class);
-		List<ResponseAssetAndCategory> responseList = mock(ArrayList.class);
-		when(locationRepository.findById("locationCode")).thenReturn(Optional.of(location));
-		when(assetRepository.findAssetByNameOrCodeAndLocationCode("text", "locationCode")).thenReturn(assetList);
-		when(assetMapper.getAssetListToResponseAssetDTOList(assetList)).thenReturn(responseList);
-		List<ResponseAssetAndCategory> result = assetServiceImpl.getAssetByCodeOrNameAndLocationCode("text",
-				"locationCode");
-		assertThat(result).isEqualTo(responseList);
-	}
+    //US584-CreateNewAssignment
+    @Test
+    void getAssetList_ShouldReturnResponseAssetDtoList_WhenAssetExist() {
+        Location location = mock(Location.class);
+        List<Asset> assetList = mock(ArrayList.class);
+        List<ResponseAssetAndCategory> responseList = mock(ArrayList.class);
+        when(locationRepository.findById("locationCode")).thenReturn(Optional.of(location));
+        when(assetRepository.findAssetByNameOrCodeAndLocationCode("text", "locationCode")).thenReturn(assetList);
+        when(assetMapper.getAssetListToResponseAssetDTOList(assetList)).thenReturn(responseList);
+        List<ResponseAssetAndCategory> result = assetServiceImpl.getAssetByCodeOrNameAndLocationCode("text", "locationCode");
+        assertThat(result).isEqualTo(responseList);
+    }
+    @Test
+    void getAssetList_ShouldThrowResourceNotFoundEx_WhenLocationCodeIncorrect(){
+        when(locationRepository.findById("HCM")).thenReturn(Optional.empty());
+        ResourceNotFoundException e = Assertions.assertThrows(ResourceNotFoundException.class,
+                () -> assetServiceImpl.getAssetByCodeOrNameAndLocationCode("text","HCM"));
+        AssertionsForClassTypes.assertThat(e.getMessage()).isEqualTo("Location code not found");
+    }
 
 	// ===========US 579=======
 	@DisplayName("Test for get list asset by user but user_id not found")
