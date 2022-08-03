@@ -228,7 +228,6 @@ public class AssetServiceImplTest {
 		
 		assertThat(pageable.getPageNumber()).isEqualTo(0);
 		assertThat(pageable.getPageSize()).isEqualTo(2);
-//		assertThat(listStatesExpect).isEqualTo(listStates);
 		assertThat(actual.getList()).isEqualTo(expectList);
 		assertThat(actual.getTotalPages()).isEqualTo(2);
 	}
