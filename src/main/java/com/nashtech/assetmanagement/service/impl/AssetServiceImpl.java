@@ -1,9 +1,15 @@
 package com.nashtech.assetmanagement.service.impl;
 
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 import java.util.Optional;
 
+import com.nashtech.assetmanagement.dto.request.EditAssetRequest;
+import com.nashtech.assetmanagement.dto.response.*;
+import lombok.AllArgsConstructor;
+import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -12,10 +18,6 @@ import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
 import com.nashtech.assetmanagement.dto.request.RequestCreateAsset;
-import com.nashtech.assetmanagement.dto.response.AssetResponseDto;
-import com.nashtech.assetmanagement.dto.response.ListAssetResponseDto;
-import com.nashtech.assetmanagement.dto.response.ResponseAssetAndCategory;
-import com.nashtech.assetmanagement.dto.response.ResponseAssetDTO;
 import com.nashtech.assetmanagement.entities.Asset;
 import com.nashtech.assetmanagement.entities.Category;
 import com.nashtech.assetmanagement.entities.Location;
@@ -34,6 +36,7 @@ import lombok.extern.slf4j.Slf4j;
 
 @Service
 @Slf4j
+@AllArgsConstructor
 public class AssetServiceImpl implements AssetService {
 
 	private final AssetRepository assetRepository;
@@ -45,16 +48,6 @@ public class AssetServiceImpl implements AssetService {
 	private final LocationRepository locationRepository;
 
 	private final AssetMapper assetMapper;
-
-	@Autowired
-	public AssetServiceImpl(AssetRepository assetRepository, CategoryRepository categoryRepository,
-			UserRepository userRepository, LocationRepository locationRepository, AssetMapper assetMapper) {
-		this.assetRepository = assetRepository;
-		this.categoryRepository = categoryRepository;
-		this.userRepository = userRepository;
-		this.locationRepository = locationRepository;
-		this.assetMapper = assetMapper;
-	}
 
 	public String generateAssetCode(String prefix) {
 		String code;
@@ -135,6 +128,19 @@ public class AssetServiceImpl implements AssetService {
 		List<Asset> assetList = assetRepository.findAssetByNameOrCodeAndLocationCode(text.toLowerCase(), locationCode);
 		List<ResponseAssetAndCategory> responseList = assetMapper.getAssetListToResponseAssetDTOList(assetList);
 		return responseList;
+	}
+
+	@Override
+	public EditAssetResponse editAsset(EditAssetRequest editAssetRequest, String assetCode) {
+		Asset asset = assetRepository.findById(assetCode).orElseThrow(
+				() -> new ResourceNotFoundException("Asset." + assetCode + ".not.found"));
+
+		if(asset.getState().equals(AssetState.ASSIGNED))
+			throw new IllegalStateException("Asset."+ assetCode + ".is.being.assigned.Cannot modify");
+
+		Asset mappedAsset = assetMapper.mapEditAssetRequestToEntity(editAssetRequest, asset);
+		Asset savedAsset = assetRepository.save(mappedAsset);
+		return assetMapper.mapToEditAssetResponse(savedAsset);
 	}
 
 }

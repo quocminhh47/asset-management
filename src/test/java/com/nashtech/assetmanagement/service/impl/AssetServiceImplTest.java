@@ -1,5 +1,10 @@
 package com.nashtech.assetmanagement.service.impl;
 
+
+import com.nashtech.assetmanagement.dto.request.EditAssetRequest;
+import com.nashtech.assetmanagement.dto.request.RequestCreateAsset;
+import com.nashtech.assetmanagement.dto.response.EditAssetResponse;
+
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.eq;
@@ -21,9 +26,10 @@ import org.mockito.Mockito;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 
-import com.nashtech.assetmanagement.dto.request.RequestCreateAsset;
+
 import com.nashtech.assetmanagement.dto.response.AssetResponseDto;
 import com.nashtech.assetmanagement.dto.response.ListAssetResponseDto;
+
 import com.nashtech.assetmanagement.dto.response.ResponseAssetAndCategory;
 import com.nashtech.assetmanagement.dto.response.ResponseAssetDTO;
 import com.nashtech.assetmanagement.entities.Asset;
@@ -50,19 +56,29 @@ public class AssetServiceImplTest {
 	private AssetMapper assetMapper;
 	private Asset asset;
 
-	private AssetServiceImpl assetServiceImpl;
+    private AssetServiceImpl assetServiceImpl;
+    EditAssetRequest request;
+    AssetState newAssetState = AssetState.NOT_AVAILABLE;
 
-	@BeforeEach
-	void setUp() {
-		asset = mock(Asset.class);
-		assetRepository = mock(AssetRepository.class);
-		assetMapper = mock(AssetMapper.class);
-		locationRepository = mock(LocationRepository.class);
-		categoryRepository = mock(CategoryRepository.class);
-		userRepository = mock(UserRepository.class);
-		assetServiceImpl = new AssetServiceImpl(assetRepository, categoryRepository, userRepository, locationRepository,
-				assetMapper);
-	}
+    @BeforeEach
+    void setUp() {
+        asset = mock(Asset.class);
+        assetRepository = mock(AssetRepository.class);
+        assetMapper = mock(AssetMapper.class);
+        locationRepository = mock(LocationRepository.class);
+        categoryRepository = mock(CategoryRepository.class);
+        userRepository = mock(UserRepository.class);
+        assetServiceImpl = new AssetServiceImpl(assetRepository
+                , categoryRepository,
+                userRepository, locationRepository, assetMapper);
+
+        request = new EditAssetRequest(
+                "Dell inspriration 5432",
+                "CPU 7200U, RAM 16GB",
+                "2022-01-01",
+                newAssetState);
+    }
+
 
 	@Test
 	public void createAsset_WhenRequestValid_Expect_ReturnAsset() {
@@ -103,13 +119,81 @@ public class AssetServiceImplTest {
         List<ResponseAssetAndCategory> result = assetServiceImpl.getAssetByCodeOrNameAndLocationCode("text", "locationCode");
         assertThat(result).isEqualTo(responseList);
     }
+
     @Test
-    void getAssetList_ShouldThrowResourceNotFoundEx_WhenLocationCodeIncorrect(){
+    void getAssetList_ShouldThrowResourceNotFoundEx_WhenLocationCodeIncorrect() {
         when(locationRepository.findById("HCM")).thenReturn(Optional.empty());
         ResourceNotFoundException e = Assertions.assertThrows(ResourceNotFoundException.class,
-                () -> assetServiceImpl.getAssetByCodeOrNameAndLocationCode("text","HCM"));
+                () -> assetServiceImpl.getAssetByCodeOrNameAndLocationCode("text", "HCM"));
         AssertionsForClassTypes.assertThat(e.getMessage()).isEqualTo("Location code not found");
     }
+
+    @DisplayName("Given valid asset request then edit asset - positive case")
+    @Test
+    void givenValidAssetRequest_whenEditAsset_thenReturnEditAssetResponse() {
+        //given
+        String assetCode = "LA100001";
+        AssetState acceptableAssetState = AssetState.AVAILABLE;
+
+        Asset existAsset = mock(Asset.class);
+        Asset mappedAsset = mock(Asset.class);
+        Asset savedAsset = mock(Asset.class);
+        EditAssetResponse expectedResponse = mock(EditAssetResponse.class);
+
+
+        when(assetRepository.findById(assetCode)).thenReturn(Optional.of(existAsset));
+        when(existAsset.getState()).thenReturn(acceptableAssetState);
+        when(assetMapper.mapEditAssetRequestToEntity(request, existAsset)).thenReturn(mappedAsset);
+        when(assetRepository.save(mappedAsset)).thenReturn(savedAsset);
+        when(assetMapper.mapToEditAssetResponse(savedAsset)).thenReturn(expectedResponse);
+
+        //when
+        EditAssetResponse actualResponse = assetServiceImpl.editAsset(request, assetCode);
+
+        //then
+        assertThat(actualResponse).isEqualTo(expectedResponse);
+    }
+
+    @DisplayName("Given asset with ASSIGNED state then throw exception - negative case")
+    @Test
+    void givenInvalidState_whenEditAsset_thenThrowsException() {
+        //given
+        String assetCode = "LA100001";
+        Asset existAsset = mock(Asset.class);
+        AssetState invalidState = AssetState.ASSIGNED;
+
+        EditAssetRequest wrongRequest = new EditAssetRequest(
+                "Dell inspriration 5432",
+                "CPU 7200U, RAM 16GB",
+                "2022-01-01",
+                invalidState);
+
+        when(assetRepository.findById(assetCode)).thenReturn(Optional.of(existAsset));
+        when(existAsset.getState()).thenReturn(AssetState.ASSIGNED);
+        //when
+        IllegalStateException exception = Assertions.assertThrows(IllegalStateException.class,
+                () -> assetServiceImpl.editAsset(wrongRequest, assetCode));
+        //then
+        assertThat(exception.getMessage())
+                .isEqualTo("Asset."+ assetCode + ".is.being.assigned.Cannot modify");
+
+    }
+
+    @DisplayName("Given non exist asset then throw 404 exception - negative case")
+    @Test
+    void givenNonExistAsset_whenEditAsset_thenThrowsException() {
+        //given
+        String assetCode = "LA100001";
+        when(assetRepository.findById(assetCode)).thenReturn(Optional.empty());
+        //when
+        ResourceNotFoundException exception = Assertions.assertThrows(ResourceNotFoundException.class,
+                () -> assetServiceImpl.editAsset(request, assetCode));
+
+        //then
+        assertThat(exception.getMessage())
+                .isEqualTo("Asset." + assetCode + ".not.found");
+    }
+
 
 	// ===========US 579=======
 	@DisplayName("Test for get list asset by user but user_id not found")
@@ -231,4 +315,5 @@ public class AssetServiceImplTest {
 		assertThat(actual.getList()).isEqualTo(expectList);
 		assertThat(actual.getTotalPages()).isEqualTo(2);
 	}
+
 }
