@@ -1,16 +1,17 @@
 package com.nashtech.assetmanagement.repositories;
 
-import com.nashtech.assetmanagement.entities.Asset;
-import com.nashtech.assetmanagement.entities.Assignment;
-import com.nashtech.assetmanagement.entities.Users;
+import java.sql.Date;
+import java.util.List;
+
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
-import java.sql.Date;
-import java.util.List;
+import com.nashtech.assetmanagement.entities.Asset;
+import com.nashtech.assetmanagement.entities.Assignment;
+import com.nashtech.assetmanagement.entities.Users;
 
 public interface AssignmentRepository extends JpaRepository<Assignment, String> {
 
@@ -48,4 +49,7 @@ public interface AssignmentRepository extends JpaRepository<Assignment, String> 
     Page<Assignment> getAssignmentWithoutAssignedDate(@Param("text") String textSearch,
                                                @Param("states") List<String> states,
                                                Pageable pageable);
+    
+    @Query("select e from Assignment e where  e.assignedTo.staffCode = :staffCode and e.id.assignedDate <= now()")
+    Page<Assignment> getListAssignmentByUser(String staffCode , Pageable pageable);
 }

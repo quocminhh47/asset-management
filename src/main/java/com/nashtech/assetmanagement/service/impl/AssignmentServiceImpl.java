@@ -1,5 +1,16 @@
 package com.nashtech.assetmanagement.service.impl;
 
+import java.sql.Date;
+import java.util.List;
+import java.util.Optional;
+import java.util.stream.Collectors;
+
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
+import org.springframework.stereotype.Service;
+
 import com.nashtech.assetmanagement.dto.request.RequestAssignmentDTO;
 import com.nashtech.assetmanagement.dto.response.AssignmentDto;
 import com.nashtech.assetmanagement.dto.response.ListAssignmentResponse;
@@ -16,17 +27,8 @@ import com.nashtech.assetmanagement.repositories.AssignmentRepository;
 import com.nashtech.assetmanagement.repositories.UserRepository;
 import com.nashtech.assetmanagement.service.AssignmentService;
 import com.nashtech.assetmanagement.utils.StateConverter;
-import lombok.AllArgsConstructor;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Pageable;
-import org.springframework.data.domain.Sort;
-import org.springframework.stereotype.Service;
 
-import java.sql.Date;
-import java.util.List;
-import java.util.Optional;
-import java.util.stream.Collectors;
+import lombok.AllArgsConstructor;
 
 @Service
 @AllArgsConstructor
@@ -116,4 +118,20 @@ public class AssignmentServiceImpl implements AssignmentService {
     }
 
 
+	@Override
+	public List<AssignmentDto> getListAssignmentByUser(String userId, String sortBy, String sortDirection) {
+		Sort.Direction sort = Sort.Direction.ASC;
+		if(sortDirection.equals("DESC")) {
+			sort = Sort.Direction.DESC;
+		}
+		Pageable pageable = PageRequest.of(0, 20 , Sort.by(sort, sortBy));
+		Optional<Users> optionalUsers = userRepository.findById(userId);
+		if (!optionalUsers.isPresent()) {
+			throw new ResourceNotFoundException(String.format("user.not.found.with.code:%s", userId));
+		}
+		Page<Assignment> pageAssignment = assignmentRepository.getListAssignmentByUser(userId, pageable);
+		List<Assignment> listEntity = pageAssignment.getContent();
+		List<AssignmentDto> listResponse = assignmentMapper.mapperListAssignment(listEntity);
+		return listResponse;
+	}
 }

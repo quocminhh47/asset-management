@@ -224,8 +224,11 @@ public class AssetServiceImplTest {
 		verify(assetRepository).getListAssetByState(eq("SD001"), captorlist.capture(), eq("a"), captor.capture());
 		Pageable pageable = captor.getValue();
 		
+//		List<String> listStatesExpect =  captorlist.getValue();
+		
 		assertThat(pageable.getPageNumber()).isEqualTo(0);
 		assertThat(pageable.getPageSize()).isEqualTo(2);
+//		assertThat(listStatesExpect).isEqualTo(listStates);
 		assertThat(actual.getList()).isEqualTo(expectList);
 		assertThat(actual.getTotalPages()).isEqualTo(2);
 	}
