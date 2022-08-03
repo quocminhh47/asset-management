@@ -52,19 +52,8 @@ public class AssignmentManagementController {
                 .body(this.assignmentService.createNewAssignment(request));
     }
 
-    // get assignment by asset code.
     @GetMapping
     public ResponseEntity<List<AssignmentDto>> getListAssignmentByAsset(@RequestParam(required = true, name = "assetId") String assetId) {
         return new ResponseEntity<List<AssignmentDto>>(assignmentService.getListAssignmentByAssetCode(assetId), HttpStatus.OK);
     }
-    
-    @GetMapping("/{userId}")
-	public ResponseEntity<List<AssignmentDto>> getListAsset(
-			@PathVariable("userId") String userId,
-			@RequestParam(required = false, defaultValue = "", value = "sortBy") String sortBy,
-			@RequestParam(required = false, defaultValue = "" , value = "sortDirection") String sortDirection){
-    	List<AssignmentDto> result = assignmentService.getListAssignmentByUser(userId, sortBy,
-				sortDirection);
-		return new ResponseEntity<List<AssignmentDto>>(result, HttpStatus.OK);
-	}
 }
