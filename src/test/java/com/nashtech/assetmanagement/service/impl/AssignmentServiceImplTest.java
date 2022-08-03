@@ -9,9 +9,7 @@ import static org.mockito.Mockito.when;
 import java.util.List;
 import java.util.Optional;
 
-import org.junit.jupiter.api.Assertions;
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.*;
 
 import com.nashtech.assetmanagement.dto.request.RequestAssignmentDTO;
 import com.nashtech.assetmanagement.dto.response.AssignmentDto;
@@ -21,6 +19,7 @@ import com.nashtech.assetmanagement.entities.Assignment;
 import com.nashtech.assetmanagement.entities.Users;
 import com.nashtech.assetmanagement.enums.AssetState;
 import com.nashtech.assetmanagement.exception.DateInvalidException;
+import com.nashtech.assetmanagement.exception.NotUniqueException;
 import com.nashtech.assetmanagement.exception.ResourceNotFoundException;
 import com.nashtech.assetmanagement.mapper.AssignmentContent;
 import com.nashtech.assetmanagement.mapper.AssignmentMapper;
@@ -30,7 +29,6 @@ import com.nashtech.assetmanagement.repositories.UserRepository;
 import com.nashtech.assetmanagement.utils.StateConverter;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -118,7 +116,7 @@ class AssignmentServiceImplTest {
         assertThat(assignedState.size()).isEqualTo(2);
         assertThat(assignedState.get(0)).isEqualTo("Accepted");
         assertThat(assignedState.get(1)).isEqualTo("Declined");
-        
+
         String assignedDateStr = " ";
 
         Pageable pageable = PageRequest.of(0, 1);
@@ -223,6 +221,19 @@ class AssignmentServiceImplTest {
                 () -> assignmentServiceImpl.createNewAssignment(request));
         assertThat(e.getMessage()).isEqualTo("Assign by User not found");
     }
+    @Test
+    void createNewAssignment_ShouldThrowNotUniqueEx_WhenRequestSameId() {
+        RequestAssignmentDTO request = mock(RequestAssignmentDTO.class);
+        Date date = mock(Date.class);
+        when(request.getAssignedTo()).thenReturn("assignTo");
+        when(request.getAssignedDate()).thenReturn(date);
+        when(request.getAssetCode()).thenReturn("assetCode");
+        when(assignmentRepository.existsById_AssetCodeAndId_AssignedDateAndId_AssignedTo
+                ("assetCode", date, "assignTo")).thenReturn(true);
+        NotUniqueException e = Assertions.assertThrows(NotUniqueException.class,
+                () -> assignmentServiceImpl.createNewAssignment(request));
+        assertThat(e.getMessage()).isEqualTo("AssignmentId.is.exist");
+    }
 
     @Test
     void getListAssignmentByAsset_ShouldReturnListAssignmentDto_WhenAssetIdExist() {
@@ -232,11 +243,11 @@ class AssignmentServiceImplTest {
     	when(assetRepository.findById("Laptop001")).thenReturn(Optional.of(entity));
     	when(assignmentRepository.findByAsset(entity)).thenReturn(listEntity);
     	when(assignmentMapper.mapperListAssignment(listEntity)).thenReturn(expected);
-    	
+
     	List<AssignmentDto> actual = assignmentServiceImpl.getListAssignmentByAssetCode("Laptop001");
     	assertThat(actual).isEqualTo(expected);
     }
-    
+
     @Test
     void getListAssignmentByAsset_ShouldReturnListAssignmentDto_WhenAssetIdNotExist() {
     	when(assetRepository.findById("Laptop001")).thenReturn(Optional.empty());

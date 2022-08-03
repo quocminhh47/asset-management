@@ -1,5 +1,6 @@
 package com.nashtech.assetmanagement.controller.rest.admin;
 
+import java.util.HashMap;
 import java.util.List;
 
 import javax.validation.Valid;
@@ -55,9 +56,13 @@ public class AssetController {
 	}
 
 	@GetMapping("/searchAsset/{location}")
-	public ResponseEntity<List<ResponseAssetAndCategory>> searchAssetByCodeOrName(@RequestParam("text") String text,
+	public ResponseEntity<HashMap> searchAssetByCodeOrName(@RequestParam("text") String text,
 			@PathVariable("location") String locationCode) {
-		return ResponseEntity.ok(assetService.getAssetByCodeOrNameAndLocationCode(text, locationCode));
+		HashMap hashMap = new HashMap<>();
+		List<ResponseAssetAndCategory> result = assetService.getAssetByCodeOrNameAndLocationCode(text, locationCode);
+		hashMap.put("list_asset",result);
+		hashMap.put("total",result.size());
+		return ResponseEntity.ok(hashMap);
 	}
 
 }
