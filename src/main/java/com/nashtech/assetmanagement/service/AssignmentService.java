@@ -18,4 +18,6 @@ public interface AssignmentService {
                                                      String text,
                                                      List<String> states,
                                                      String assignedDateStr);
+    
+    List<AssignmentDto> getListAssignmentByUser(String userId, String sortBy, String sortDirection);
 }

@@ -1,5 +1,18 @@
 package com.nashtech.assetmanagement.service.impl;
 
+import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
+
+import java.util.List;
+import java.util.Optional;
+
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+
 import com.nashtech.assetmanagement.dto.request.RequestAssignmentDTO;
 import com.nashtech.assetmanagement.dto.response.AssignmentDto;
 import com.nashtech.assetmanagement.dto.response.ListAssignmentResponse;
@@ -211,4 +224,25 @@ class AssignmentServiceImplTest {
         assertThat(e.getMessage()).isEqualTo("Assign by User not found");
     }
 
+    @Test
+    void getListAssignmentByAsset_ShouldReturnListAssignmentDto_WhenAssetIdExist() {
+    	Asset entity = mock(Asset.class);
+		List<Assignment> listEntity = mock(List.class);
+		List<AssignmentDto> expected = mock(List.class);
+    	when(assetRepository.findById("Laptop001")).thenReturn(Optional.of(entity));
+    	when(assignmentRepository.findByAsset(entity)).thenReturn(listEntity);
+    	when(assignmentMapper.mapperListAssignment(listEntity)).thenReturn(expected);
+    	
+    	List<AssignmentDto> actual = assignmentServiceImpl.getListAssignmentByAssetCode("Laptop001");
+    	assertThat(actual).isEqualTo(expected);
+    }
+    
+    @Test
+    void getListAssignmentByAsset_ShouldReturnListAssignmentDto_WhenAssetIdNotExist() {
+    	when(assetRepository.findById("Laptop001")).thenReturn(Optional.empty());
+    	Exception exception = assertThrows(ResourceNotFoundException.class, () -> {
+    		assignmentServiceImpl.getListAssignmentByAssetCode("Laptop001");
+		});
+    	assertThat(exception.getMessage()).isEqualTo("asset.not.found.with.code:Laptop001");
+    }
 }
