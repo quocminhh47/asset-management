@@ -61,6 +61,7 @@ public class AssetRepositoryTest {
     @DisplayName("test for getListAsset by userId and filter: categories, states; search: asset name or code")
     @Test
     void getListAsset_ShouldReturnPageAsset_WhenDataRequestValid() {
+    	
     	Users users = new Users();
     	users.setStaffCode("SD0004");
     	users.setUserName("huet");
