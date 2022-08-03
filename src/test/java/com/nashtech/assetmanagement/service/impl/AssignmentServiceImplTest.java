@@ -32,6 +32,7 @@ import com.nashtech.assetmanagement.entities.Assignment;
 import com.nashtech.assetmanagement.entities.Users;
 import com.nashtech.assetmanagement.enums.AssetState;
 import com.nashtech.assetmanagement.exception.DateInvalidException;
+import com.nashtech.assetmanagement.exception.NotUniqueException;
 import com.nashtech.assetmanagement.exception.ResourceNotFoundException;
 import com.nashtech.assetmanagement.mapper.AssignmentContent;
 import com.nashtech.assetmanagement.mapper.AssignmentMapper;
@@ -104,11 +105,11 @@ class AssignmentServiceImplTest {
 		List<String> assignedState = states.stream().map(StateConverter::getAssignmentState)
 				.collect(Collectors.toList());
 
-		assertThat(assignedState.size()).isEqualTo(2);
-		assertThat(assignedState.get(0)).isEqualTo("Accepted");
-		assertThat(assignedState.get(1)).isEqualTo("Declined");
+        assertThat(assignedState.size()).isEqualTo(2);
+        assertThat(assignedState.get(0)).isEqualTo("Accepted");
+        assertThat(assignedState.get(1)).isEqualTo("Declined");
 
-		String assignedDateStr = " ";
+        String assignedDateStr = " ";
 
 		Pageable pageable = PageRequest.of(0, 1);
 		Page<Assignment> assignmentPage = mock(Page.class);
@@ -194,40 +195,53 @@ class AssignmentServiceImplTest {
 		assertThat(e.getMessage()).isEqualTo("Assign to User not found");
 	}
 
-	@Test
-	void createNewAssignment_ShouldThrowResourceNotFoundEx_WhenUserAssignByNotExist() {
-		Asset asset = mock(Asset.class);
-		Users assignTo = mock(Users.class);
-		RequestAssignmentDTO request = mock(RequestAssignmentDTO.class);
-		when(request.getAssetCode()).thenReturn("assetCode");
-		when(request.getAssignedTo()).thenReturn("assignTo");
-		when(request.getAssignedBy()).thenReturn("assignBy");
-		when(assetRepository.findById("assetCode")).thenReturn(Optional.of(asset));
-		when(userRepository.findById("assignTo")).thenReturn(Optional.of(assignTo));
-		when(userRepository.findById("assignBy")).thenReturn(Optional.empty());
-		ResourceNotFoundException e = Assertions.assertThrows(ResourceNotFoundException.class,
-				() -> assignmentServiceImpl.createNewAssignment(request));
-		assertThat(e.getMessage()).isEqualTo("Assign by User not found");
-	}
+    @Test
+    void createNewAssignment_ShouldThrowResourceNotFoundEx_WhenUserAssignByNotExist() {
+        Asset asset = mock(Asset.class);
+        Users assignTo = mock(Users.class);
+        RequestAssignmentDTO request = mock(RequestAssignmentDTO.class);
+        when(request.getAssetCode()).thenReturn("assetCode");
+        when(request.getAssignedTo()).thenReturn("assignTo");
+        when(request.getAssignedBy()).thenReturn("assignBy");
+        when(assetRepository.findById("assetCode")).thenReturn(Optional.of(asset));
+        when(userRepository.findById("assignTo")).thenReturn(Optional.of(assignTo));
+        when(userRepository.findById("assignBy")).thenReturn(Optional.empty());
+        ResourceNotFoundException e = Assertions.assertThrows(ResourceNotFoundException.class,
+                () -> assignmentServiceImpl.createNewAssignment(request));
+        assertThat(e.getMessage()).isEqualTo("Assign by User not found");
+    }
+    @Test
+    void createNewAssignment_ShouldThrowNotUniqueEx_WhenRequestSameId() {
+        RequestAssignmentDTO request = mock(RequestAssignmentDTO.class);
+        Date date = mock(Date.class);
+        when(request.getAssignedTo()).thenReturn("assignTo");
+        when(request.getAssignedDate()).thenReturn(date);
+        when(request.getAssetCode()).thenReturn("assetCode");
+        when(assignmentRepository.existsById_AssetCodeAndId_AssignedDateAndId_AssignedTo
+                ("assetCode", date, "assignTo")).thenReturn(true);
+        NotUniqueException e = Assertions.assertThrows(NotUniqueException.class,
+                () -> assignmentServiceImpl.createNewAssignment(request));
+        assertThat(e.getMessage()).isEqualTo("AssignmentId.is.exist");
+    }
 
 	@Test
 	void getListAssignmentByAsset_ShouldReturnListAssignmentDto_WhenAssetIdExist() {
 		Asset entity = mock(Asset.class);
 		List<Assignment> listEntity = mock(List.class);
 		List<AssignmentDto> expected = mock(List.class);
-		when(assetRepository.findById("Laptop001")).thenReturn(Optional.of(entity));
-		when(assignmentRepository.findByAsset(entity)).thenReturn(listEntity);
-		when(assignmentMapper.mapperListAssignment(listEntity)).thenReturn(expected);
+    	when(assetRepository.findById("Laptop001")).thenReturn(Optional.of(entity));
+    	when(assignmentRepository.findByAsset(entity)).thenReturn(listEntity);
+    	when(assignmentMapper.mapperListAssignment(listEntity)).thenReturn(expected);
 
-		List<AssignmentDto> actual = assignmentServiceImpl.getListAssignmentByAssetCode("Laptop001");
-		assertThat(actual).isEqualTo(expected);
-	}
+    	List<AssignmentDto> actual = assignmentServiceImpl.getListAssignmentByAssetCode("Laptop001");
+    	assertThat(actual).isEqualTo(expected);
+    }
 
-	@Test
-	void getListAssignmentByAsset_ShouldReturnListAssignmentDto_WhenAssetIdNotExist() {
-		when(assetRepository.findById("Laptop001")).thenReturn(Optional.empty());
-		Exception exception = assertThrows(ResourceNotFoundException.class, () -> {
-			assignmentServiceImpl.getListAssignmentByAssetCode("Laptop001");
+    @Test
+    void getListAssignmentByAsset_ShouldReturnListAssignmentDto_WhenAssetIdNotExist() {
+    	when(assetRepository.findById("Laptop001")).thenReturn(Optional.empty());
+    	Exception exception = assertThrows(ResourceNotFoundException.class, () -> {
+    		assignmentServiceImpl.getListAssignmentByAssetCode("Laptop001");
 		});
 		assertThat(exception.getMessage()).isEqualTo("asset.not.found.with.code:Laptop001");
 	}
@@ -266,5 +280,4 @@ class AssignmentServiceImplTest {
 		assertThat(pageable.getSort().ascending()).isEqualTo(Sort.by("code"));
 		assertThat(actual).isEqualTo(expectList);
 	}
-
 }

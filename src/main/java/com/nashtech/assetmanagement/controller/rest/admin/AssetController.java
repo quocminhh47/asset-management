@@ -1,21 +1,16 @@
 package com.nashtech.assetmanagement.controller.rest.admin;
 
+import java.util.HashMap;
 import java.util.List;
 
 import javax.validation.Valid;
 
+import com.nashtech.assetmanagement.dto.request.EditAssetRequest;
+import com.nashtech.assetmanagement.dto.response.EditAssetResponse;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.ResponseStatus;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import com.nashtech.assetmanagement.dto.request.RequestCreateAsset;
 import com.nashtech.assetmanagement.dto.response.ListAssetResponseDto;
@@ -55,9 +50,20 @@ public class AssetController {
 	}
 
 	@GetMapping("/searchAsset/{location}")
-	public ResponseEntity<List<ResponseAssetAndCategory>> searchAssetByCodeOrName(@RequestParam("text") String text,
+	public ResponseEntity<HashMap> searchAssetByCodeOrName(@RequestParam("text") String text,
 			@PathVariable("location") String locationCode) {
-		return ResponseEntity.ok(assetService.getAssetByCodeOrNameAndLocationCode(text, locationCode));
+		HashMap hashMap = new HashMap<>();
+		List<ResponseAssetAndCategory> result = assetService.getAssetByCodeOrNameAndLocationCode(text, locationCode);
+		hashMap.put("list_asset",result);
+		hashMap.put("total",result.size());
+		return ResponseEntity.ok(hashMap);
+	}
+
+	@PutMapping("/{id}")
+	@ResponseStatus(HttpStatus.OK)
+	public EditAssetResponse editAsset(@Valid @RequestBody EditAssetRequest editAssetRequest,
+									   @PathVariable("id") String id) {
+		return assetService.editAsset(editAssetRequest, id);
 	}
 
 }

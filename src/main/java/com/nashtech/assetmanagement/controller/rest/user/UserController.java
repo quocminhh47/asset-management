@@ -14,6 +14,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
+import java.util.HashMap;
 import java.util.List;
 
 @RequestMapping("")
@@ -44,8 +45,12 @@ public class UserController {
     }
 
     @GetMapping("admin/api/searchUser/{location}")
-    public ResponseEntity<List<UserDto>> getUserListByStaffCodeOrName(@RequestParam("text")String text,@PathVariable("location")String locationCode){
-        return ResponseEntity.ok(this.userService.getUsersByStaffCodeOrNameAndLocationCode(text,locationCode));
+    public ResponseEntity<HashMap> getUserListByStaffCodeOrName(@RequestParam("text")String text,@PathVariable("location")String locationCode){
+        HashMap hashMap = new HashMap();
+        List<UserDto> result = this.userService.getUsersByStaffCodeOrNameAndLocationCode(text,locationCode);
+        hashMap.put("list_user",result);
+        hashMap.put("total",result.size());
+        return ResponseEntity.ok(hashMap);
     }
 
     @PostMapping("/user/api/first-login")

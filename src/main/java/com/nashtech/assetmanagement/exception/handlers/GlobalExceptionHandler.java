@@ -44,7 +44,7 @@ public class GlobalExceptionHandler  extends ResponseEntityExceptionHandler {
         return new ResponseEntity<>(error, HttpStatus.UNAUTHORIZED);
     }
 
-    @ExceptionHandler({DateInvalidException.class, IllegalArgumentException.class})
+    @ExceptionHandler({DateInvalidException.class, IllegalArgumentException.class, IllegalStateException.class})
     protected ResponseEntity<ErrorResponse> handleDateInvalidException(RuntimeException exception) {
         ErrorResponse error = new ErrorResponse(HttpStatus.BAD_REQUEST.toString(), exception.getMessage());
         return new ResponseEntity<>(error, HttpStatus.BAD_REQUEST);
