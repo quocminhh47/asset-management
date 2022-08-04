@@ -8,6 +8,8 @@ import java.util.Optional;
 
 import com.nashtech.assetmanagement.dto.request.EditAssetRequest;
 import com.nashtech.assetmanagement.dto.response.*;
+import com.nashtech.assetmanagement.entities.*;
+import com.nashtech.assetmanagement.repositories.*;
 import lombok.AllArgsConstructor;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -15,20 +17,13 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 
 import com.nashtech.assetmanagement.dto.request.RequestCreateAsset;
-import com.nashtech.assetmanagement.entities.Asset;
-import com.nashtech.assetmanagement.entities.Category;
-import com.nashtech.assetmanagement.entities.Location;
-import com.nashtech.assetmanagement.entities.Users;
 import com.nashtech.assetmanagement.enums.AssetState;
 import com.nashtech.assetmanagement.exception.ResourceNotFoundException;
 import com.nashtech.assetmanagement.mapper.AssetMapper;
-import com.nashtech.assetmanagement.repositories.AssetRepository;
-import com.nashtech.assetmanagement.repositories.CategoryRepository;
-import com.nashtech.assetmanagement.repositories.LocationRepository;
-import com.nashtech.assetmanagement.repositories.UserRepository;
 import com.nashtech.assetmanagement.service.AssetService;
 import com.nashtech.assetmanagement.utils.GenerateRandomNumber;
 
@@ -48,6 +43,8 @@ public class AssetServiceImpl implements AssetService {
 	private final LocationRepository locationRepository;
 
 	private final AssetMapper assetMapper;
+
+	private final AssignmentRepository assignmentRepository;
 
 	public String generateAssetCode(String prefix) {
 		String code;
@@ -143,4 +140,16 @@ public class AssetServiceImpl implements AssetService {
 		return assetMapper.mapToEditAssetResponse(savedAsset);
 	}
 
+	//582 - Delete asset
+	@Override
+	public ResponseMessage deleteAssetByAssetCode(String assetCode) {
+		Asset asset = assetRepository.findById(assetCode).orElseThrow(
+				() -> new ResourceNotFoundException("Cannot find asset with asset code: " + assetCode));
+		List<Assignment> assignmentList = assignmentRepository.findByAsset(asset);
+		if (!assignmentList.isEmpty()) {
+			return new ResponseMessage(HttpStatus.CONFLICT, "Asset belongs to one or more historical assignments", new Date());
+		}
+		assetRepository.delete(asset);
+		return new ResponseMessage(HttpStatus.OK, "Delete asset successfully!", new Date());
+	}
 }

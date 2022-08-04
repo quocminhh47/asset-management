@@ -2,10 +2,7 @@ package com.nashtech.assetmanagement.service;
 
 import com.nashtech.assetmanagement.dto.request.EditAssetRequest;
 import com.nashtech.assetmanagement.dto.request.RequestCreateAsset;
-import com.nashtech.assetmanagement.dto.response.EditAssetResponse;
-import com.nashtech.assetmanagement.dto.response.ListAssetResponseDto;
-import com.nashtech.assetmanagement.dto.response.ResponseAssetAndCategory;
-import com.nashtech.assetmanagement.dto.response.ResponseAssetDTO;
+import com.nashtech.assetmanagement.dto.response.*;
 
 import java.util.List;
 
@@ -18,4 +15,7 @@ public interface AssetService {
 	List<ResponseAssetAndCategory> getAssetByCodeOrNameAndLocationCode(String text, String locationCode);
 
 	EditAssetResponse editAsset(EditAssetRequest editAssetRequest, String assetCode);
+
+	//582 - Delete asset
+	ResponseMessage deleteAssetByAssetCode(String assetCode);
 }

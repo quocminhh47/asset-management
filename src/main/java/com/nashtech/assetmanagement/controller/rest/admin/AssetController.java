@@ -6,16 +6,13 @@ import java.util.List;
 import javax.validation.Valid;
 
 import com.nashtech.assetmanagement.dto.request.EditAssetRequest;
-import com.nashtech.assetmanagement.dto.response.EditAssetResponse;
+import com.nashtech.assetmanagement.dto.response.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import com.nashtech.assetmanagement.dto.request.RequestCreateAsset;
-import com.nashtech.assetmanagement.dto.response.ListAssetResponseDto;
-import com.nashtech.assetmanagement.dto.response.ResponseAssetAndCategory;
-import com.nashtech.assetmanagement.dto.response.ResponseAssetDTO;
 import com.nashtech.assetmanagement.service.AssetService;
 
 @RestController
@@ -64,6 +61,14 @@ public class AssetController {
 	public EditAssetResponse editAsset(@Valid @RequestBody EditAssetRequest editAssetRequest,
 									   @PathVariable("id") String id) {
 		return assetService.editAsset(editAssetRequest, id);
+	}
+
+//	582 - Delete asset
+	@DeleteMapping("/{assetCode}")
+	@CrossOrigin(origins = "*")
+	public ResponseEntity<?> deleteAssetByAssetCode(@PathVariable("assetCode") String assetCode) {
+		ResponseMessage responseMessage = assetService.deleteAssetByAssetCode(assetCode);
+		return new ResponseEntity<>(responseMessage, responseMessage.getStatus());
 	}
 
 }

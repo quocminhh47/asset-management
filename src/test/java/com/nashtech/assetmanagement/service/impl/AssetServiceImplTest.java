@@ -3,7 +3,7 @@ package com.nashtech.assetmanagement.service.impl;
 
 import com.nashtech.assetmanagement.dto.request.EditAssetRequest;
 import com.nashtech.assetmanagement.dto.request.RequestCreateAsset;
-import com.nashtech.assetmanagement.dto.response.EditAssetResponse;
+import com.nashtech.assetmanagement.dto.response.*;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertThrows;
@@ -13,9 +13,12 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 
+import com.nashtech.assetmanagement.entities.*;
+import com.nashtech.assetmanagement.repositories.*;
 import org.assertj.core.api.AssertionsForClassTypes;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
@@ -27,22 +30,9 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 
 
-import com.nashtech.assetmanagement.dto.response.AssetResponseDto;
-import com.nashtech.assetmanagement.dto.response.ListAssetResponseDto;
-
-import com.nashtech.assetmanagement.dto.response.ResponseAssetAndCategory;
-import com.nashtech.assetmanagement.dto.response.ResponseAssetDTO;
-import com.nashtech.assetmanagement.entities.Asset;
-import com.nashtech.assetmanagement.entities.Category;
-import com.nashtech.assetmanagement.entities.Location;
-import com.nashtech.assetmanagement.entities.Users;
 import com.nashtech.assetmanagement.enums.AssetState;
 import com.nashtech.assetmanagement.exception.ResourceNotFoundException;
 import com.nashtech.assetmanagement.mapper.AssetMapper;
-import com.nashtech.assetmanagement.repositories.AssetRepository;
-import com.nashtech.assetmanagement.repositories.CategoryRepository;
-import com.nashtech.assetmanagement.repositories.LocationRepository;
-import com.nashtech.assetmanagement.repositories.UserRepository;
 
 public class AssetServiceImplTest {
 
@@ -56,6 +46,8 @@ public class AssetServiceImplTest {
 	private AssetMapper assetMapper;
 	private Asset asset;
 
+	private AssignmentRepository assignmentRepository;
+
     private AssetServiceImpl assetServiceImpl;
     EditAssetRequest request;
     AssetState newAssetState = AssetState.NOT_AVAILABLE;
@@ -68,9 +60,10 @@ public class AssetServiceImplTest {
         locationRepository = mock(LocationRepository.class);
         categoryRepository = mock(CategoryRepository.class);
         userRepository = mock(UserRepository.class);
+		assignmentRepository = mock(AssignmentRepository.class);
         assetServiceImpl = new AssetServiceImpl(assetRepository
                 , categoryRepository,
-                userRepository, locationRepository, assetMapper);
+                userRepository, locationRepository, assetMapper, assignmentRepository);
 
         request = new EditAssetRequest(
                 "Dell inspriration 5432",
@@ -316,4 +309,36 @@ public class AssetServiceImplTest {
 		assertThat(actual.getTotalPages()).isEqualTo(2);
 	}
 
+	//582 - Delete asset
+	@Test
+	void deleteAsset_ShouldThrowResourceNotFoundException_WhenAssetCodeIncorrect() {
+		when(assetRepository.findById("LT1111")).thenReturn(Optional.empty());
+		ResourceNotFoundException exception = Assertions.assertThrows(ResourceNotFoundException.class,
+				() -> assetServiceImpl.deleteAssetByAssetCode("LT1111"));
+		assertThat(exception.getMessage()).isEqualTo("Cannot find asset with asset code: LT1111");
+	}
+
+	@Test
+	void deleteAsset_ShouldReturnResponseMessage_WhenAssetBelongsToOneOrMoreHistoricalAssignments() {
+		Optional<Asset> assetOptional = Optional.of(asset);
+		List<Assignment> assignmentList = mock(List.class);
+		when(assetRepository.findById("LT1111")).thenReturn(assetOptional);
+		when(assignmentRepository.findByAsset(asset)).thenReturn(assignmentList);
+
+		ResponseMessage responseMessage = assetServiceImpl.deleteAssetByAssetCode("LT1111");
+
+		assertThat(responseMessage.getMessage()).isEqualTo("Asset belongs to one or more historical assignments");
+	}
+
+	@Test
+	void deleteAsset_ShouldReturnResponseMessage_DeleteAssetSuccessfully() {
+		Optional<Asset> assetOptional = Optional.of(asset);
+		when(assetRepository.findById("LT1111")).thenReturn(assetOptional);
+		when(assignmentRepository.findByAsset(asset)).thenReturn(Collections.emptyList());
+
+		ResponseMessage responseMessage = assetServiceImpl.deleteAssetByAssetCode("LT1111");
+		verify(assetRepository).delete(asset);
+
+		assertThat(responseMessage.getMessage()).isEqualTo("Delete asset successfully!");
+	}
 }
