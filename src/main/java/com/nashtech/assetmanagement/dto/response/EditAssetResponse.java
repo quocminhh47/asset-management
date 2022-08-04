@@ -23,4 +23,6 @@ public class EditAssetResponse {
     private String installedDate;
 
     private AssetState state;
+
+    private String locationCode;
 }
