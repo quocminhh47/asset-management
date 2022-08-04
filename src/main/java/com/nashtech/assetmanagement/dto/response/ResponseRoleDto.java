@@ -6,9 +6,9 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 @Getter@Setter
-@NoArgsConstructor
 @AllArgsConstructor
-public class LocationResponseDTO {
-    private String code;
+@NoArgsConstructor
+public class ResponseRoleDto {
+    private Long id;
     private String name;
 }
