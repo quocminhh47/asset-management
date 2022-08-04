@@ -12,7 +12,7 @@ import javax.validation.constraints.NotNull;
 @Getter @Setter
 @AllArgsConstructor
 @NoArgsConstructor
-public class EditAssetRequest {
+public class EditAssetRequestDto {
     @NotBlank(message = "Asset name is required")
     private String name;
 

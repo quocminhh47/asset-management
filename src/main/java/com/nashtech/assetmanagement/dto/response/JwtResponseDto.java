@@ -8,7 +8,7 @@ import lombok.Setter;
 import java.util.List;
 
 @Getter @Setter
-public class JwtResponse {
+public class JwtResponseDto {
     private String token;
     private String type = "Bearer";
     private String id;
@@ -17,7 +17,7 @@ public class JwtResponse {
     private List<String> roles;
     private String location;
 
-    public JwtResponse(String token, String type, String id, String username, UserState state, List<String> roles, String location) {
+    public JwtResponseDto(String token, String type, String id, String username, UserState state, List<String> roles, String location) {
         this.token = token;
         this.type = type;
         this.id = id;

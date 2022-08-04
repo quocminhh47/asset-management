@@ -13,7 +13,7 @@ import java.util.Date;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-public class ResponseMessage {
+public class MessageResponse {
 
     private HttpStatus status;
     private String message;

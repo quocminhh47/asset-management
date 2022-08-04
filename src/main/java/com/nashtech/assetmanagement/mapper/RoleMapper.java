@@ -1,7 +1,7 @@
 package com.nashtech.assetmanagement.mapper;
 
-import com.nashtech.assetmanagement.dto.response.LocationResponseDTO;
-import com.nashtech.assetmanagement.dto.response.ResponseRoleDto;
+import com.nashtech.assetmanagement.dto.response.LocationResponseDto;
+import com.nashtech.assetmanagement.dto.response.RoleResponseDto;
 import com.nashtech.assetmanagement.entities.Location;
 import com.nashtech.assetmanagement.entities.Role;
 import lombok.AllArgsConstructor;
@@ -19,9 +19,9 @@ public class RoleMapper {
     ModelMapper modelMapper;
 
 
-    public List<ResponseRoleDto> roleListToResponseRoleDtoList (List<Role> roles){
-        List<ResponseRoleDto> responseRoleDtoList = roles.stream()
-                .map(role -> modelMapper.map(role,ResponseRoleDto.class)).collect(Collectors.toList());
+    public List<RoleResponseDto> roleListToResponseRoleDtoList (List<Role> roles){
+        List<RoleResponseDto> responseRoleDtoList = roles.stream()
+                .map(role -> modelMapper.map(role,RoleResponseDto.class)).collect(Collectors.toList());
         return  responseRoleDtoList;
     }
 

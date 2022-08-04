@@ -1,7 +1,7 @@
 package com.nashtech.assetmanagement.service.impl;
 
-import com.nashtech.assetmanagement.dto.response.LocationResponseDTO;
-import com.nashtech.assetmanagement.dto.response.ResponseRoleDto;
+import com.nashtech.assetmanagement.dto.response.LocationResponseDto;
+import com.nashtech.assetmanagement.dto.response.RoleResponseDto;
 import com.nashtech.assetmanagement.entities.Location;
 import com.nashtech.assetmanagement.entities.Role;
 import com.nashtech.assetmanagement.mapper.LocationMapper;
@@ -33,11 +33,11 @@ public class RoleServiceImplTest {
     @Test
     void getRoleList_ShouldReturnResponseRoleDtoList_WhenRoleExist(){
         List<Role> roles = mock(ArrayList.class);
-        List<ResponseRoleDto> responseList = mock(ArrayList.class);
+        List<RoleResponseDto> responseList = mock(ArrayList.class);
         when(roleRepository.findAll()).thenReturn(roles);
         when(roles.isEmpty()).thenReturn(false);
         when(roleMapper.roleListToResponseRoleDtoList(roles)).thenReturn(responseList);
-        List<ResponseRoleDto> result = roleService.getRoleList();
+        List<RoleResponseDto> result = roleService.getRoleList();
         assertThat(result).isEqualTo(responseList);
     }
 }

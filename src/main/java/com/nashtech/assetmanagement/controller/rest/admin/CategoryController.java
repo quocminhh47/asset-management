@@ -12,8 +12,8 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.nashtech.assetmanagement.dto.request.RequestCategoryDTO;
-import com.nashtech.assetmanagement.dto.response.ResponseCategoryDTO;
+import com.nashtech.assetmanagement.dto.request.CategoryRequestDto;
+import com.nashtech.assetmanagement.dto.response.CategoryResponseDto;
 import com.nashtech.assetmanagement.service.CategoryService;
 
 @RestController
@@ -28,13 +28,13 @@ public class CategoryController {
 
     @PostMapping
     @ResponseStatus(HttpStatus.OK)
-    public ResponseCategoryDTO createCategory(@Valid @RequestBody RequestCategoryDTO requestCategoryDTO){
+    public CategoryResponseDto createCategory(@Valid @RequestBody CategoryRequestDto requestCategoryDTO){
         return categoryService.createCategory(requestCategoryDTO);
     }
 
     @GetMapping
     @ResponseStatus(HttpStatus.OK)
-    public List<ResponseCategoryDTO> getAllCategories(){
+    public List<CategoryResponseDto> getAllCategories(){
         return categoryService.getAllCategory();
     }
 }

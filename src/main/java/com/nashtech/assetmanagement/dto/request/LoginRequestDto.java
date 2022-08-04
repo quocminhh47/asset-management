@@ -12,7 +12,7 @@ import javax.validation.constraints.NotBlank;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-public class RequestLoginDTO {
+public class LoginRequestDto {
     @NotBlank
     @JsonProperty("username")
     private String userName;

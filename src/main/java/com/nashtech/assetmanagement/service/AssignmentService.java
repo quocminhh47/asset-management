@@ -2,22 +2,22 @@ package com.nashtech.assetmanagement.service;
 
 import java.util.List;
 
-import com.nashtech.assetmanagement.dto.request.RequestAssignmentDTO;
-import com.nashtech.assetmanagement.dto.response.AssignmentDto;
-import com.nashtech.assetmanagement.dto.response.ListAssignmentResponse;
+import com.nashtech.assetmanagement.dto.request.AssignmentRequestDto;
+import com.nashtech.assetmanagement.dto.response.AssignmentResponseDto;
+import com.nashtech.assetmanagement.dto.response.ListAssignmentResponseDto;
 
 public interface AssignmentService {
 
 
-    AssignmentDto createNewAssignment(RequestAssignmentDTO request);
+    AssignmentResponseDto createNewAssignment(AssignmentRequestDto request);
     
-    List<AssignmentDto> getListAssignmentByAssetCode(String assetCode);
+    List<AssignmentResponseDto> getListAssignmentByAssetCode(String assetCode);
 
-    ListAssignmentResponse getAssignmentsByCondition(int pageNo,
+    ListAssignmentResponseDto getAssignmentsByCondition(int pageNo,
                                                      int pageSize,
                                                      String text,
                                                      List<String> states,
                                                      String assignedDateStr);
     
-    List<AssignmentDto> getListAssignmentByUser(String userId, String sortBy, String sortDirection);
+    List<AssignmentResponseDto> getListAssignmentByUser(String userId, String sortBy, String sortDirection);
 }

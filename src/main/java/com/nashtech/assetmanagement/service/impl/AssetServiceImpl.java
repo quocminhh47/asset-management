@@ -1,18 +1,10 @@
 package com.nashtech.assetmanagement.service.impl;
 
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.Optional;
 
-import com.nashtech.assetmanagement.dto.request.EditAssetRequest;
-import com.nashtech.assetmanagement.dto.response.*;
-import com.nashtech.assetmanagement.entities.*;
-import com.nashtech.assetmanagement.repositories.*;
-import lombok.AllArgsConstructor;
-import org.modelmapper.ModelMapper;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -20,13 +12,30 @@ import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 
-import com.nashtech.assetmanagement.dto.request.RequestCreateAsset;
+import com.nashtech.assetmanagement.dto.request.EditAssetRequestDto;
+import com.nashtech.assetmanagement.dto.request.CreateAssetRequestDto;
+import com.nashtech.assetmanagement.dto.response.AssetResponseDto;
+import com.nashtech.assetmanagement.dto.response.EditAssetResponseDto;
+import com.nashtech.assetmanagement.dto.response.ListAssetResponseDto;
+import com.nashtech.assetmanagement.dto.response.ResponseAssetDto;
+import com.nashtech.assetmanagement.dto.response.MessageResponse;
+import com.nashtech.assetmanagement.entities.Asset;
+import com.nashtech.assetmanagement.entities.Assignment;
+import com.nashtech.assetmanagement.entities.Category;
+import com.nashtech.assetmanagement.entities.Location;
+import com.nashtech.assetmanagement.entities.Users;
 import com.nashtech.assetmanagement.enums.AssetState;
 import com.nashtech.assetmanagement.exception.ResourceNotFoundException;
 import com.nashtech.assetmanagement.mapper.AssetMapper;
+import com.nashtech.assetmanagement.repositories.AssetRepository;
+import com.nashtech.assetmanagement.repositories.AssignmentRepository;
+import com.nashtech.assetmanagement.repositories.CategoryRepository;
+import com.nashtech.assetmanagement.repositories.LocationRepository;
+import com.nashtech.assetmanagement.repositories.UserRepository;
 import com.nashtech.assetmanagement.service.AssetService;
 import com.nashtech.assetmanagement.utils.GenerateRandomNumber;
 
+import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
 @Service
@@ -55,7 +64,7 @@ public class AssetServiceImpl implements AssetService {
 	}
 
 	@Override
-	public ResponseAssetDTO createAsset(RequestCreateAsset requestCreateAsset) {
+	public ResponseAssetDto createAsset(CreateAssetRequestDto requestCreateAsset) {
 		Asset asset = assetMapper.RequestAssetToAsset(requestCreateAsset);
 		asset.setCode(generateAssetCode(requestCreateAsset.getCategoryId()));
 		Category category = categoryRepository.findById(requestCreateAsset.getCategoryId())
@@ -117,18 +126,18 @@ public class AssetServiceImpl implements AssetService {
 	}
 
 	@Override
-	public List<ResponseAssetAndCategory> getAssetByCodeOrNameAndLocationCode(String text, String locationCode) {
+	public List<AssetResponseDto> getAssetByCodeOrNameAndLocationCode(String text, String locationCode) {
 		Optional<Location> locationOptional = locationRepository.findById(locationCode);
 		if (locationOptional.isEmpty()) {
 			throw new ResourceNotFoundException("Location code not found");
 		}
 		List<Asset> assetList = assetRepository.findAssetByNameOrCodeAndLocationCode(text.toLowerCase(), locationCode);
-		List<ResponseAssetAndCategory> responseList = assetMapper.getAssetListToResponseAssetDTOList(assetList);
+		List<AssetResponseDto> responseList = assetMapper.getAssetListToResponseAssetDTOList(assetList);
 		return responseList;
 	}
 
 	@Override
-	public EditAssetResponse editAsset(EditAssetRequest editAssetRequest, String assetCode) {
+	public EditAssetResponseDto editAsset(EditAssetRequestDto editAssetRequest, String assetCode) {
 		Asset asset = assetRepository.findById(assetCode).orElseThrow(
 				() -> new ResourceNotFoundException("Asset." + assetCode + ".not.found"));
 
@@ -142,14 +151,14 @@ public class AssetServiceImpl implements AssetService {
 
 	//582 - Delete asset
 	@Override
-	public ResponseMessage deleteAssetByAssetCode(String assetCode) {
+	public MessageResponse deleteAssetByAssetCode(String assetCode) {
 		Asset asset = assetRepository.findById(assetCode).orElseThrow(
 				() -> new ResourceNotFoundException("Cannot find asset with asset code: " + assetCode));
 		List<Assignment> assignmentList = assignmentRepository.findByAsset(asset);
 		if (!assignmentList.isEmpty()) {
-			return new ResponseMessage(HttpStatus.CONFLICT, "Asset belongs to one or more historical assignments", new Date());
+			return new MessageResponse(HttpStatus.CONFLICT, "Asset belongs to one or more historical assignments", new Date());
 		}
 		assetRepository.delete(asset);
-		return new ResponseMessage(HttpStatus.OK, "Delete asset successfully!", new Date());
+		return new MessageResponse(HttpStatus.OK, "Delete asset successfully!", new Date());
 	}
 }

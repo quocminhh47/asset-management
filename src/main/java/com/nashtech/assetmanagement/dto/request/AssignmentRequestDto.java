@@ -14,7 +14,7 @@ import java.sql.Date;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-public class RequestAssignmentDTO {
+public class AssignmentRequestDto {
     @NotEmpty
     String assignedBy;
     @NotEmpty

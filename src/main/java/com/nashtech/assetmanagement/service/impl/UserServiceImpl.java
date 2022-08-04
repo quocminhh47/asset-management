@@ -20,16 +20,16 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
-import com.nashtech.assetmanagement.dto.request.RequestChangePassDto;
-import com.nashtech.assetmanagement.dto.request.RequestLoginDTO;
-import com.nashtech.assetmanagement.dto.request.RequestUserDto;
-import com.nashtech.assetmanagement.dto.response.ListUsersResponse;
-import com.nashtech.assetmanagement.dto.response.LocationResponseDTO;
-import com.nashtech.assetmanagement.dto.response.ResponseMessage;
-import com.nashtech.assetmanagement.dto.response.ResponseSignInDTO;
-import com.nashtech.assetmanagement.dto.response.ResponseUserDTO;
-import com.nashtech.assetmanagement.dto.response.SingleUserResponse;
-import com.nashtech.assetmanagement.dto.response.UserDto;
+import com.nashtech.assetmanagement.dto.request.ChangePassRequestDto;
+import com.nashtech.assetmanagement.dto.request.LoginRequestDto;
+import com.nashtech.assetmanagement.dto.request.UserRequestDto;
+import com.nashtech.assetmanagement.dto.response.ListUsersResponseDto;
+import com.nashtech.assetmanagement.dto.response.LocationResponseDto;
+import com.nashtech.assetmanagement.dto.response.MessageResponse;
+import com.nashtech.assetmanagement.dto.response.SignInResponseDto;
+import com.nashtech.assetmanagement.dto.response.UserResponseDto;
+import com.nashtech.assetmanagement.dto.response.SingleUserResponseDto;
+import com.nashtech.assetmanagement.dto.response.UserContentResponseDto;
 import com.nashtech.assetmanagement.entities.Location;
 import com.nashtech.assetmanagement.entities.Role;
 import com.nashtech.assetmanagement.entities.Users;
@@ -96,18 +96,18 @@ public class UserServiceImpl implements UserService {
 	}
 
 	@Override
-	public ResponseSignInDTO signIn(RequestLoginDTO requestLoginDTO) {
+	public SignInResponseDto signIn(LoginRequestDto requestLoginDTO) {
 		Authentication authentication = authenticationManager.authenticate(
 				new UsernamePasswordAuthenticationToken(requestLoginDTO.getUserName(), requestLoginDTO.getPassword()));
 		SecurityContextHolder.getContext().setAuthentication(authentication);
 		String token = jwtUtils.generateJwtToken(authentication);
 		UserPrinciple userPrinciple = (UserPrinciple) authentication.getPrincipal();
-		return new ResponseSignInDTO(userPrinciple.getStaffCode(), userPrinciple.getUsername(),
+		return new SignInResponseDto(userPrinciple.getStaffCode(), userPrinciple.getUsername(),
 				userPrinciple.getState(), userPrinciple.getAuthorities(), token);
 	}
 
     @Override
-    public UserDto createNewUser(RequestUserDto user) {
+    public UserContentResponseDto createNewUser(UserRequestDto user) {
 
 		Optional<Location> location = locationRepository.findByName(user.getLocationName());
 		Optional<Role> role = roleRepository.findByName(user.getRoleName());
@@ -128,12 +128,12 @@ public class UserServiceImpl implements UserService {
 		newUser.setPassword(new BCryptPasswordEncoder()
 				.encode(UserGenerateUtil.generatePassword(newUser.getUserName(), newUser.getBirthDate())));
 		userRepository.save(newUser);
-		UserDto responseUser = modelMapper.map(newUser, UserDto.class);
+		UserContentResponseDto responseUser = modelMapper.map(newUser, UserContentResponseDto.class);
 		return responseUser;
 	}
 
     @Override
-    public UserDto editUser(RequestUserDto user, String staffCode) {
+    public UserContentResponseDto editUser(UserRequestDto user, String staffCode) {
         Optional<Users> usersOptional = userRepository.findByStaffCode(staffCode);
         Optional<Role> roleOptional = roleRepository.findByName(user.getRoleName());
         if (usersOptional.isEmpty()){
@@ -146,12 +146,12 @@ public class UserServiceImpl implements UserService {
         Role role = roleOptional.get();
         userMapper.requestDtoToUser(editUser,user,role);
         userRepository.save(editUser);
-        UserDto responseUser = modelMapper.map(editUser,UserDto.class);
+        UserContentResponseDto responseUser = modelMapper.map(editUser,UserContentResponseDto.class);
         return responseUser;
     }
 
 	@Override
-	public LocationResponseDTO getLocationByStaffCode(String staffCode) {
+	public LocationResponseDto getLocationByStaffCode(String staffCode) {
 		Optional<Users> usersOptional = userRepository.findByStaffCode(staffCode);
 		if (usersOptional.isEmpty()) {
 			throw new ResourceNotFoundException("Staff code not found");
@@ -162,19 +162,19 @@ public class UserServiceImpl implements UserService {
 	}
 
     @Override
-    public List<UserDto> getUsersByStaffCodeOrNameAndLocationCode(String text,String locationCode) {
+    public List<UserContentResponseDto> getUsersByStaffCodeOrNameAndLocationCode(String text,String locationCode) {
         Optional<Location> location = locationRepository.findById(locationCode);
         if(location.isEmpty()){
             throw new ResourceNotFoundException("Location code not found");
         }
         List<Users> usersList = userRepository.findByStaffCodeOrNameAndLocationCode(text.toLowerCase(),locationCode);
-        List<UserDto> userDtoList = userMapper.mapListUserToListUserDto(usersList);
+        List<UserContentResponseDto> userDtoList = userMapper.mapListUserToListUserDto(usersList);
         return userDtoList;
     }
 
 
 	@Override
-	public ListUsersResponse getAllUsersBySearchingStaffCodeOrNameOrRole(int pageNo,
+	public ListUsersResponseDto getAllUsersBySearchingStaffCodeOrNameOrRole(int pageNo,
 																		 int pageSize,
 																		 String sortBy,
 																		 String sortDirection,
@@ -206,7 +206,7 @@ public class UserServiceImpl implements UserService {
 
 
 	@Override
-	public SingleUserResponse getUserDetailInfo(String staffCode) {
+	public SingleUserResponseDto getUserDetailInfo(String staffCode) {
 		Users user = userRepository.findById(staffCode)
 				.orElseThrow(() -> new ResourceNotFoundException("User " + staffCode + " not found"));
 
@@ -219,28 +219,28 @@ public class UserServiceImpl implements UserService {
 	}
 
 	@Override
-	public ResponseMessage changePasswordFirstLogin(String userName, String newPassword) {
+	public MessageResponse changePasswordFirstLogin(String userName, String newPassword) {
 		Users user = userRepository.findByUserName(userName)
 				.orElseThrow(() -> new ResourceNotFoundException("Did not find user " + "with username: " + userName));
 		if (user.getState() != UserState.INIT) {
-			return new ResponseMessage(HttpStatus.CONFLICT,
+			return new MessageResponse(HttpStatus.CONFLICT,
 					"You don't have to " + "change your password for the first time you log in because your "
 							+ "password has already been changed.",
 					new Date());
 		}
 		if (passwordEncoder.matches(newPassword, user.getPassword())) {
-			return new ResponseMessage(HttpStatus.CONFLICT,
+			return new MessageResponse(HttpStatus.CONFLICT,
 					"The new password must be " + "different from the previous password.", new Date());
 		} else {
 			user.setPassword(passwordEncoder.encode(newPassword));
 			user.setState(UserState.ACTIVE);
 			userRepository.save(user);
 		}
-		return new ResponseMessage(HttpStatus.OK, "Change password successfully.", new Date());
+		return new MessageResponse(HttpStatus.OK, "Change password successfully.", new Date());
 	}
 
 	@Override
-	public ResponseUserDTO changePassword(RequestChangePassDto dto) {
+	public UserResponseDto changePassword(ChangePassRequestDto dto) {
 		Optional<Users> optional = userRepository.findById(dto.getStaffCode());
 		if (!optional.isPresent()) {
 			throw new ResourceNotFoundException(String.format("user.not.found.with.staff.code:%s", dto.getStaffCode()));
@@ -253,7 +253,7 @@ public class UserServiceImpl implements UserService {
 		} else {
 			user.setPassword(passwordEncoder.encode(dto.getNewPassword()));
 			user = userRepository.save(user);
-			ResponseUserDTO repDto = modelMapper.map(user, ResponseUserDTO.class);
+			UserResponseDto repDto = modelMapper.map(user, UserResponseDto.class);
 			return repDto;
 		}
 	}
@@ -271,7 +271,7 @@ public class UserServiceImpl implements UserService {
 		} 
 	}
 
-	public ResponseUserDTO disableStaff(String staffCode) {
+	public UserResponseDto disableStaff(String staffCode) {
 		Optional<Users> optional = userRepository.findById(staffCode);
 		if (!optional.isPresent()) {
 			throw new ResourceNotFoundException(String.format("staff.not.found.with.code:%s", staffCode));
@@ -279,7 +279,7 @@ public class UserServiceImpl implements UserService {
 		Users user = optional.get();
 		user.setState(UserState.INACTIVE);
 		userRepository.save(user);
-		ResponseUserDTO dto = modelMapper.map(user, ResponseUserDTO.class);
+		UserResponseDto dto = modelMapper.map(user, UserResponseDto.class);
 		return dto;
 	}
 }

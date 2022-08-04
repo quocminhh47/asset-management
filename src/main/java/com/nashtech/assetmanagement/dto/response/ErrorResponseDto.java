@@ -5,7 +5,7 @@ import com.fasterxml.jackson.annotation.JsonInclude.Include;
 
 import java.util.Map;
 
-public class ErrorResponse {
+public class ErrorResponseDto {
 	String code;
 
 	String message;
@@ -13,13 +13,13 @@ public class ErrorResponse {
 	@JsonInclude(Include.NON_NULL)
 	Map<String, String> validationErrors;
 
-	public ErrorResponse(String code, String message) {
+	public ErrorResponseDto(String code, String message) {
 		super();
 		this.code = code;
 		this.message = message;
 	}
 	
-	public ErrorResponse(String code, String message, Map<String, String> validationErrors) {
+	public ErrorResponseDto(String code, String message, Map<String, String> validationErrors) {
 		super();
 		this.code = code;
 		this.message = message;

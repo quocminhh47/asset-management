@@ -9,9 +9,9 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.nashtech.assetmanagement.dto.response.ListUsersResponse;
-import com.nashtech.assetmanagement.dto.response.ResponseUserDTO;
-import com.nashtech.assetmanagement.dto.response.SingleUserResponse;
+import com.nashtech.assetmanagement.dto.response.ListUsersResponseDto;
+import com.nashtech.assetmanagement.dto.response.UserResponseDto;
+import com.nashtech.assetmanagement.dto.response.SingleUserResponseDto;
 import com.nashtech.assetmanagement.service.UserService;
 import com.nashtech.assetmanagement.utils.AppConstants;
 
@@ -22,13 +22,13 @@ import java.util.List;
 @RestController
 @AllArgsConstructor
 @RequestMapping("/admin/api/users")
-public class UsersManagementController {
+public class UsersController {
 
 	private final UserService userService;
 
     @GetMapping("/all")
     @ResponseStatus(HttpStatus.OK)
-    public ListUsersResponse getAllStaffOrderByFirstNameAsc(
+    public ListUsersResponseDto getAllStaffOrderByFirstNameAsc(
             @RequestParam(value = "textPattern", defaultValue = "" ) String searchText,
             @RequestParam("role") List<String> roles,
             @RequestParam(
@@ -49,7 +49,7 @@ public class UsersManagementController {
 
 	@GetMapping("/{staffCode}")
 	@ResponseStatus(HttpStatus.OK)
-	public SingleUserResponse getUserDetailInfo(@PathVariable("staffCode") String staffCode) {
+	public SingleUserResponseDto getUserDetailInfo(@PathVariable("staffCode") String staffCode) {
 		return userService.getUserDetailInfo(staffCode);
 	}
 
@@ -59,8 +59,8 @@ public class UsersManagementController {
 	}
 
 	@GetMapping("/disable/{staffCode}")
-	public ResponseEntity<ResponseUserDTO> disableStaff(@PathVariable("staffCode") String staffCode) {
-		ResponseUserDTO dto = userService.disableStaff(staffCode);
-		return new ResponseEntity<ResponseUserDTO>(dto, HttpStatus.OK);
+	public ResponseEntity<UserResponseDto> disableStaff(@PathVariable("staffCode") String staffCode) {
+		UserResponseDto dto = userService.disableStaff(staffCode);
+		return new ResponseEntity<UserResponseDto>(dto, HttpStatus.OK);
 	}
 }

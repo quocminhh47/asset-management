@@ -18,7 +18,7 @@ import java.util.Date;
 @NoArgsConstructor
 @AllArgsConstructor
 @JoinedDate(before = "birthDate", after = "joinedDate",message = "Joined date is not later than Date of Birth. Please select a different date")
-public class RequestUserDto {
+public class UserRequestDto {
     @Size(max = 128)
     private String firstName;
     @Size(max = 128)

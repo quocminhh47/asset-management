@@ -12,7 +12,7 @@ import javax.validation.constraints.NotEmpty;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-public class RequestCategoryDTO {
+public class CategoryRequestDto {
 
     @NotEmpty(message = "Category code must not be empty.")
     private String id;

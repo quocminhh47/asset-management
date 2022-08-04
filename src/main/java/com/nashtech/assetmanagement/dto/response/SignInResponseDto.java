@@ -12,7 +12,7 @@ import java.util.Collection;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-public class ResponseSignInDTO {
+public class SignInResponseDto {
     private String staffCode;
     private String userName;
     private UserState state;

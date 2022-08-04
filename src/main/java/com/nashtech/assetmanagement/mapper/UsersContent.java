@@ -1,7 +1,7 @@
 package com.nashtech.assetmanagement.mapper;
 
-import com.nashtech.assetmanagement.dto.response.ListUsersResponse;
-import com.nashtech.assetmanagement.dto.response.UserDto;
+import com.nashtech.assetmanagement.dto.response.ListUsersResponseDto;
+import com.nashtech.assetmanagement.dto.response.UserContentResponseDto;
 import com.nashtech.assetmanagement.entities.Users;
 import lombok.AllArgsConstructor;
 import org.modelmapper.ModelMapper;
@@ -17,17 +17,17 @@ public class UsersContent {
 
     private final ModelMapper mapper;
 
-    public UserDto mapToDto(Users user) {
-        return mapper.map(user, UserDto.class);
+    public UserContentResponseDto mapToDto(Users user) {
+        return mapper.map(user, UserContentResponseDto.class);
     }
 
-     public ListUsersResponse getUsersContent(Page<Users> usersPage) {
+     public ListUsersResponseDto getUsersContent(Page<Users> usersPage) {
         List<Users> users = usersPage.getContent();
-        List<UserDto> usersContent = users.stream()
+        List<UserContentResponseDto> usersContent = users.stream()
                 .map(this::mapToDto)
                 .collect(Collectors.toList());
 
-        return ListUsersResponse.builder()
+        return ListUsersResponseDto.builder()
                 .userContent(usersContent)
                 .pageNo(usersPage.getNumber())
                 .pageSize(usersPage.getSize())

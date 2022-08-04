@@ -4,16 +4,16 @@ import java.util.List;
 
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 
-import com.nashtech.assetmanagement.dto.request.RequestChangePassDto;
-import com.nashtech.assetmanagement.dto.request.RequestLoginDTO;
-import com.nashtech.assetmanagement.dto.request.RequestUserDto;
-import com.nashtech.assetmanagement.dto.response.ListUsersResponse;
-import com.nashtech.assetmanagement.dto.response.LocationResponseDTO;
-import com.nashtech.assetmanagement.dto.response.ResponseMessage;
-import com.nashtech.assetmanagement.dto.response.ResponseSignInDTO;
-import com.nashtech.assetmanagement.dto.response.ResponseUserDTO;
-import com.nashtech.assetmanagement.dto.response.SingleUserResponse;
-import com.nashtech.assetmanagement.dto.response.UserDto;
+import com.nashtech.assetmanagement.dto.request.ChangePassRequestDto;
+import com.nashtech.assetmanagement.dto.request.LoginRequestDto;
+import com.nashtech.assetmanagement.dto.request.UserRequestDto;
+import com.nashtech.assetmanagement.dto.response.ListUsersResponseDto;
+import com.nashtech.assetmanagement.dto.response.LocationResponseDto;
+import com.nashtech.assetmanagement.dto.response.MessageResponse;
+import com.nashtech.assetmanagement.dto.response.SignInResponseDto;
+import com.nashtech.assetmanagement.dto.response.UserResponseDto;
+import com.nashtech.assetmanagement.dto.response.SingleUserResponseDto;
+import com.nashtech.assetmanagement.dto.response.UserContentResponseDto;
 import com.nashtech.assetmanagement.sercurity.userdetail.UserPrinciple;
 
 public interface UserService {
@@ -21,19 +21,19 @@ public interface UserService {
     boolean isUsernameExist(String username);
 
 
-    ResponseSignInDTO signIn(RequestLoginDTO requestLoginDTO);
-    UserDto createNewUser(RequestUserDto user);
+    SignInResponseDto signIn(LoginRequestDto requestLoginDTO);
+    UserContentResponseDto createNewUser(UserRequestDto user);
 
-    UserDto editUser(RequestUserDto user, String staffCode);
-    LocationResponseDTO getLocationByStaffCode(String staffCode);
-    List<UserDto> getUsersByStaffCodeOrNameAndLocationCode(String text,String locationCode);
+    UserContentResponseDto editUser(UserRequestDto user, String staffCode);
+    LocationResponseDto getLocationByStaffCode(String staffCode);
+    List<UserContentResponseDto> getUsersByStaffCodeOrNameAndLocationCode(String text,String locationCode);
 
     UserPrinciple loadUserByUsername(String userName)
             throws UsernameNotFoundException;
 
 
     //filter + searching
-    ListUsersResponse getAllUsersBySearchingStaffCodeOrNameOrRole(int pageNo,
+    ListUsersResponseDto getAllUsersBySearchingStaffCodeOrNameOrRole(int pageNo,
                                                                   int pageSize,
                                                                   String sortBy,
                                                                   String sortDirection,
@@ -43,13 +43,13 @@ public interface UserService {
 
     
 
-    SingleUserResponse getUserDetailInfo(String staffCode);
+    SingleUserResponseDto getUserDetailInfo(String staffCode);
 
-    ResponseMessage changePasswordFirstLogin(String userName, String newPassword);
-    ResponseUserDTO changePassword(RequestChangePassDto dto);
+    MessageResponse changePasswordFirstLogin(String userName, String newPassword);
+    UserResponseDto changePassword(ChangePassRequestDto dto);
 
     void checkExistsAssignment(String staffCode);
     
-    ResponseUserDTO disableStaff(String staffCode);
+    UserResponseDto disableStaff(String staffCode);
 
 }

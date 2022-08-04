@@ -1,6 +1,5 @@
-package com.nashtech.assetmanagement.dto.response;
+package com.nashtech.assetmanagement.dto.request;
 
-import com.nashtech.assetmanagement.entities.Location;
 import com.nashtech.assetmanagement.enums.AssetState;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -8,16 +7,16 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import java.util.Date;
-
 @Getter
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-public class ResponseAssetDTO {
-    private String assetCode;
+public class CreateAssetRequestDto {
     private String assetName;
+    private String categoryId;
     private String specification;
-    private Date installedDate;
     private AssetState state;
-    private String locationCode;
+    private Date installedDate;
+    private String locationId;
+    private String userId;
 }

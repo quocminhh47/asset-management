@@ -5,11 +5,10 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
-@Getter
-@Setter
-@NoArgsConstructor
+@Getter@Setter
 @AllArgsConstructor
-public class ResponseCategoryDTO {
-    private String id;
+@NoArgsConstructor
+public class RoleResponseDto {
+    private Long id;
     private String name;
 }

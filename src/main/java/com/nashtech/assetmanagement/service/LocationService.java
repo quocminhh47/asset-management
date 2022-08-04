@@ -1,10 +1,10 @@
 package com.nashtech.assetmanagement.service;
 
-import com.nashtech.assetmanagement.dto.response.LocationResponseDTO;
+import com.nashtech.assetmanagement.dto.response.LocationResponseDto;
 
 import java.util.List;
 
 public interface LocationService {
 
-    List<LocationResponseDTO> getLocationList();
+    List<LocationResponseDto> getLocationList();
 }

@@ -13,27 +13,27 @@ import java.util.List;
 @Getter
 @Setter
 @ToString
-public class ResponseErrorMessage {
+public class ErrorResponseMessageDto {
     private HttpStatus status;
     private String message;
     private List<String> errors;
     @JsonProperty("timestamp")
     private Date timeStamp;
 
-    public ResponseErrorMessage(HttpStatus status, String message, List<String> errors,Date  timeStamp) {
+    public ErrorResponseMessageDto(HttpStatus status, String message, List<String> errors,Date  timeStamp) {
         this.timeStamp = timeStamp;
         this.status = status;
         this.message = message;
         this.errors = errors;
     }
-    public ResponseErrorMessage(HttpStatus status, String message, String error,Date  timeStamp) {
+    public ErrorResponseMessageDto(HttpStatus status, String message, String error,Date  timeStamp) {
         this.timeStamp = timeStamp;
         this.status = status;
         this.message = message;
         errors= Arrays.asList(error);
     }
 
-    public ResponseErrorMessage(HttpStatus status, String message, Date timeStamp) {
+    public ErrorResponseMessageDto(HttpStatus status, String message, Date timeStamp) {
         this.status = status;
         this.message = message;
         this.timeStamp = timeStamp;

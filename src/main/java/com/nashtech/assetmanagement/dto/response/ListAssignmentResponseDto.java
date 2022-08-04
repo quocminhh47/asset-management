@@ -3,12 +3,13 @@ package com.nashtech.assetmanagement.dto.response;
 import lombok.*;
 
 import java.util.List;
+
 @Getter @Setter @Builder
 @AllArgsConstructor
 @NoArgsConstructor
-public class ListUsersResponse {
+public class ListAssignmentResponseDto {
 
-    private List<UserDto> userContent;
+    List<AssignmentResponseDto> assignmentContent;
 
     private int pageNo;
 
@@ -19,4 +20,5 @@ public class ListUsersResponse {
     private int totalPages;
 
     private boolean last;
+
 }

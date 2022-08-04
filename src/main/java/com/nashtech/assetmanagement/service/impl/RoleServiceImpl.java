@@ -1,6 +1,6 @@
 package com.nashtech.assetmanagement.service.impl;
 
-import com.nashtech.assetmanagement.dto.response.ResponseRoleDto;
+import com.nashtech.assetmanagement.dto.response.RoleResponseDto;
 import com.nashtech.assetmanagement.entities.Role;
 import com.nashtech.assetmanagement.exception.ResourceNotFoundException;
 import com.nashtech.assetmanagement.mapper.RoleMapper;
@@ -40,12 +40,12 @@ public class RoleServiceImpl implements RoleService {
     }
 
     @Override
-    public List<ResponseRoleDto> getRoleList() {
+    public List<RoleResponseDto> getRoleList() {
         List<Role> roles = roleRepository.findAll();
         if (roles.isEmpty()){
             throw new ResourceNotFoundException("Role list not found");
         }
-        List<ResponseRoleDto> responseList = roleMapper.roleListToResponseRoleDtoList(roles);
+        List<RoleResponseDto> responseList = roleMapper.roleListToResponseRoleDtoList(roles);
         return responseList;
     }
 

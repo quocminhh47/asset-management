@@ -24,9 +24,9 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 
-import com.nashtech.assetmanagement.dto.request.RequestAssignmentDTO;
-import com.nashtech.assetmanagement.dto.response.AssignmentDto;
-import com.nashtech.assetmanagement.dto.response.ListAssignmentResponse;
+import com.nashtech.assetmanagement.dto.request.AssignmentRequestDto;
+import com.nashtech.assetmanagement.dto.response.AssignmentResponseDto;
+import com.nashtech.assetmanagement.dto.response.ListAssignmentResponseDto;
 import com.nashtech.assetmanagement.entities.Asset;
 import com.nashtech.assetmanagement.entities.Assignment;
 import com.nashtech.assetmanagement.entities.Users;
@@ -71,7 +71,7 @@ class AssignmentServiceImplTest {
 	@Test
 	void givenValidCondition_whenGetAssignmentsByCondition_thenReturnListAssignmentResponse() {
 		// given
-		ListAssignmentResponse expectedResponse = mock(ListAssignmentResponse.class);
+		ListAssignmentResponseDto expectedResponse = mock(ListAssignmentResponseDto.class);
 
 		List<String> assignedState = states.stream().map(StateConverter::getAssignmentState)
 				.collect(Collectors.toList());
@@ -91,7 +91,7 @@ class AssignmentServiceImplTest {
 		when(assignmentContent.getAssignmentResponse(assignmentPage)).thenReturn(expectedResponse);
 
 		// when
-		ListAssignmentResponse actualResponse = assignmentServiceImpl.getAssignmentsByCondition(0, 1, "SD", states,
+		ListAssignmentResponseDto actualResponse = assignmentServiceImpl.getAssignmentsByCondition(0, 1, "SD", states,
 				assignedDateStr);
 		// then
 		assertThat(actualResponse).isEqualTo(expectedResponse);
@@ -100,7 +100,7 @@ class AssignmentServiceImplTest {
 	@Test
 	void givenWithoutDateCondition_whenGetAssignmentsByCondition_thenReturnListAssignmentResponse() {
 		// given
-		ListAssignmentResponse expectedResponse = mock(ListAssignmentResponse.class);
+		ListAssignmentResponseDto expectedResponse = mock(ListAssignmentResponseDto.class);
 
 		List<String> assignedState = states.stream().map(StateConverter::getAssignmentState)
 				.collect(Collectors.toList());
@@ -118,7 +118,7 @@ class AssignmentServiceImplTest {
 		when(assignmentContent.getAssignmentResponse(assignmentPage)).thenReturn(expectedResponse);
 
 		// when
-		ListAssignmentResponse actualResponse = assignmentServiceImpl.getAssignmentsByCondition(0, 1, "SD", states,
+		ListAssignmentResponseDto actualResponse = assignmentServiceImpl.getAssignmentsByCondition(0, 1, "SD", states,
 				assignedDateStr);
 		// then
 		assertThat(actualResponse).isEqualTo(expectedResponse);
@@ -149,7 +149,7 @@ class AssignmentServiceImplTest {
 	// US584 Create New Assignment
 	@Test
 	void createNewAssignment_ShouldReturnResponseAssignmentDto_WhenRequestValid() {
-		RequestAssignmentDTO request = mock(RequestAssignmentDTO.class);
+		AssignmentRequestDto request = mock(AssignmentRequestDto.class);
 		when(request.getAssignedTo()).thenReturn("assignTo");
 		when(request.getAssignedBy()).thenReturn("assignBy");
 		when(request.getAssetCode()).thenReturn("assetCode");
@@ -157,13 +157,13 @@ class AssignmentServiceImplTest {
 		Users assignBy = mock(Users.class);
 		Users assignTo = mock(Users.class);
 		Assignment assignment = mock(Assignment.class);
-		AssignmentDto response = mock(AssignmentDto.class);
+		AssignmentResponseDto response = mock(AssignmentResponseDto.class);
 		when(assetRepository.findById("assetCode")).thenReturn(Optional.of(asset));
 		when(userRepository.findById("assignBy")).thenReturn(Optional.of(assignBy));
 		when(userRepository.findById("assignTo")).thenReturn(Optional.of(assignTo));
 		when(assignmentMapper.MapRequestAssignmentToAssignment(request)).thenReturn(assignment);
 		when(assignmentMapper.MapAssignmentToResponseDto(assignment)).thenReturn(response);
-		AssignmentDto result = assignmentServiceImpl.createNewAssignment(request);
+		AssignmentResponseDto result = assignmentServiceImpl.createNewAssignment(request);
 		verify(asset).setState(AssetState.ASSIGNED);
 		verify(assignment).setAssignedTo(assignTo);
 		verify(assignment).setAssignedBy(assignBy);
@@ -175,7 +175,7 @@ class AssignmentServiceImplTest {
 	@Test
 	void createNewAssignment_ShouldThrowResourceNotFoundEx_WhenAssetCodeNotExist() {
 		Asset asset = mock(Asset.class);
-		RequestAssignmentDTO request = mock(RequestAssignmentDTO.class);
+		AssignmentRequestDto request = mock(AssignmentRequestDto.class);
 		when(assetRepository.findById("assetCode")).thenReturn(Optional.empty());
 		ResourceNotFoundException e = Assertions.assertThrows(ResourceNotFoundException.class,
 				() -> assignmentServiceImpl.createNewAssignment(request));
@@ -185,7 +185,7 @@ class AssignmentServiceImplTest {
 	@Test
 	void createNewAssignment_ShouldThrowResourceNotFoundEx_WhenUserAssignToNotExist() {
 		Asset asset = mock(Asset.class);
-		RequestAssignmentDTO request = mock(RequestAssignmentDTO.class);
+		AssignmentRequestDto request = mock(AssignmentRequestDto.class);
 		when(request.getAssetCode()).thenReturn("assetCode");
 		when(request.getAssignedTo()).thenReturn("assignTo");
 		when(assetRepository.findById("assetCode")).thenReturn(Optional.of(asset));
@@ -199,7 +199,7 @@ class AssignmentServiceImplTest {
     void createNewAssignment_ShouldThrowResourceNotFoundEx_WhenUserAssignByNotExist() {
         Asset asset = mock(Asset.class);
         Users assignTo = mock(Users.class);
-        RequestAssignmentDTO request = mock(RequestAssignmentDTO.class);
+        AssignmentRequestDto request = mock(AssignmentRequestDto.class);
         when(request.getAssetCode()).thenReturn("assetCode");
         when(request.getAssignedTo()).thenReturn("assignTo");
         when(request.getAssignedBy()).thenReturn("assignBy");
@@ -212,7 +212,7 @@ class AssignmentServiceImplTest {
     }
     @Test
     void createNewAssignment_ShouldThrowNotUniqueEx_WhenRequestSameId() {
-        RequestAssignmentDTO request = mock(RequestAssignmentDTO.class);
+        AssignmentRequestDto request = mock(AssignmentRequestDto.class);
         Date date = mock(Date.class);
         when(request.getAssignedTo()).thenReturn("assignTo");
         when(request.getAssignedDate()).thenReturn(date);
@@ -228,12 +228,12 @@ class AssignmentServiceImplTest {
 	void getListAssignmentByAsset_ShouldReturnListAssignmentDto_WhenAssetIdExist() {
 		Asset entity = mock(Asset.class);
 		List<Assignment> listEntity = mock(List.class);
-		List<AssignmentDto> expected = mock(List.class);
+		List<AssignmentResponseDto> expected = mock(List.class);
     	when(assetRepository.findById("Laptop001")).thenReturn(Optional.of(entity));
     	when(assignmentRepository.findByAsset(entity)).thenReturn(listEntity);
     	when(assignmentMapper.mapperListAssignment(listEntity)).thenReturn(expected);
 
-    	List<AssignmentDto> actual = assignmentServiceImpl.getListAssignmentByAssetCode("Laptop001");
+    	List<AssignmentResponseDto> actual = assignmentServiceImpl.getListAssignmentByAssetCode("Laptop001");
     	assertThat(actual).isEqualTo(expected);
     }
 
@@ -261,7 +261,7 @@ class AssignmentServiceImplTest {
 		Users user = mock(Users.class);
 		Page<Assignment> pageAssignment = mock(Page.class);
 		List<Assignment> listAssignment = mock(List.class);
-		List<AssignmentDto> expectList = mock(List.class);
+		List<AssignmentResponseDto> expectList = mock(List.class);
 		
 		when(userRepository.findById("SD001")).thenReturn(Optional.of(user));
 		when(assignmentRepository.getListAssignmentByUser(eq("SD001"), Mockito.any(Pageable.class))).thenReturn(pageAssignment);
@@ -269,7 +269,7 @@ class AssignmentServiceImplTest {
 		when(assignmentMapper.mapperListAssignment(listAssignment)).thenReturn(expectList);
 		
 	
-		List<AssignmentDto> actual = assignmentServiceImpl.getListAssignmentByUser("SD001", "code", "ASC");
+		List<AssignmentResponseDto> actual = assignmentServiceImpl.getListAssignmentByUser("SD001", "code", "ASC");
 	
 		ArgumentCaptor<Pageable> captor = ArgumentCaptor.forClass(Pageable.class);
 		verify(assignmentRepository).getListAssignmentByUser(eq("SD001"), captor.capture());

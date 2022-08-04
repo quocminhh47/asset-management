@@ -1,6 +1,6 @@
 package com.nashtech.assetmanagement.service.impl;
 
-import com.nashtech.assetmanagement.dto.response.LocationResponseDTO;
+import com.nashtech.assetmanagement.dto.response.LocationResponseDto;
 import com.nashtech.assetmanagement.entities.Location;
 import com.nashtech.assetmanagement.exception.ResourceNotFoundException;
 import com.nashtech.assetmanagement.mapper.LocationMapper;
@@ -23,12 +23,12 @@ public class LocationServiceImpl implements LocationService {
     }
 
     @Override
-    public List<LocationResponseDTO> getLocationList() {
+    public List<LocationResponseDto> getLocationList() {
         List<Location> locations = locationRepository.findAll();
         if (locations.isEmpty()){
             throw new ResourceNotFoundException("Location list not found");
         }
-        List<LocationResponseDTO> responseList = locationMapper.locationListToLocationResponseDtoList(locations);
+        List<LocationResponseDto> responseList = locationMapper.locationListToLocationResponseDtoList(locations);
         return responseList;
     }
 }

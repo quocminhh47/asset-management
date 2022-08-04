@@ -30,8 +30,8 @@ import org.springframework.http.HttpStatus;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
-import com.nashtech.assetmanagement.dto.request.RequestChangePassDto;
-import com.nashtech.assetmanagement.dto.request.RequestUserDto;
+import com.nashtech.assetmanagement.dto.request.ChangePassRequestDto;
+import com.nashtech.assetmanagement.dto.request.UserRequestDto;
 import com.nashtech.assetmanagement.entities.Location;
 import com.nashtech.assetmanagement.entities.Role;
 import com.nashtech.assetmanagement.entities.Users;
@@ -83,16 +83,16 @@ public class UserServiceImplTest {
         Location location = mock(Location.class);
         Role role = mock(Role.class);
         Users user = mock(Users.class);
-        RequestUserDto userRequest = mock(RequestUserDto.class);
-        UserDto userResponse = mock(UserDto.class);
+        UserRequestDto userRequest = mock(UserRequestDto.class);
+        UserContentResponseDto userResponse = mock(UserContentResponseDto.class);
         when(locationRepository.findByName(userRequest.getLocationName())).thenReturn(Optional.of(location));
         when(roleRepository.findByName(userRequest.getRoleName())).thenReturn(Optional.of(role));
         when(userMapper.MapToUser(userRequest,role,location)).thenReturn(user);
         when(user.getFirstName()).thenReturn("firstname");
         when(user.getLastName()).thenReturn("lastname");
         when(user.getBirthDate()).thenReturn(new Date());
-        when(modelMapper.map(user, UserDto.class)).thenReturn(userResponse);
-        UserDto result = userServiceImpl.createNewUser(userRequest);
+        when(modelMapper.map(user, UserContentResponseDto.class)).thenReturn(userResponse);
+        UserContentResponseDto result = userServiceImpl.createNewUser(userRequest);
         assertThat(result).isEqualTo(userResponse);
     }
 
@@ -101,7 +101,7 @@ public class UserServiceImplTest {
     	//given
 		Users user = mock(Users.class);
 		Location location = mock(Location.class);
-		ListUsersResponse expectedResponse = mock(ListUsersResponse.class);
+		ListUsersResponseDto expectedResponse = mock(ListUsersResponseDto.class);
 		when(authenticationService.getUser()).thenReturn(user);
 		when(user.getStaffCode()).thenReturn("SD001");
 		when(user.getLocation()).thenReturn(location);
@@ -120,7 +120,7 @@ public class UserServiceImplTest {
 		when(usersContent.getUsersContent(usersPage)).thenReturn(expectedResponse);
 
 		//when
-		ListUsersResponse actualResponse =
+		ListUsersResponseDto actualResponse =
 				userServiceImpl.getAllUsersBySearchingStaffCodeOrNameOrRole(
 						0,
 						1,
@@ -135,7 +135,7 @@ public class UserServiceImplTest {
     @Test
     void createNewUser_ShouldThrowResourceNotFoundEx_WhenRequestRoleNameIncorrect(){
         Location location = mock(Location.class);
-        RequestUserDto userRequest = mock(RequestUserDto.class);
+        UserRequestDto userRequest = mock(UserRequestDto.class);
         when(locationRepository.findByName(userRequest.getLocationName())).thenReturn(Optional.of(location));
         when(roleRepository.findByName(userRequest.getRoleName())).thenReturn(Optional.empty());
         ResourceNotFoundException e = Assertions.assertThrows(ResourceNotFoundException.class,
@@ -145,7 +145,7 @@ public class UserServiceImplTest {
     @Test
     void createNewUser_ShouldThrowResourceNotFoundEx_WhenRequestLocationNameIncorrect(){
         Role role = mock(Role.class);
-        RequestUserDto userRequest = mock(RequestUserDto.class);
+        UserRequestDto userRequest = mock(UserRequestDto.class);
         when(locationRepository.findByName(userRequest.getLocationName())).thenReturn(Optional.empty());
         when(roleRepository.findByName(userRequest.getRoleName())).thenReturn(Optional.of(role));
         ResourceNotFoundException e = Assertions.assertThrows(ResourceNotFoundException.class,
@@ -156,17 +156,17 @@ public class UserServiceImplTest {
     void editUser_ShouldReturnUserDto_WhenStaffCodeAndRequestCorrect(){
         Role role = mock(Role.class);
         Users user = mock(Users.class);
-        RequestUserDto userRequest = mock(RequestUserDto.class);
-        UserDto userResponse = mock(UserDto.class);
+        UserRequestDto userRequest = mock(UserRequestDto.class);
+        UserContentResponseDto userResponse = mock(UserContentResponseDto.class);
         when(userRepository.findByStaffCode("sd0001")).thenReturn(Optional.of(user));
         when(roleRepository.findByName(userRequest.getRoleName())).thenReturn(Optional.of(role));
-        when(modelMapper.map(user, UserDto.class)).thenReturn(userResponse);
-        UserDto result = userServiceImpl.editUser(userRequest, "sd0001");
+        when(modelMapper.map(user, UserContentResponseDto.class)).thenReturn(userResponse);
+        UserContentResponseDto result = userServiceImpl.editUser(userRequest, "sd0001");
         assertThat(result).isEqualTo(userResponse);
     }
     @Test
     void editUser_ShouldThrowResourceNotFoundEx_WhenStaffCodeIncorrect(){
-        RequestUserDto userRequest = mock(RequestUserDto.class);
+        UserRequestDto userRequest = mock(UserRequestDto.class);
         when(userRepository.findByStaffCode("sd0001")).thenReturn(Optional.empty());
         ResourceNotFoundException e = Assertions.assertThrows(ResourceNotFoundException.class,
                 () -> userServiceImpl.editUser(userRequest,"sd0001"));
@@ -174,7 +174,7 @@ public class UserServiceImplTest {
     }
     @Test
     void editUser_ShouldThrowResourceNotFoundEx_WhenRequestRoleIncorrect(){
-        RequestUserDto userRequest = mock(RequestUserDto.class);
+        UserRequestDto userRequest = mock(UserRequestDto.class);
         Users user = mock(Users.class);
         when(userRepository.findByStaffCode("sd0001")).thenReturn(Optional.of(user));
         when(roleRepository.findByName(userRequest.getRoleName())).thenReturn(Optional.empty());
@@ -187,11 +187,11 @@ public class UserServiceImplTest {
     void getLocationByStaffCode_ShouldReturnLocationName_WhenStaffCodeCorrect(){
         Users user = mock(Users.class);
         Location location = mock(Location.class);
-        LocationResponseDTO response = mock(LocationResponseDTO.class);
+        LocationResponseDto response = mock(LocationResponseDto.class);
         when(userRepository.findByStaffCode("sd0001")).thenReturn(Optional.of(user));
         when(user.getLocation()).thenReturn(location);
         when(locationMapper.locationToLocationDTO(location)).thenReturn(response);
-        LocationResponseDTO result = userServiceImpl.getLocationByStaffCode("sd0001");
+        LocationResponseDto result = userServiceImpl.getLocationByStaffCode("sd0001");
         assertThat(result).isEqualTo(response);
     }
     @Test
@@ -205,12 +205,12 @@ public class UserServiceImplTest {
 	@Test
     void getUserByStaffCodeOrName_ShouldReturnUserDtoList_WhenStaffCodeOrNameExist(){
         List<Users> usersList = mock(ArrayList.class);
-        List<UserDto> responseList = mock(ArrayList.class);
+        List<UserContentResponseDto> responseList = mock(ArrayList.class);
         Location location = mock(Location.class);
         when(locationRepository.findById("HCM")).thenReturn(Optional.of(location));
         when(userRepository.findByStaffCodeOrNameAndLocationCode("text","HCM")).thenReturn(usersList);
         when(userMapper.mapListUserToListUserDto(usersList)).thenReturn(responseList);
-        List<UserDto> result = userServiceImpl.getUsersByStaffCodeOrNameAndLocationCode("text","HCM");
+        List<UserContentResponseDto> result = userServiceImpl.getUsersByStaffCodeOrNameAndLocationCode("text","HCM");
         assertThat(result).isEqualTo(responseList);
     }
 
@@ -230,11 +230,11 @@ public class UserServiceImplTest {
 				location, null);
 		Optional<Users> usersOptional = Optional.of(users);
 		when(userRepository.findByUserName("duc")).thenReturn(usersOptional);
-		ResponseMessage expected = new ResponseMessage(HttpStatus.CONFLICT,
+		MessageResponse expected = new MessageResponse(HttpStatus.CONFLICT,
 				"You don't " + "have to " + "change your password for the first time you log in because your "
 						+ "password has already been changed.",
 				new Date());
-		ResponseMessage actual = userServiceImpl.changePasswordFirstLogin("duc", "123");
+		MessageResponse actual = userServiceImpl.changePasswordFirstLogin("duc", "123");
 		assertThat(actual.getMessage()).isEqualTo(expected.getMessage());
 		assertThat(actual.getStatus()).isEqualTo(expected.getStatus());
 	}
@@ -248,9 +248,9 @@ public class UserServiceImplTest {
 		Optional<Users> usersOptional = Optional.of(users);
 		when(userRepository.findByUserName("duc")).thenReturn(usersOptional);
 		when(passwordEncoder.matches("123", users.getPassword())).thenReturn(true);
-		ResponseMessage expected = new ResponseMessage(HttpStatus.CONFLICT,
+		MessageResponse expected = new MessageResponse(HttpStatus.CONFLICT,
 				"The new password must be " + "different from the previous password.", new Date());
-		ResponseMessage actual = userServiceImpl.changePasswordFirstLogin("duc", "123");
+		MessageResponse actual = userServiceImpl.changePasswordFirstLogin("duc", "123");
 		assertThat(actual.getMessage()).isEqualTo(expected.getMessage());
 		assertThat(actual.getStatus()).isEqualTo(expected.getStatus());
 	}
@@ -261,7 +261,7 @@ public class UserServiceImplTest {
 	@Test
 	public void changePassword_shouldReturnExceptionPasswordIncorrect_whenUserIdExist() {
 		Users entity = mock(Users.class);
-		RequestChangePassDto request = mock(RequestChangePassDto.class);
+		ChangePassRequestDto request = mock(ChangePassRequestDto.class);
 		when(userRepository.findById(request.getStaffCode())).thenReturn(Optional.of(entity));
 		when(passwordEncoder.matches(request.getPassword(), entity.getPassword())).thenReturn(false);
 		Exception exception = assertThrows(ResourceNotFoundException.class, () -> {
@@ -274,7 +274,7 @@ public class UserServiceImplTest {
 	@Test
 	public void changePassword_shouldReturnExceptionSamePassword_whenUserIdExist() {
 		Users entity = mock(Users.class);
-		RequestChangePassDto request = mock(RequestChangePassDto.class);
+		ChangePassRequestDto request = mock(ChangePassRequestDto.class);
 		when(userRepository.findById(request.getStaffCode())).thenReturn(Optional.of(entity));
 		when(passwordEncoder.matches(request.getNewPassword(), entity.getPassword())).thenReturn(true);
 		Exception exception = assertThrows(ResourceNotFoundException.class, () -> {
@@ -286,7 +286,7 @@ public class UserServiceImplTest {
 	@DisplayName("change password throw not found when user not exist")
 	@Test
 	public void changePassword_shouldThrowsExceptionNotFound_whenNotFound() {
-		RequestChangePassDto requestDto = mock(RequestChangePassDto.class);
+		ChangePassRequestDto requestDto = mock(ChangePassRequestDto.class);
 		when(userRepository.findById(requestDto.getStaffCode())).thenReturn(Optional.empty());
 		Exception exception = assertThrows(ResourceNotFoundException.class, () -> {
 			userServiceImpl.changePassword(requestDto);
@@ -329,13 +329,13 @@ public class UserServiceImplTest {
 	public void disableStaff_shouldReturnResponseDto_whenUserIdExist() {
 		
 		Users entity = mock(Users.class);
-		ResponseUserDTO expected = mock(ResponseUserDTO.class);
+		UserResponseDto expected = mock(UserResponseDto.class);
 		
 		when(userRepository.findById("SD001")).thenReturn(Optional.of(entity));
 		when(userRepository.save(entity)).thenReturn(entity);
-		when(modelMapper.map(entity, ResponseUserDTO.class)).thenReturn(expected);
+		when(modelMapper.map(entity, UserResponseDto.class)).thenReturn(expected);
 		
-		ResponseUserDTO actual = userServiceImpl.disableStaff("SD001");
+		UserResponseDto actual = userServiceImpl.disableStaff("SD001");
 		verify(entity).setState(UserState.INACTIVE);
 		assertThat(actual).isEqualTo(expected);
 	}
