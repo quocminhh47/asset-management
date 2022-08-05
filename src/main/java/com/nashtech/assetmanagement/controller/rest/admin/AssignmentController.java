@@ -14,9 +14,9 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.nashtech.assetmanagement.dto.request.RequestAssignmentDTO;
-import com.nashtech.assetmanagement.dto.response.AssignmentDto;
-import com.nashtech.assetmanagement.dto.response.ListAssignmentResponse;
+import com.nashtech.assetmanagement.dto.request.AssignmentRequestDto;
+import com.nashtech.assetmanagement.dto.response.AssignmentResponseDto;
+import com.nashtech.assetmanagement.dto.response.ListAssignmentResponseDto;
 import com.nashtech.assetmanagement.service.AssignmentService;
 import com.nashtech.assetmanagement.utils.AppConstants;
 
@@ -25,13 +25,13 @@ import lombok.AllArgsConstructor;
 @RestController
 @AllArgsConstructor
 @RequestMapping("/admin/api/assignment")
-public class AssignmentManagementController {
+public class AssignmentController {
 
     private final AssignmentService assignmentService;
 
     @GetMapping("/all")
     @ResponseStatus(HttpStatus.OK)
-    public ListAssignmentResponse getAssignmentListOrderByDefaultOrFilter(
+    public ListAssignmentResponseDto getAssignmentListOrderByDefaultOrFilter(
             @RequestParam(
                     value = "pageNo", defaultValue = AppConstants.DEFAULT_PAGE_NUMBER, required = false)
                     int pageNo,
@@ -47,13 +47,13 @@ public class AssignmentManagementController {
     }
 
     @PostMapping("/create")
-    public ResponseEntity<AssignmentDto> createNewAssignment(@RequestBody RequestAssignmentDTO request) {
+    public ResponseEntity<AssignmentResponseDto> createNewAssignment(@RequestBody AssignmentRequestDto request) {
         return ResponseEntity.created(URI.create("/admin/api/assignment/create"))
                 .body(this.assignmentService.createNewAssignment(request));
     }
 
     @GetMapping
-    public ResponseEntity<List<AssignmentDto>> getListAssignmentByAsset(@RequestParam(required = true, name = "assetId") String assetId) {
-        return new ResponseEntity<List<AssignmentDto>>(assignmentService.getListAssignmentByAssetCode(assetId), HttpStatus.OK);
+    public ResponseEntity<List<AssignmentResponseDto>> getListAssignmentByAsset(@RequestParam(required = true, name = "assetId") String assetId) {
+        return new ResponseEntity<List<AssignmentResponseDto>>(assignmentService.getListAssignmentByAssetCode(assetId), HttpStatus.OK);
     }
 }

@@ -5,9 +5,9 @@ import lombok.*;
 import java.util.Date;
 
 @Getter @Setter @Builder
-@NoArgsConstructor
 @AllArgsConstructor
-public class UserDto {
+@NoArgsConstructor
+public class SingleUserResponseDto {
 
     private String staffCode;
 
@@ -15,16 +15,17 @@ public class UserDto {
 
     private String lastName;
 
+    private String username;
+
     private Date birthDate;
 
     private Boolean gender;
 
-    private String username;
-
     private Date joinedDate;
+
+    private String roleName;
 
     private String locationCode;
 
-    private String roleName;
 
 }

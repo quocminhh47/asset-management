@@ -1,7 +1,7 @@
 package com.nashtech.assetmanagement.controller.rest.auth;
 
-import com.nashtech.assetmanagement.dto.request.RequestLoginDTO;
-import com.nashtech.assetmanagement.dto.response.JwtResponse;
+import com.nashtech.assetmanagement.dto.request.LoginRequestDto;
+import com.nashtech.assetmanagement.dto.response.JwtResponseDto;
 import com.nashtech.assetmanagement.entities.Users;
 import com.nashtech.assetmanagement.enums.UserState;
 import com.nashtech.assetmanagement.exception.ResourceNotFoundException;
@@ -36,7 +36,7 @@ public class AuthController {
     private final JwtUtils jwtUtils;
 
     @PostMapping("/signin")
-    public ResponseEntity<?> signIn(@Valid @RequestBody RequestLoginDTO requestLoginDTO) {
+    public ResponseEntity<?> signIn(@Valid @RequestBody LoginRequestDto requestLoginDTO) {
         Users user = userRepository.findByUserName(requestLoginDTO.getUserName())
                 .orElseThrow(() -> new ResourceNotFoundException(("Username is not found")));
 
@@ -57,7 +57,7 @@ public class AuthController {
                 .map(GrantedAuthority::getAuthority)
                 .collect(Collectors.toList());
 
-        return ResponseEntity.ok(new JwtResponse(
+        return ResponseEntity.ok(new JwtResponseDto(
                 jwt,
                 "Bearer",
                 userPrinciple.getStaffCode(),

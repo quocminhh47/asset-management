@@ -10,8 +10,8 @@ import java.util.List;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
-import com.nashtech.assetmanagement.dto.request.RequestCategoryDTO;
-import com.nashtech.assetmanagement.dto.response.ResponseCategoryDTO;
+import com.nashtech.assetmanagement.dto.request.CategoryRequestDto;
+import com.nashtech.assetmanagement.dto.response.CategoryResponseDto;
 import com.nashtech.assetmanagement.entities.Category;
 import com.nashtech.assetmanagement.exception.NotUniqueException;
 import com.nashtech.assetmanagement.mapper.CategoryMapper;
@@ -36,25 +36,25 @@ public class CategoryServiceImplTest {
     @Test
     public void getAllCategory_WhenRequestValid_Expect_ReturnListCategory(){
         List<Category> categories=mock(List.class);
-        List<ResponseCategoryDTO> expected=mock(List.class);
+        List<CategoryResponseDto> expected=mock(List.class);
         when(categoryRepository.findAll()).thenReturn(categories);
         when(categoryMapper.ListCategoriesToListResponseCategories(categories)).thenReturn(expected);
-        List<ResponseCategoryDTO> actual =categoryServiceImpl.getAllCategory();
+        List<CategoryResponseDto> actual =categoryServiceImpl.getAllCategory();
         assertThat(actual).isEqualTo(expected);
     }
     @Test
     public void createCategory_WhenRequestValid_Expect_ReturnCategory(){
-        RequestCategoryDTO requestCategoryDTO=mock(RequestCategoryDTO.class);
+        CategoryRequestDto requestCategoryDTO=mock(CategoryRequestDto.class);
         when(categoryMapper.RequestCategoryToCategory(requestCategoryDTO)).thenReturn(category);
         when(categoryRepository.save(category)).thenReturn(category);
-        ResponseCategoryDTO expected=mock(ResponseCategoryDTO.class);
+        CategoryResponseDto expected=mock(CategoryResponseDto.class);
         when(categoryMapper.categoryToResponseCategoryDTO(category)).thenReturn(expected);
-        ResponseCategoryDTO actual=categoryServiceImpl.createCategory(requestCategoryDTO);
+        CategoryResponseDto actual=categoryServiceImpl.createCategory(requestCategoryDTO);
         assertThat(actual).isEqualTo(expected);
     }
     @Test
     public void createCategory_WhenCategoryPrefixNotUnique_Expect_ReturnCategory(){
-        RequestCategoryDTO requestCategoryDTO=new RequestCategoryDTO("LT","Laptop");
+        CategoryRequestDto requestCategoryDTO=new CategoryRequestDto("LT","Laptop");
         when(categoryRepository.existsCategoriesById("LT")).thenReturn(true);
         when(categoryRepository.existsCategoriesByName("Laptop")).thenReturn(false);
         NotUniqueException exception= assertThrows(NotUniqueException.class,
@@ -64,7 +64,7 @@ public class CategoryServiceImplTest {
     }
     @Test
     public void createCategory_WhenCategoryNotUnique_Expect_ReturnCategory(){
-        RequestCategoryDTO requestCategoryDTO=new RequestCategoryDTO("LT","Laptop");
+        CategoryRequestDto requestCategoryDTO=new CategoryRequestDto("LT","Laptop");
         when(categoryRepository.existsCategoriesById("LT")).thenReturn(false);
         when(categoryRepository.existsCategoriesByName("Laptop")).thenReturn(true);
         NotUniqueException exception= assertThrows(NotUniqueException.class,

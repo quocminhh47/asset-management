@@ -20,7 +20,7 @@ public class AssetResponseDto {
 	
 	private String specification;
 	private Date installedDate;
-//	
+	
 	private String locationCode;
 	private String locationName;
 	private String categoryId;

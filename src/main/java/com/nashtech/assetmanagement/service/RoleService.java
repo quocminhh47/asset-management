@@ -1,6 +1,6 @@
 package com.nashtech.assetmanagement.service;
 
-import com.nashtech.assetmanagement.dto.response.ResponseRoleDto;
+import com.nashtech.assetmanagement.dto.response.RoleResponseDto;
 import com.nashtech.assetmanagement.entities.Role;
 
 import java.util.List;
@@ -10,5 +10,5 @@ public interface RoleService {
 
     Role getRole(Long id);
 
-    List<ResponseRoleDto> getRoleList();
+    List<RoleResponseDto> getRoleList();
 }

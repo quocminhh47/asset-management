@@ -5,14 +5,28 @@ import java.util.List;
 
 import javax.validation.Valid;
 
-import com.nashtech.assetmanagement.dto.request.EditAssetRequest;
-import com.nashtech.assetmanagement.dto.response.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.CrossOrigin;
+import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.ResponseStatus;
+import org.springframework.web.bind.annotation.RestController;
 
-import com.nashtech.assetmanagement.dto.request.RequestCreateAsset;
+import com.nashtech.assetmanagement.dto.request.EditAssetRequestDto;
+import com.nashtech.assetmanagement.dto.request.CreateAssetRequestDto;
+import com.nashtech.assetmanagement.dto.response.AssetResponseDto;
+import com.nashtech.assetmanagement.dto.response.EditAssetResponseDto;
+import com.nashtech.assetmanagement.dto.response.ListAssetResponseDto;
+import com.nashtech.assetmanagement.dto.response.ResponseAssetDto;
+import com.nashtech.assetmanagement.dto.response.MessageResponse;
 import com.nashtech.assetmanagement.service.AssetService;
 
 @RestController
@@ -28,7 +42,7 @@ public class AssetController {
 
 	@PostMapping
 	@ResponseStatus(HttpStatus.OK)
-	public ResponseAssetDTO createAsset(@Valid @RequestBody RequestCreateAsset requestCreateAsset) {
+	public ResponseAssetDto createAsset(@Valid @RequestBody CreateAssetRequestDto requestCreateAsset) {
 		return assetService.createAsset(requestCreateAsset);
 	}
 
@@ -50,7 +64,7 @@ public class AssetController {
 	public ResponseEntity<HashMap> searchAssetByCodeOrName(@RequestParam("text") String text,
 			@PathVariable("location") String locationCode) {
 		HashMap hashMap = new HashMap<>();
-		List<ResponseAssetAndCategory> result = assetService.getAssetByCodeOrNameAndLocationCode(text, locationCode);
+		List<AssetResponseDto> result = assetService.getAssetByCodeOrNameAndLocationCode(text, locationCode);
 		hashMap.put("list_asset",result);
 		hashMap.put("total",result.size());
 		return ResponseEntity.ok(hashMap);
@@ -58,7 +72,7 @@ public class AssetController {
 
 	@PutMapping("/{id}")
 	@ResponseStatus(HttpStatus.OK)
-	public EditAssetResponse editAsset(@Valid @RequestBody EditAssetRequest editAssetRequest,
+	public EditAssetResponseDto editAsset(@Valid @RequestBody EditAssetRequestDto editAssetRequest,
 									   @PathVariable("id") String id) {
 		return assetService.editAsset(editAssetRequest, id);
 	}
@@ -67,7 +81,7 @@ public class AssetController {
 	@DeleteMapping("/{assetCode}")
 	@CrossOrigin(origins = "*")
 	public ResponseEntity<?> deleteAssetByAssetCode(@PathVariable("assetCode") String assetCode) {
-		ResponseMessage responseMessage = assetService.deleteAssetByAssetCode(assetCode);
+		MessageResponse responseMessage = assetService.deleteAssetByAssetCode(assetCode);
 		return new ResponseEntity<>(responseMessage, responseMessage.getStatus());
 	}
 

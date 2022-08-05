@@ -8,7 +8,7 @@ import lombok.Setter;
 @Getter@Setter
 @NoArgsConstructor
 @AllArgsConstructor
-public class LocationResponseDTO {
+public class LocationResponseDto {
     private String code;
     private String name;
 }

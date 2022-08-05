@@ -1,7 +1,7 @@
 package com.nashtech.assetmanagement.exception.handlers;
 
-import com.nashtech.assetmanagement.dto.response.ErrorResponse;
-import com.nashtech.assetmanagement.dto.response.ResponseErrorMessage;
+import com.nashtech.assetmanagement.dto.response.ErrorResponseDto;
+import com.nashtech.assetmanagement.dto.response.ErrorResponseMessageDto;
 import com.nashtech.assetmanagement.exception.DateInvalidException;
 import com.nashtech.assetmanagement.exception.NotUniqueException;
 import com.nashtech.assetmanagement.exception.ResourceNotFoundException;
@@ -25,28 +25,28 @@ import java.util.stream.Collectors;
 public class GlobalExceptionHandler  extends ResponseEntityExceptionHandler {
 
     @ExceptionHandler({ResourceNotFoundException.class})
-    protected ResponseEntity<ErrorResponse> handleResourceNotFoundException(RuntimeException exception) {
-        ErrorResponse error = new ErrorResponse("404", exception.getMessage());
+    protected ResponseEntity<ErrorResponseDto> handleResourceNotFoundException(RuntimeException exception) {
+        ErrorResponseDto error = new ErrorResponseDto("404", exception.getMessage());
         return new ResponseEntity<>(error, HttpStatus.NOT_FOUND);
     }
 
     @ExceptionHandler(Exception.class)
     public ResponseEntity<Object> handleUnwantedException(Exception ex) {
-        ResponseErrorMessage errorResponse = new ResponseErrorMessage(
+        ErrorResponseMessageDto errorResponse = new ErrorResponseMessageDto(
                 HttpStatus.INTERNAL_SERVER_ERROR, ex.getMessage(), new Date());
         return new ResponseEntity<>(errorResponse,
                 HttpStatus.INTERNAL_SERVER_ERROR);
     }
 
     @ExceptionHandler({UnauthorizedException.class})
-    protected ResponseEntity<ErrorResponse> handleUnauthorizedException(RuntimeException exception) {
-        ErrorResponse error = new ErrorResponse("401", exception.getMessage());
+    protected ResponseEntity<ErrorResponseDto> handleUnauthorizedException(RuntimeException exception) {
+        ErrorResponseDto error = new ErrorResponseDto("401", exception.getMessage());
         return new ResponseEntity<>(error, HttpStatus.UNAUTHORIZED);
     }
 
     @ExceptionHandler({DateInvalidException.class, IllegalArgumentException.class, IllegalStateException.class})
-    protected ResponseEntity<ErrorResponse> handleDateInvalidException(RuntimeException exception) {
-        ErrorResponse error = new ErrorResponse(HttpStatus.BAD_REQUEST.toString(), exception.getMessage());
+    protected ResponseEntity<ErrorResponseDto> handleDateInvalidException(RuntimeException exception) {
+        ErrorResponseDto error = new ErrorResponseDto(HttpStatus.BAD_REQUEST.toString(), exception.getMessage());
         return new ResponseEntity<>(error, HttpStatus.BAD_REQUEST);
     }
 //    @Override
@@ -63,9 +63,9 @@ public class GlobalExceptionHandler  extends ResponseEntityExceptionHandler {
 //        return new ResponseEntity<>(body, HttpStatus.BAD_REQUEST);
 //    }
     @ExceptionHandler({NotUniqueException.class})
-    protected ResponseEntity<ResponseErrorMessage> handleNotUniqueException(RuntimeException exception) {
-        ResponseErrorMessage responseErrorMessage =
-                new ResponseErrorMessage(HttpStatus.CONFLICT,exception.getMessage(),
+    protected ResponseEntity<ErrorResponseMessageDto> handleNotUniqueException(RuntimeException exception) {
+        ErrorResponseMessageDto responseErrorMessage =
+                new ErrorResponseMessageDto(HttpStatus.CONFLICT,exception.getMessage(),
                         new Date());
         return new ResponseEntity<>(responseErrorMessage, responseErrorMessage.getStatus());
     }
@@ -85,8 +85,8 @@ public class GlobalExceptionHandler  extends ResponseEntityExceptionHandler {
             errors.add(error.getObjectName() + ": " + error.getDefaultMessage());
         }
 
-        ResponseErrorMessage apiError =
-                new ResponseErrorMessage(HttpStatus.BAD_REQUEST,
+        ErrorResponseMessageDto apiError =
+                new ErrorResponseMessageDto(HttpStatus.BAD_REQUEST,
                         message, errors,new Date());
         return handleExceptionInternal(
                 ex, apiError, headers, apiError.getStatus(), request);

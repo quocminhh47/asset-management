@@ -15,7 +15,7 @@ import lombok.Setter;
 @Getter @Setter @Builder
 @AllArgsConstructor
 @NoArgsConstructor
-public class AssignmentDto {
+public class AssignmentResponseDto {
 
     private String assetCode;
 

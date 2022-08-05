@@ -11,9 +11,9 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
-import com.nashtech.assetmanagement.dto.request.RequestAssignmentDTO;
-import com.nashtech.assetmanagement.dto.response.AssignmentDto;
-import com.nashtech.assetmanagement.dto.response.ListAssignmentResponse;
+import com.nashtech.assetmanagement.dto.request.AssignmentRequestDto;
+import com.nashtech.assetmanagement.dto.response.AssignmentResponseDto;
+import com.nashtech.assetmanagement.dto.response.ListAssignmentResponseDto;
 import com.nashtech.assetmanagement.entities.Asset;
 import com.nashtech.assetmanagement.entities.Assignment;
 import com.nashtech.assetmanagement.entities.Users;
@@ -54,7 +54,7 @@ public class AssignmentServiceImpl implements AssignmentService {
     private final AssignmentMapper assignmentMapper;
 
     @Override
-    public ListAssignmentResponse getAssignmentsByCondition(int pageNo,
+    public ListAssignmentResponseDto getAssignmentsByCondition(int pageNo,
                                                             int pageSize,
                                                             String text,
                                                             List<String> states,
@@ -96,7 +96,7 @@ public class AssignmentServiceImpl implements AssignmentService {
 
     @Override
     @Transactional(rollbackFor = {SQLException.class,NotUniqueException.class})
-    public AssignmentDto createNewAssignment(RequestAssignmentDTO request) {
+    public AssignmentResponseDto createNewAssignment(AssignmentRequestDto request) {
         if(assignmentRepository.existsById_AssetCodeAndId_AssignedDateAndId_AssignedTo
                 (request.getAssetCode(),request.getAssignedDate(),request.getAssignedTo())){
             throw new NotUniqueException("AssignmentId.is.exist");
@@ -123,21 +123,21 @@ public class AssignmentServiceImpl implements AssignmentService {
     }
 
     @Override
-    public List<AssignmentDto> getListAssignmentByAssetCode(String assetCode) {
+    public List<AssignmentResponseDto> getListAssignmentByAssetCode(String assetCode) {
         Optional<Asset> optionalAsset = assetRepository.findById(assetCode);
         if (!optionalAsset.isPresent()) {
             throw new ResourceNotFoundException(String.format("asset.not.found.with.code:%s", assetCode));
         }
         Asset asset = optionalAsset.get();
         List<Assignment> list = assignmentRepository.findByAsset(asset);
-        List<AssignmentDto> resultList = assignmentMapper.mapperListAssignment(list);
+        List<AssignmentResponseDto> resultList = assignmentMapper.mapperListAssignment(list);
         return resultList;
 
     }
 
 
 	@Override
-	public List<AssignmentDto> getListAssignmentByUser(String userId, String sortBy, String sortDirection) {
+	public List<AssignmentResponseDto> getListAssignmentByUser(String userId, String sortBy, String sortDirection) {
 		Sort.Direction sort = Sort.Direction.ASC;
 		if(sortDirection.equals("DESC")) {
 			sort = Sort.Direction.DESC;
@@ -149,7 +149,7 @@ public class AssignmentServiceImpl implements AssignmentService {
 		}
 		Page<Assignment> pageAssignment = assignmentRepository.getListAssignmentByUser(userId, pageable);
 		List<Assignment> listEntity = pageAssignment.getContent();
-		List<AssignmentDto> listResponse = assignmentMapper.mapperListAssignment(listEntity);
+		List<AssignmentResponseDto> listResponse = assignmentMapper.mapperListAssignment(listEntity);
 		return listResponse;
 	}
 }

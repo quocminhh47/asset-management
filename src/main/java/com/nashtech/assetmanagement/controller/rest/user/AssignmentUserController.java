@@ -11,7 +11,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.nashtech.assetmanagement.dto.response.AssignmentDto;
+import com.nashtech.assetmanagement.dto.response.AssignmentResponseDto;
 import com.nashtech.assetmanagement.service.AssignmentService;
 
 import lombok.AllArgsConstructor;
@@ -25,11 +25,11 @@ public class AssignmentUserController {
 	private AssignmentService assignmentService;
 
 	@GetMapping("/{userId}")
-	public ResponseEntity<List<AssignmentDto>> getListAsset(@PathVariable("userId") String userId,
+	public ResponseEntity<List<AssignmentResponseDto>> getListAsset(@PathVariable("userId") String userId,
 			@RequestParam(required = false, defaultValue = "", value = "sortBy") String sortBy,
 			@RequestParam(required = false, defaultValue = "", value = "sortDirection") String sortDirection) {
-		List<AssignmentDto> result = assignmentService.getListAssignmentByUser(userId, sortBy, sortDirection);
-		return new ResponseEntity<List<AssignmentDto>>(result, HttpStatus.OK);
+		List<AssignmentResponseDto> result = assignmentService.getListAssignmentByUser(userId, sortBy, sortDirection);
+		return new ResponseEntity<List<AssignmentResponseDto>>(result, HttpStatus.OK);
 	}
 
 }

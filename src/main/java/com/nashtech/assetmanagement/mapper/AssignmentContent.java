@@ -1,7 +1,7 @@
 package com.nashtech.assetmanagement.mapper;
 
-import com.nashtech.assetmanagement.dto.response.AssignmentDto;
-import com.nashtech.assetmanagement.dto.response.ListAssignmentResponse;
+import com.nashtech.assetmanagement.dto.response.AssignmentResponseDto;
+import com.nashtech.assetmanagement.dto.response.ListAssignmentResponseDto;
 import com.nashtech.assetmanagement.entities.Assignment;
 import lombok.AllArgsConstructor;
 import org.modelmapper.ModelMapper;
@@ -17,16 +17,16 @@ public class AssignmentContent {
 
     private final ModelMapper mapper;
 
-    public AssignmentDto mapToAssignmentDto(Assignment assignment) {
-        return mapper.map(assignment, AssignmentDto.class);
+    public AssignmentResponseDto mapToAssignmentDto(Assignment assignment) {
+        return mapper.map(assignment, AssignmentResponseDto.class);
     }
 
-    public ListAssignmentResponse getAssignmentResponse(Page<Assignment> assignmentPage) {
+    public ListAssignmentResponseDto getAssignmentResponse(Page<Assignment> assignmentPage) {
         List<Assignment> assignments = assignmentPage.getContent();
-        List<AssignmentDto> assignmentContent = assignments.stream()
+        List<AssignmentResponseDto> assignmentContent = assignments.stream()
                 .map(this::mapToAssignmentDto)
                 .collect(Collectors.toList());
-        return ListAssignmentResponse.builder()
+        return ListAssignmentResponseDto.builder()
                 .assignmentContent(assignmentContent)
                 .pageNo(assignmentPage.getNumber())
                 .pageSize(assignmentPage.getSize())

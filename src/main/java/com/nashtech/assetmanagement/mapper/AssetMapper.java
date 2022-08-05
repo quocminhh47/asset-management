@@ -1,20 +1,20 @@
 package com.nashtech.assetmanagement.mapper;
 
 
-import com.nashtech.assetmanagement.dto.request.EditAssetRequest;
-import com.nashtech.assetmanagement.dto.request.RequestCreateAsset;
-import com.nashtech.assetmanagement.dto.response.AssetResponseDto;
-import com.nashtech.assetmanagement.dto.response.EditAssetResponse;
-import com.nashtech.assetmanagement.dto.response.ResponseAssetAndCategory;
-import com.nashtech.assetmanagement.dto.response.ResponseAssetDTO;
-import com.nashtech.assetmanagement.entities.Asset;
-import com.nashtech.assetmanagement.exception.DateInvalidException;
-import org.modelmapper.ModelMapper;
-import org.springframework.stereotype.Component;
-
 import java.sql.Date;
 import java.util.List;
 import java.util.stream.Collectors;
+
+import org.modelmapper.ModelMapper;
+import org.springframework.stereotype.Component;
+
+import com.nashtech.assetmanagement.dto.request.EditAssetRequestDto;
+import com.nashtech.assetmanagement.dto.request.CreateAssetRequestDto;
+import com.nashtech.assetmanagement.dto.response.AssetResponseDto;
+import com.nashtech.assetmanagement.dto.response.EditAssetResponseDto;
+import com.nashtech.assetmanagement.dto.response.ResponseAssetDto;
+import com.nashtech.assetmanagement.entities.Asset;
+import com.nashtech.assetmanagement.exception.DateInvalidException;
 
 @Component
 public class AssetMapper {
@@ -24,11 +24,11 @@ public class AssetMapper {
         this.mapper = mapper;
     }
 
-    public ResponseAssetDTO assetToResponseAssetDTO(Asset asset) {
-        return mapper.map(asset, ResponseAssetDTO.class);
+    public ResponseAssetDto assetToResponseAssetDTO(Asset asset) {
+        return mapper.map(asset, ResponseAssetDto.class);
     }
 
-    public Asset RequestAssetToAsset(RequestCreateAsset requestCreateAsset) {
+    public Asset RequestAssetToAsset(CreateAssetRequestDto requestCreateAsset) {
         return mapper.map(requestCreateAsset, Asset.class);
     }
 
@@ -38,13 +38,13 @@ public class AssetMapper {
         return result;
     }
 
-    public List<ResponseAssetAndCategory> getAssetListToResponseAssetDTOList(List<Asset> assetList) {
-        List<ResponseAssetAndCategory> responseList = assetList.stream()
-                .map(asset -> mapper.map(asset, ResponseAssetAndCategory.class)).collect(Collectors.toList());
+    public List<AssetResponseDto> getAssetListToResponseAssetDTOList(List<Asset> assetList) {
+        List<AssetResponseDto> responseList = assetList.stream()
+                .map(asset -> mapper.map(asset, AssetResponseDto.class)).collect(Collectors.toList());
         return responseList;
     }
 
-    public Asset mapEditAssetRequestToEntity(EditAssetRequest request, Asset asset) {
+    public Asset mapEditAssetRequestToEntity(EditAssetRequestDto request, Asset asset) {
         try {
             Date installedDate = Date.valueOf(request.getInstalledDate());
             Date dateNow = new Date(new java.util.Date().getTime());
@@ -61,7 +61,7 @@ public class AssetMapper {
         return asset;
     }
 
-    public EditAssetResponse mapToEditAssetResponse(Asset asset) {
-        return mapper.map(asset, EditAssetResponse.class);
+    public EditAssetResponseDto mapToEditAssetResponse(Asset asset) {
+        return mapper.map(asset, EditAssetResponseDto.class);
     }
 }

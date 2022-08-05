@@ -1,10 +1,6 @@
 package com.nashtech.assetmanagement.service.impl;
 
 
-import com.nashtech.assetmanagement.dto.request.EditAssetRequest;
-import com.nashtech.assetmanagement.dto.request.RequestCreateAsset;
-import com.nashtech.assetmanagement.dto.response.*;
-
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.eq;
@@ -17,8 +13,6 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 
-import com.nashtech.assetmanagement.entities.*;
-import com.nashtech.assetmanagement.repositories.*;
 import org.assertj.core.api.AssertionsForClassTypes;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
@@ -29,10 +23,26 @@ import org.mockito.Mockito;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 
-
+import com.nashtech.assetmanagement.dto.request.EditAssetRequestDto;
+import com.nashtech.assetmanagement.dto.request.CreateAssetRequestDto;
+import com.nashtech.assetmanagement.dto.response.AssetResponseDto;
+import com.nashtech.assetmanagement.dto.response.EditAssetResponseDto;
+import com.nashtech.assetmanagement.dto.response.ListAssetResponseDto;
+import com.nashtech.assetmanagement.dto.response.ResponseAssetDto;
+import com.nashtech.assetmanagement.dto.response.MessageResponse;
+import com.nashtech.assetmanagement.entities.Asset;
+import com.nashtech.assetmanagement.entities.Assignment;
+import com.nashtech.assetmanagement.entities.Category;
+import com.nashtech.assetmanagement.entities.Location;
+import com.nashtech.assetmanagement.entities.Users;
 import com.nashtech.assetmanagement.enums.AssetState;
 import com.nashtech.assetmanagement.exception.ResourceNotFoundException;
 import com.nashtech.assetmanagement.mapper.AssetMapper;
+import com.nashtech.assetmanagement.repositories.AssetRepository;
+import com.nashtech.assetmanagement.repositories.AssignmentRepository;
+import com.nashtech.assetmanagement.repositories.CategoryRepository;
+import com.nashtech.assetmanagement.repositories.LocationRepository;
+import com.nashtech.assetmanagement.repositories.UserRepository;
 
 public class AssetServiceImplTest {
 
@@ -49,7 +59,7 @@ public class AssetServiceImplTest {
 	private AssignmentRepository assignmentRepository;
 
     private AssetServiceImpl assetServiceImpl;
-    EditAssetRequest request;
+    EditAssetRequestDto request;
     AssetState newAssetState = AssetState.NOT_AVAILABLE;
 
     @BeforeEach
@@ -65,7 +75,7 @@ public class AssetServiceImplTest {
                 , categoryRepository,
                 userRepository, locationRepository, assetMapper, assignmentRepository);
 
-        request = new EditAssetRequest(
+        request = new EditAssetRequestDto(
                 "Dell inspriration 5432",
                 "CPU 7200U, RAM 16GB",
                 "2022-01-01",
@@ -75,7 +85,7 @@ public class AssetServiceImplTest {
 
 	@Test
 	public void createAsset_WhenRequestValid_Expect_ReturnAsset() {
-		RequestCreateAsset requestCreateAsset = new RequestCreateAsset("Lap top", "LT", "good", AssetState.AVAILABLE,
+		CreateAssetRequestDto requestCreateAsset = new CreateAssetRequestDto("Lap top", "LT", "good", AssetState.AVAILABLE,
 				null, "HN", "SD0001");
 		// RequestCreateAsset requestCreateAsset=mock(RequestCreateAsset.class);
 		when(assetMapper.RequestAssetToAsset(requestCreateAsset)).thenReturn(asset);
@@ -89,9 +99,9 @@ public class AssetServiceImplTest {
 		when(categoryRepository.findById("LT")).thenReturn(categoryOptional);
 		when(locationRepository.findById("HN")).thenReturn(locationOptional);
 		when(assetRepository.save(asset)).thenReturn(asset);
-		ResponseAssetDTO expected = mock(ResponseAssetDTO.class);
+		ResponseAssetDto expected = mock(ResponseAssetDto.class);
 		when(assetMapper.assetToResponseAssetDTO(asset)).thenReturn(expected);
-		ResponseAssetDTO actual = assetServiceImpl.createAsset(requestCreateAsset);
+		ResponseAssetDto actual = assetServiceImpl.createAsset(requestCreateAsset);
 		ArgumentCaptor<String> assetCodeCapture = ArgumentCaptor.forClass(java.lang.String.class);
 		verify(asset).setCode(assetCodeCapture.capture());
 		verify(asset).setLocation(location);
@@ -105,11 +115,11 @@ public class AssetServiceImplTest {
     void getAssetList_ShouldReturnResponseAssetDtoList_WhenAssetExist() {
         Location location = mock(Location.class);
         List<Asset> assetList = mock(ArrayList.class);
-        List<ResponseAssetAndCategory> responseList = mock(ArrayList.class);
+        List<AssetResponseDto> responseList = mock(ArrayList.class);
         when(locationRepository.findById("locationCode")).thenReturn(Optional.of(location));
         when(assetRepository.findAssetByNameOrCodeAndLocationCode("text", "locationCode")).thenReturn(assetList);
         when(assetMapper.getAssetListToResponseAssetDTOList(assetList)).thenReturn(responseList);
-        List<ResponseAssetAndCategory> result = assetServiceImpl.getAssetByCodeOrNameAndLocationCode("text", "locationCode");
+        List<AssetResponseDto> result = assetServiceImpl.getAssetByCodeOrNameAndLocationCode("text", "locationCode");
         assertThat(result).isEqualTo(responseList);
     }
 
@@ -131,7 +141,7 @@ public class AssetServiceImplTest {
         Asset existAsset = mock(Asset.class);
         Asset mappedAsset = mock(Asset.class);
         Asset savedAsset = mock(Asset.class);
-        EditAssetResponse expectedResponse = mock(EditAssetResponse.class);
+        EditAssetResponseDto expectedResponse = mock(EditAssetResponseDto.class);
 
 
         when(assetRepository.findById(assetCode)).thenReturn(Optional.of(existAsset));
@@ -141,7 +151,7 @@ public class AssetServiceImplTest {
         when(assetMapper.mapToEditAssetResponse(savedAsset)).thenReturn(expectedResponse);
 
         //when
-        EditAssetResponse actualResponse = assetServiceImpl.editAsset(request, assetCode);
+        EditAssetResponseDto actualResponse = assetServiceImpl.editAsset(request, assetCode);
 
         //then
         assertThat(actualResponse).isEqualTo(expectedResponse);
@@ -155,7 +165,7 @@ public class AssetServiceImplTest {
         Asset existAsset = mock(Asset.class);
         AssetState invalidState = AssetState.ASSIGNED;
 
-        EditAssetRequest wrongRequest = new EditAssetRequest(
+        EditAssetRequestDto wrongRequest = new EditAssetRequestDto(
                 "Dell inspriration 5432",
                 "CPU 7200U, RAM 16GB",
                 "2022-01-01",
@@ -325,7 +335,7 @@ public class AssetServiceImplTest {
 		when(assetRepository.findById("LT1111")).thenReturn(assetOptional);
 		when(assignmentRepository.findByAsset(asset)).thenReturn(assignmentList);
 
-		ResponseMessage responseMessage = assetServiceImpl.deleteAssetByAssetCode("LT1111");
+		MessageResponse responseMessage = assetServiceImpl.deleteAssetByAssetCode("LT1111");
 
 		assertThat(responseMessage.getMessage()).isEqualTo("Asset belongs to one or more historical assignments");
 	}
@@ -336,7 +346,7 @@ public class AssetServiceImplTest {
 		when(assetRepository.findById("LT1111")).thenReturn(assetOptional);
 		when(assignmentRepository.findByAsset(asset)).thenReturn(Collections.emptyList());
 
-		ResponseMessage responseMessage = assetServiceImpl.deleteAssetByAssetCode("LT1111");
+		MessageResponse responseMessage = assetServiceImpl.deleteAssetByAssetCode("LT1111");
 		verify(assetRepository).delete(asset);
 
 		assertThat(responseMessage.getMessage()).isEqualTo("Delete asset successfully!");

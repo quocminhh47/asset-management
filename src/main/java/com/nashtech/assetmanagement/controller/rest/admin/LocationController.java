@@ -1,6 +1,6 @@
 package com.nashtech.assetmanagement.controller.rest.admin;
 
-import com.nashtech.assetmanagement.dto.response.LocationResponseDTO;
+import com.nashtech.assetmanagement.dto.response.LocationResponseDto;
 import com.nashtech.assetmanagement.service.LocationService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -19,7 +19,7 @@ public class LocationController {
     }
 
     @GetMapping("")
-    public ResponseEntity<List<LocationResponseDTO>> getLocationList(){
+    public ResponseEntity<List<LocationResponseDto>> getLocationList(){
         return ResponseEntity.ok(this.locationService.getLocationList());
     }
 }

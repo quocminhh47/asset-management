@@ -1,6 +1,6 @@
 package com.nashtech.assetmanagement.service.impl;
 
-import com.nashtech.assetmanagement.dto.response.LocationResponseDTO;
+import com.nashtech.assetmanagement.dto.response.LocationResponseDto;
 import com.nashtech.assetmanagement.entities.Location;
 import com.nashtech.assetmanagement.mapper.LocationMapper;
 import com.nashtech.assetmanagement.repositories.LocationRepository;
@@ -28,11 +28,11 @@ public class LocationServiceImplTest {
     @Test
     void getLocationList_ShouldReturnLocationResponseDtoList_WhenLocationExist(){
         List<Location> locationList = mock(ArrayList.class);
-        List<LocationResponseDTO> responseList = mock(ArrayList.class);
+        List<LocationResponseDto> responseList = mock(ArrayList.class);
         when(locationRepository.findAll()).thenReturn(locationList);
         when(locationList.isEmpty()).thenReturn(false);
         when(locationMapper.locationListToLocationResponseDtoList(locationList)).thenReturn(responseList);
-        List<LocationResponseDTO> result = locationService.getLocationList();
+        List<LocationResponseDto> result = locationService.getLocationList();
         assertThat(result).isEqualTo(responseList);
     }
 }
