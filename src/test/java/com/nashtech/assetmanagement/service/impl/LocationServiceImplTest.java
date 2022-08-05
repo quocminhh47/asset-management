@@ -23,10 +23,11 @@ public class LocationServiceImplTest {
     LocationRepository locationRepository;
     @Mock
     LocationMapper locationMapper;
-    @InjectMocks LocationServiceImpl locationService;
+    @InjectMocks
+    LocationServiceImpl locationService;
 
     @Test
-    void getLocationList_ShouldReturnLocationResponseDtoList_WhenLocationExist(){
+    void getLocationList_ShouldReturnLocationResponseDtoList_WhenLocationExist() {
         List<Location> locationList = mock(ArrayList.class);
         List<LocationResponseDto> responseList = mock(ArrayList.class);
         when(locationRepository.findAll()).thenReturn(locationList);

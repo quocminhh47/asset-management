@@ -1,6 +1,5 @@
 package com.nashtech.assetmanagement.repositories;
 
-import com.nashtech.assetmanagement.entities.Role;
 import com.nashtech.assetmanagement.entities.Users;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -18,15 +17,18 @@ public interface UserRepository extends JpaRepository<Users, String> {
 
     @Query(value = " select u from Users u where not u.staffCode = :staffCode and u.location.code = :location")
     Page<Users> findAllByOrderByFirstNameAsc(Pageable pageable, @Param("staffCode") String staffCode, @Param("location") String location);
-    @Query(value = "select staff_code from users where staff_code LIKE 'SD%'",nativeQuery = true)
+
+    @Query(value = "select staff_code from users where staff_code LIKE 'SD%'", nativeQuery = true)
     List<String> findAllStaffCode();
+
     @Query(value = " select * from users where" +
             " (lower(staff_code) LIKE %:text% OR lower(concat(first_name,' ',last_name)) LIKE %:text%)" +
-            "and location_id=:locationCode",nativeQuery = true)
-    List<Users> findByStaffCodeOrNameAndLocationCode(@Param("text") String text,String locationCode);
+            "and location_id=:locationCode", nativeQuery = true)
+    List<Users> findByStaffCodeOrNameAndLocationCode(@Param("text") String text, String locationCode);
 
 
-    int countUsersByFirstNameAndLastNameLikeIgnoreCase(String firstName,String lastName);
+    int countUsersByFirstNameAndLastNameLikeIgnoreCase(String firstName, String lastName);
+
     Optional<Users> findByStaffCode(String staffCode);
 
 
@@ -36,7 +38,7 @@ public interface UserRepository extends JpaRepository<Users, String> {
             "and lower(u.location.code) = :location " +
             "and upper(u.role.name) in :roles " +
             "and u.staffCode <> :loggedStaffCode " +
-            "and u.state <> 'INACTIVE'" , nativeQuery = false)
+            "and u.state <> 'INACTIVE'", nativeQuery = false)
     Page<Users> searchByStaffCodeOrNameWithRole(@Param("text") String text,
                                                 @Param("loggedStaffCode") String loggedStaffCode,
                                                 @Param("location") String adminLocation,

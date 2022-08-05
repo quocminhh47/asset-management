@@ -20,17 +20,18 @@ public class ErrorResponseMessageDto {
     @JsonProperty("timestamp")
     private Date timeStamp;
 
-    public ErrorResponseMessageDto(HttpStatus status, String message, List<String> errors,Date  timeStamp) {
+    public ErrorResponseMessageDto(HttpStatus status, String message, List<String> errors, Date timeStamp) {
         this.timeStamp = timeStamp;
         this.status = status;
         this.message = message;
         this.errors = errors;
     }
-    public ErrorResponseMessageDto(HttpStatus status, String message, String error,Date  timeStamp) {
+
+    public ErrorResponseMessageDto(HttpStatus status, String message, String error, Date timeStamp) {
         this.timeStamp = timeStamp;
         this.status = status;
         this.message = message;
-        errors= Arrays.asList(error);
+        errors = Arrays.asList(error);
     }
 
     public ErrorResponseMessageDto(HttpStatus status, String message, Date timeStamp) {

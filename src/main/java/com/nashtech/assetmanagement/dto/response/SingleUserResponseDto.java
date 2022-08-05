@@ -4,7 +4,9 @@ import lombok.*;
 
 import java.util.Date;
 
-@Getter @Setter @Builder
+@Getter
+@Setter
+@Builder
 @AllArgsConstructor
 @NoArgsConstructor
 public class SingleUserResponseDto {

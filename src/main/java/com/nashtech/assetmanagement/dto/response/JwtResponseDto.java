@@ -1,13 +1,13 @@
 package com.nashtech.assetmanagement.dto.response;
 
 import com.nashtech.assetmanagement.enums.UserState;
-import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.Setter;
 
 import java.util.List;
 
-@Getter @Setter
+@Getter
+@Setter
 public class JwtResponseDto {
     private String token;
     private String type = "Bearer";

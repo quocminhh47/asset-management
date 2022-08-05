@@ -1,12 +1,8 @@
 package com.nashtech.assetmanagement.service.impl;
 
-import com.nashtech.assetmanagement.dto.response.LocationResponseDto;
 import com.nashtech.assetmanagement.dto.response.RoleResponseDto;
-import com.nashtech.assetmanagement.entities.Location;
 import com.nashtech.assetmanagement.entities.Role;
-import com.nashtech.assetmanagement.mapper.LocationMapper;
 import com.nashtech.assetmanagement.mapper.RoleMapper;
-import com.nashtech.assetmanagement.repositories.LocationRepository;
 import com.nashtech.assetmanagement.repositories.RoleRepository;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -31,7 +27,7 @@ public class RoleServiceImplTest {
     RoleServiceImpl roleService;
 
     @Test
-    void getRoleList_ShouldReturnResponseRoleDtoList_WhenRoleExist(){
+    void getRoleList_ShouldReturnResponseRoleDtoList_WhenRoleExist() {
         List<Role> roles = mock(ArrayList.class);
         List<RoleResponseDto> responseList = mock(ArrayList.class);
         when(roleRepository.findAll()).thenReturn(roles);

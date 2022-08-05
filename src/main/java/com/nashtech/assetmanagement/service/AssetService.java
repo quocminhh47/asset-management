@@ -1,25 +1,21 @@
 package com.nashtech.assetmanagement.service;
 
+import com.nashtech.assetmanagement.dto.request.CreateAssetRequestDto;
+import com.nashtech.assetmanagement.dto.request.EditAssetRequestDto;
+import com.nashtech.assetmanagement.dto.response.*;
+
 import java.util.List;
 
-import com.nashtech.assetmanagement.dto.request.EditAssetRequestDto;
-import com.nashtech.assetmanagement.dto.request.CreateAssetRequestDto;
-import com.nashtech.assetmanagement.dto.response.AssetResponseDto;
-import com.nashtech.assetmanagement.dto.response.EditAssetResponseDto;
-import com.nashtech.assetmanagement.dto.response.ListAssetResponseDto;
-import com.nashtech.assetmanagement.dto.response.ResponseAssetDto;
-import com.nashtech.assetmanagement.dto.response.MessageResponse;
-
 public interface AssetService {
-	ResponseAssetDto createAsset(CreateAssetRequestDto requestCreateAsset);
-	
-	ListAssetResponseDto getListAsset(String userId, List<String> categoryId, List<String> state, String keyword,
-			String sortBy, String sortDirection, Integer page, Integer size);
+    ResponseAssetDto createAsset(CreateAssetRequestDto requestCreateAsset);
 
-	List<AssetResponseDto> getAssetByCodeOrNameAndLocationCode(String text, String locationCode);
+    ListAssetResponseDto getListAsset(String userId, List<String> categoryId, List<String> state, String keyword,
+                                      String sortBy, String sortDirection, Integer page, Integer size);
 
-	EditAssetResponseDto editAsset(EditAssetRequestDto editAssetRequest, String assetCode);
+    List<AssetResponseDto> getAssetByCodeOrNameAndLocationCode(String text, String locationCode);
 
-	//582 - Delete asset
-	MessageResponse deleteAssetByAssetCode(String assetCode);
+    EditAssetResponseDto editAsset(EditAssetRequestDto editAssetRequest, String assetCode);
+
+    //582 - Delete asset
+    MessageResponse deleteAssetByAssetCode(String assetCode);
 }

@@ -24,7 +24,7 @@ class AuthenticationServiceImplTest {
     @BeforeEach
     void setUp() {
         authentication = mock(Authentication.class);
-        userRepository = mock(UserRepository.class) ;
+        userRepository = mock(UserRepository.class);
         expectedUser = mock(Users.class);
         authenticationServiceImpl = new AuthenticationServiceImpl(userRepository);
     }

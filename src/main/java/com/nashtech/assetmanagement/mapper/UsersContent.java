@@ -21,7 +21,7 @@ public class UsersContent {
         return mapper.map(user, UserContentResponseDto.class);
     }
 
-     public ListUsersResponseDto getUsersContent(Page<Users> usersPage) {
+    public ListUsersResponseDto getUsersContent(Page<Users> usersPage) {
         List<Users> users = usersPage.getContent();
         List<UserContentResponseDto> usersContent = users.stream()
                 .map(this::mapToDto)

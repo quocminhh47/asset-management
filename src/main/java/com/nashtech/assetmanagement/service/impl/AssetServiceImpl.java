@@ -65,7 +65,7 @@ public class AssetServiceImpl implements AssetService {
 
 	@Override
 	public ResponseAssetDto createAsset(CreateAssetRequestDto requestCreateAsset) {
-		Asset asset = assetMapper.RequestAssetToAsset(requestCreateAsset);
+		Asset asset = assetMapper.requestAssetToAsset(requestCreateAsset);
 		asset.setCode(generateAssetCode(requestCreateAsset.getCategoryId()));
 		Category category = categoryRepository.findById(requestCreateAsset.getCategoryId())
 				.orElseThrow(() -> new ResourceNotFoundException(

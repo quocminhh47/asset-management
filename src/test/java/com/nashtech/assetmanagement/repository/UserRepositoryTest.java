@@ -33,13 +33,13 @@ public class UserRepositoryTest {
     }
 
     @Test
-    void findByStaffCodeOrNameAndLocationCode_ShouldReturnUserList_WhenNameOrCodeAndLocationCodeExist(){
-        List<Users> userList = userRepository.findByStaffCodeOrNameAndLocationCode(" p","HCM");
+    void findByStaffCodeOrNameAndLocationCode_ShouldReturnUserList_WhenNameOrCodeAndLocationCodeExist() {
+        List<Users> userList = userRepository.findByStaffCodeOrNameAndLocationCode(" p", "HCM");
         String pattern = "(.* [pP].*)";
-        for(int i = 0;i<userList.size();i++){
+        for (int i = 0; i < userList.size(); i++) {
             String fullname = userList.get(i).getFirstName() + ' ' + userList.get(i).getLastName();
             assertTrue(fullname.matches(pattern));
-            assertEquals("HCM",userList.get(i).getLocation().getCode());
+            assertEquals("HCM", userList.get(i).getLocation().getCode());
         }
     }
 

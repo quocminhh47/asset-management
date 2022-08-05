@@ -27,9 +27,9 @@ import java.io.IOException;
 @Slf4j
 public class JwtAuthorizationTokenFilter extends OncePerRequestFilter {
 
+    private final UserRepository userRepository;
     private JwtUtils jwtUtils;
     private UserDetailServiceImpl userService;
-    private final UserRepository userRepository;
 
     @Override
     protected void doFilterInternal(HttpServletRequest request,
@@ -44,7 +44,8 @@ public class JwtAuthorizationTokenFilter extends OncePerRequestFilter {
                 Users user = userRepository.findByUserName(username)
                         .orElseThrow(() -> new ResourceNotFoundException(
                                 String.format("Username not found", username)));
-                if(user.getState().equals("INACTIVE")) throw new UnauthorizedException("User is disabled");
+                if (user.getState().equals("INACTIVE"))
+                    throw new UnauthorizedException("User is disabled");
                 UserDetails userDetails = userService.loadUserByUsername(username);
                 UsernamePasswordAuthenticationToken authenticationToken = new UsernamePasswordAuthenticationToken(
                         userDetails, null, userDetails.getAuthorities());

@@ -27,7 +27,6 @@ import java.util.stream.Collectors;
 @RestController
 @RequestMapping("/user/api/auth")
 @AllArgsConstructor
-@CrossOrigin
 public class AuthController {
     @Autowired
     private final UserService userService;

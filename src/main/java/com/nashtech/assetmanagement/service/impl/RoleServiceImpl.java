@@ -23,6 +23,7 @@ public class RoleServiceImpl implements RoleService {
         this.roleRepository = roleRepository;
         this.roleMapper = roleMapper;
     }
+
     @Override
     public Role getRole(String name) {
         Role role =
@@ -32,7 +33,7 @@ public class RoleServiceImpl implements RoleService {
     }
 
     @Override
-    public Role getRole(Long id){
+    public Role getRole(Long id) {
         Role role =
                 roleRepository.findById(id).orElseThrow(() -> new ResourceNotFoundException("Did not find role with id: " + id)
                 );
@@ -42,7 +43,7 @@ public class RoleServiceImpl implements RoleService {
     @Override
     public List<RoleResponseDto> getRoleList() {
         List<Role> roles = roleRepository.findAll();
-        if (roles.isEmpty()){
+        if (roles.isEmpty()) {
             throw new ResourceNotFoundException("Role list not found");
         }
         List<RoleResponseDto> responseList = roleMapper.roleListToResponseRoleDtoList(roles);

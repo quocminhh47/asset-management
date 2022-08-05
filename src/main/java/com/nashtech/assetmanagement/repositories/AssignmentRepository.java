@@ -43,6 +43,6 @@ public interface AssignmentRepository extends JpaRepository<Assignment, String> 
 
     Boolean existsById_AssetCodeAndId_AssignedDateAndId_AssignedTo(String id_assetCode, Date id_assignedDate, String id_assignedTo);
 
-    @Query("select e from Assignment e where  e.assignedTo.staffCode = :staffCode and e.id.assignedDate < current_date + 1")
+    @Query("select e from Assignment e where  e.assignedTo.staffCode = :staffCode and e.id.assignedDate <= now()")
     Page<Assignment> getListAssignmentByUser(String staffCode , Pageable pageable);
 }

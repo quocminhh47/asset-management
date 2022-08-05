@@ -1,4 +1,5 @@
 package com.nashtech.assetmanagement.constraint;
+
 import javax.validation.ConstraintValidator;
 import javax.validation.ConstraintValidatorContext;
 import java.util.Calendar;
@@ -9,6 +10,6 @@ public class BirthDayValidator implements ConstraintValidator<BirthDay, Date> {
     public boolean isValid(Date date, ConstraintValidatorContext constraintValidatorContext) {
         Calendar dateInCalendar = Calendar.getInstance();
         dateInCalendar.setTime(date);
-        return Calendar.getInstance().get(Calendar.YEAR)-dateInCalendar.get(Calendar.YEAR)>=18;
+        return Calendar.getInstance().get(Calendar.YEAR) - dateInCalendar.get(Calendar.YEAR) >= 18;
     }
 }

@@ -1,14 +1,13 @@
 package com.nashtech.assetmanagement.mapper;
 
-import java.util.List;
-
+import com.nashtech.assetmanagement.dto.request.CategoryRequestDto;
+import com.nashtech.assetmanagement.dto.response.CategoryResponseDto;
+import com.nashtech.assetmanagement.entities.Category;
 import org.modelmapper.ModelMapper;
 import org.modelmapper.TypeToken;
 import org.springframework.stereotype.Component;
 
-import com.nashtech.assetmanagement.dto.request.CategoryRequestDto;
-import com.nashtech.assetmanagement.dto.response.CategoryResponseDto;
-import com.nashtech.assetmanagement.entities.Category;
+import java.util.List;
 
 @Component
 public class CategoryMapper {
@@ -20,16 +19,17 @@ public class CategoryMapper {
         this.mapper = mapper;
     }
 
-    public CategoryResponseDto categoryToResponseCategoryDTO(Category category){
-        return mapper.map(category,CategoryResponseDto.class);
+    public CategoryResponseDto categoryToResponseCategoryDTO(Category category) {
+        return mapper.map(category, CategoryResponseDto.class);
     }
 
-    public List<CategoryResponseDto> ListCategoriesToListResponseCategories(List<Category> categories){
-        return  mapper.map(categories,
+    public List<CategoryResponseDto> ListCategoriesToListResponseCategories(List<Category> categories) {
+        return mapper.map(categories,
                 new TypeToken<List<CategoryResponseDto>>() {
                 }.getType());
     }
-    public Category RequestCategoryToCategory(CategoryRequestDto requestCategoryDTO){
-        return mapper.map(requestCategoryDTO,Category.class);
+
+    public Category RequestCategoryToCategory(CategoryRequestDto requestCategoryDTO) {
+        return mapper.map(requestCategoryDTO, Category.class);
     }
 }

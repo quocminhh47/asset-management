@@ -6,10 +6,12 @@ import javax.validation.ConstraintValidator;
 import javax.validation.ConstraintValidatorContext;
 import java.lang.reflect.Field;
 import java.util.Date;
+
 @Slf4j
 public class CompareDateValidator implements ConstraintValidator<JoinedDate, Object> {
     private String beforeFieldName;
     private String afterFieldName;
+
     @Override
     public void initialize(JoinedDate constraintAnnotation) {
         beforeFieldName = constraintAnnotation.before();

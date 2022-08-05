@@ -11,22 +11,22 @@ import java.util.Date;
 @AllArgsConstructor
 public class UserContentResponseDto {
 
-	private String staffCode;
+    private String staffCode;
 
-	private String firstName;
+    private String firstName;
 
-	private String lastName;
+    private String lastName;
 
-	private Date birthDate;
+    private Date birthDate;
 
-	private Boolean gender;
+    private Boolean gender;
 
-	private String username;
+    private String username;
 
-	private Date joinedDate;
+    private Date joinedDate;
 
-	private String locationCode;
+    private String locationCode;
 
-	private String roleName;
+    private String roleName;
 
 }

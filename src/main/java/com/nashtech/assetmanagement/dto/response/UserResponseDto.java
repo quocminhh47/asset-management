@@ -12,14 +12,14 @@ import java.util.Date;
 @NoArgsConstructor
 @AllArgsConstructor
 public class UserResponseDto {
-	
-	private String staffCode;
-	private String firstName;
-	private String lastName;
-	private String userName;
-	private Date joinedDate;
-	private Date birthDate;
-	private Boolean gender;
-	private String state;
-	
+
+    private String staffCode;
+    private String firstName;
+    private String lastName;
+    private String userName;
+    private Date joinedDate;
+    private Date birthDate;
+    private Boolean gender;
+    private String state;
+
 }

@@ -16,16 +16,16 @@ import java.util.List;
 @Table(name = "location")
 public class Location {
 
-	@Id
-	@Column(length = 10, nullable = false)
-	private String code;
-	
-	@Column(length = 100, nullable = false)
-	private String name;
+    @Id
+    @Column(length = 10, nullable = false)
+    private String code;
 
-	@OneToMany( mappedBy = "location")
-	private List<Asset> assets;
-	
-	@OneToMany( mappedBy = "location")
-	private List<Users> users;
+    @Column(length = 100, nullable = false)
+    private String name;
+
+    @OneToMany(mappedBy = "location")
+    private List<Asset> assets;
+
+    @OneToMany(mappedBy = "location")
+    private List<Users> users;
 }

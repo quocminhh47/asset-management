@@ -19,7 +19,7 @@ public class LocationController {
     }
 
     @GetMapping("")
-    public ResponseEntity<List<LocationResponseDto>> getLocationList(){
+    public ResponseEntity<List<LocationResponseDto>> getLocationList() {
         return ResponseEntity.ok(this.locationService.getLocationList());
     }
 }

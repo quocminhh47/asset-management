@@ -1,6 +1,5 @@
 package com.nashtech.assetmanagement.controller.rest.admin;
 
-import com.nashtech.assetmanagement.dto.response.LocationResponseDto;
 import com.nashtech.assetmanagement.dto.response.RoleResponseDto;
 import com.nashtech.assetmanagement.service.RoleService;
 import org.springframework.http.ResponseEntity;
@@ -21,7 +20,7 @@ public class RoleController {
 
 
     @GetMapping("")
-    public ResponseEntity<List<RoleResponseDto>> getLocationList(){
+    public ResponseEntity<List<RoleResponseDto>> getLocationList() {
         return ResponseEntity.ok(this.roleService.getRoleList());
     }
 }

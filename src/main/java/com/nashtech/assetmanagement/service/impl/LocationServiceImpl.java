@@ -25,7 +25,7 @@ public class LocationServiceImpl implements LocationService {
     @Override
     public List<LocationResponseDto> getLocationList() {
         List<Location> locations = locationRepository.findAll();
-        if (locations.isEmpty()){
+        if (locations.isEmpty()) {
             throw new ResourceNotFoundException("Location list not found");
         }
         List<LocationResponseDto> responseList = locationMapper.locationListToLocationResponseDtoList(locations);

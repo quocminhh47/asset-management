@@ -1,5 +1,6 @@
 package com.nashtech.assetmanagement.service.impl;
 
+
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.eq;
@@ -76,32 +77,32 @@ public class AssetServiceImplTest {
 		request = new EditAssetRequestDto("Dell inspriration 5432", "CPU 7200U, RAM 16GB", "2022-01-01", newAssetState);
 	}
 
-	@Test
-	public void createAsset_WhenRequestValid_Expect_ReturnAsset() {
-		CreateAssetRequestDto requestCreateAsset = new CreateAssetRequestDto("Lap top", "LT", "good",
-				AssetState.AVAILABLE, null, "HN", "SD0001");
-		// RequestCreateAsset requestCreateAsset=mock(RequestCreateAsset.class);
-		when(assetMapper.RequestAssetToAsset(requestCreateAsset)).thenReturn(asset);
-		Category category = mock(Category.class);
-		Optional<Category> categoryOptional = Optional.of(category);
-		Location location = mock(Location.class);
-		Optional<Location> locationOptional = Optional.of(location);
-		Users users = mock(Users.class);
-		Optional<Users> usersOptional = Optional.of(users);
-		when(userRepository.findById("SD0001")).thenReturn(usersOptional);
-		when(categoryRepository.findById("LT")).thenReturn(categoryOptional);
-		when(locationRepository.findById("HN")).thenReturn(locationOptional);
-		when(assetRepository.save(asset)).thenReturn(asset);
-		ResponseAssetDto expected = mock(ResponseAssetDto.class);
-		when(assetMapper.assetToResponseAssetDTO(asset)).thenReturn(expected);
-		ResponseAssetDto actual = assetServiceImpl.createAsset(requestCreateAsset);
-		ArgumentCaptor<String> assetCodeCapture = ArgumentCaptor.forClass(java.lang.String.class);
-		verify(asset).setCode(assetCodeCapture.capture());
-		verify(asset).setLocation(location);
-		verify(asset).setCategory(category);
-		verify(asset).setUser(users);
-		assertThat(actual).isEqualTo(expected);
-	}
+    @Test
+    public void createAsset_WhenRequestValid_Expect_ReturnAsset() {
+        CreateAssetRequestDto requestCreateAsset = new CreateAssetRequestDto("Lap top", "LT", "good", AssetState.AVAILABLE,
+                null, "HN", "SD0001");
+        // RequestCreateAsset requestCreateAsset=mock(RequestCreateAsset.class);
+        when(assetMapper.requestAssetToAsset(requestCreateAsset)).thenReturn(asset);
+        Category category = mock(Category.class);
+        Optional<Category> categoryOptional = Optional.of(category);
+        Location location = mock(Location.class);
+        Optional<Location> locationOptional = Optional.of(location);
+        Users users = mock(Users.class);
+        Optional<Users> usersOptional = Optional.of(users);
+        when(userRepository.findById("SD0001")).thenReturn(usersOptional);
+        when(categoryRepository.findById("LT")).thenReturn(categoryOptional);
+        when(locationRepository.findById("HN")).thenReturn(locationOptional);
+        when(assetRepository.save(asset)).thenReturn(asset);
+        ResponseAssetDto expected = mock(ResponseAssetDto.class);
+        when(assetMapper.assetToResponseAssetDTO(asset)).thenReturn(expected);
+        ResponseAssetDto actual = assetServiceImpl.createAsset(requestCreateAsset);
+        ArgumentCaptor<String> assetCodeCapture = ArgumentCaptor.forClass(java.lang.String.class);
+        verify(asset).setCode(assetCodeCapture.capture());
+        verify(asset).setLocation(location);
+        verify(asset).setCategory(category);
+        verify(asset).setUser(users);
+        assertThat(actual).isEqualTo(expected);
+    }
 
 	// US584-CreateNewAssignment
 	@Test
@@ -277,7 +278,7 @@ public class AssetServiceImplTest {
 		List<String> listCategoriesExpect = captorlist.getValue();
 
 		assertThat(listCategoriesExpect.size()).isEqualTo(listcategories.size());
-		
+
 		assertThat(pageable.getPageNumber()).isEqualTo(0);
 		assertThat(pageable.getPageSize()).isEqualTo(2);
 		assertThat(actual.getList()).isEqualTo(expectList);
@@ -323,7 +324,7 @@ public class AssetServiceImplTest {
 		assertThat(actual.getTotalPages()).isEqualTo(2);
 	}
 
-	// 582 - Delete asset
+	//582 - Delete asset
 	@Test
 	void deleteAsset_ShouldThrowResourceNotFoundException_WhenAssetCodeIncorrect() {
 		when(assetRepository.findById("LT1111")).thenReturn(Optional.empty());

@@ -1,6 +1,5 @@
 package com.nashtech.assetmanagement.dto.response;
 
-import com.nashtech.assetmanagement.entities.Location;
 import com.nashtech.assetmanagement.enums.AssetState;
 import lombok.AllArgsConstructor;
 import lombok.Getter;

@@ -8,8 +8,8 @@ import org.springframework.test.context.jdbc.Sql;
 @Sql(scripts = {"/data_test.sql"})
 class AssetmanagementApplicationTests {
 
-	@Test
-	void contextLoads() {
-	}
+    @Test
+    void contextLoads() {
+    }
 
 }

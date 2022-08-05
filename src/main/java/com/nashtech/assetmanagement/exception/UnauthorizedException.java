@@ -1,6 +1,6 @@
 package com.nashtech.assetmanagement.exception;
 
-public class UnauthorizedException extends RuntimeException{
+public class UnauthorizedException extends RuntimeException {
 
     private static final long serialVersionUID = 1L;
 

@@ -14,22 +14,24 @@ import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Past;
 import javax.validation.constraints.Size;
 import java.util.Date;
-@Getter@Setter
+
+@Getter
+@Setter
 @NoArgsConstructor
 @AllArgsConstructor
-@JoinedDate(before = "birthDate", after = "joinedDate",message = "Joined date is not later than Date of Birth. Please select a different date")
+@JoinedDate(before = "birthDate", after = "joinedDate", message = "Joined date is not later than Date of Birth. Please select a different date")
 public class UserRequestDto {
     @Size(max = 128)
     private String firstName;
     @Size(max = 128)
     private String lastName;
-    @JsonFormat(pattern="yyyy-MM-dd")
+    @JsonFormat(pattern = "yyyy-MM-dd")
     @NotWeekend(message = "joined date is Saturday or Sunday. Please select a different date")
     private Date joinedDate;
     @NotNull(message = "birthDate must not be null")
     @BirthDay(message = "birthDate User is under 18. Please select a different date")
     @Past(message = "birthDate must be in the past")
-    @JsonFormat(pattern="yyyy-MM-dd")
+    @JsonFormat(pattern = "yyyy-MM-dd")
     private Date birthDate;
     @NotNull
     private Boolean gender;

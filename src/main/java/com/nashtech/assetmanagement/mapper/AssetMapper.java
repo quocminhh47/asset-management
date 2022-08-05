@@ -1,20 +1,19 @@
 package com.nashtech.assetmanagement.mapper;
 
 
-import java.sql.Date;
-import java.util.List;
-import java.util.stream.Collectors;
-
-import org.modelmapper.ModelMapper;
-import org.springframework.stereotype.Component;
-
-import com.nashtech.assetmanagement.dto.request.EditAssetRequestDto;
 import com.nashtech.assetmanagement.dto.request.CreateAssetRequestDto;
+import com.nashtech.assetmanagement.dto.request.EditAssetRequestDto;
 import com.nashtech.assetmanagement.dto.response.AssetResponseDto;
 import com.nashtech.assetmanagement.dto.response.EditAssetResponseDto;
 import com.nashtech.assetmanagement.dto.response.ResponseAssetDto;
 import com.nashtech.assetmanagement.entities.Asset;
 import com.nashtech.assetmanagement.exception.DateInvalidException;
+import org.modelmapper.ModelMapper;
+import org.springframework.stereotype.Component;
+
+import java.sql.Date;
+import java.util.List;
+import java.util.stream.Collectors;
 
 @Component
 public class AssetMapper {
@@ -28,7 +27,7 @@ public class AssetMapper {
         return mapper.map(asset, ResponseAssetDto.class);
     }
 
-    public Asset RequestAssetToAsset(CreateAssetRequestDto requestCreateAsset) {
+    public Asset requestAssetToAsset(CreateAssetRequestDto requestCreateAsset) {
         return mapper.map(requestCreateAsset, Asset.class);
     }
 

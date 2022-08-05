@@ -1,6 +1,6 @@
 package com.nashtech.assetmanagement.exception;
 
-public class DateInvalidException extends RuntimeException{
+public class DateInvalidException extends RuntimeException {
 
     private static final long serialVersionUID = 1L;
 

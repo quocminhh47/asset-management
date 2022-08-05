@@ -7,7 +7,6 @@ import lombok.ToString;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
-import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -40,10 +39,10 @@ public class UserPrinciple implements UserDetails {
 
     public static UserPrinciple build(Users users) {
         List<GrantedAuthority> authorities = new ArrayList<>();
-        if(users.getRole().getName().equalsIgnoreCase("admin"))
+        if (users.getRole().getName().equalsIgnoreCase("admin"))
             authorities.add(new SimpleGrantedAuthority("ROLE_ADMIN"));
 
-        if(users.getRole().getName().equalsIgnoreCase("staff"))
+        if (users.getRole().getName().equalsIgnoreCase("staff"))
             authorities.add(new SimpleGrantedAuthority("ROLE_STAFF"));
 
         return new UserPrinciple(

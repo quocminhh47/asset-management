@@ -1,18 +1,16 @@
 package com.nashtech.assetmanagement.mapper;
 
 
-import java.util.List;
-import java.util.stream.Collectors;
-
-import org.modelmapper.ModelMapper;
-import org.springframework.stereotype.Component;
-
 import com.nashtech.assetmanagement.dto.request.AssignmentRequestDto;
 import com.nashtech.assetmanagement.dto.response.AssignmentResponseDto;
 import com.nashtech.assetmanagement.entities.Assignment;
 import com.nashtech.assetmanagement.entities.AssignmentId;
-
 import lombok.AllArgsConstructor;
+import org.modelmapper.ModelMapper;
+import org.springframework.stereotype.Component;
+
+import java.util.List;
+import java.util.stream.Collectors;
 
 @Component
 @AllArgsConstructor
@@ -43,8 +41,8 @@ public class AssignmentMapper {
     }
 
     public List<AssignmentResponseDto> mapperListAssignment(List<Assignment> list) {
-		List<AssignmentResponseDto> result = list.stream().map(item -> mapper.map(item, AssignmentResponseDto.class))
-				.collect(Collectors.toList());
-		return result;
-	}
+        List<AssignmentResponseDto> result = list.stream().map(item -> mapper.map(item, AssignmentResponseDto.class))
+                .collect(Collectors.toList());
+        return result;
+    }
 }

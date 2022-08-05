@@ -1,12 +1,9 @@
 package com.nashtech.assetmanagement.mapper;
 
-import com.nashtech.assetmanagement.dto.response.LocationResponseDto;
 import com.nashtech.assetmanagement.dto.response.RoleResponseDto;
-import com.nashtech.assetmanagement.entities.Location;
 import com.nashtech.assetmanagement.entities.Role;
 import lombok.AllArgsConstructor;
 import org.modelmapper.ModelMapper;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import java.util.List;
@@ -19,10 +16,10 @@ public class RoleMapper {
     ModelMapper modelMapper;
 
 
-    public List<RoleResponseDto> roleListToResponseRoleDtoList (List<Role> roles){
+    public List<RoleResponseDto> roleListToResponseRoleDtoList(List<Role> roles) {
         List<RoleResponseDto> responseRoleDtoList = roles.stream()
-                .map(role -> modelMapper.map(role,RoleResponseDto.class)).collect(Collectors.toList());
-        return  responseRoleDtoList;
+                .map(role -> modelMapper.map(role, RoleResponseDto.class)).collect(Collectors.toList());
+        return responseRoleDtoList;
     }
 
 }

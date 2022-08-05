@@ -11,10 +11,10 @@ import lombok.Setter;
 @AllArgsConstructor
 public class CategoryResponseDto {
 
-	private String id;
-	
-	private String name;
-	
-	private Long totalQuantity;
+    private String id;
+
+    private String name;
+
+    private Long totalQuantity;
 
 }
