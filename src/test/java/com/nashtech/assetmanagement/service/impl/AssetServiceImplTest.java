@@ -1,6 +1,5 @@
 package com.nashtech.assetmanagement.service.impl;
 
-
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.eq;
@@ -58,35 +57,29 @@ public class AssetServiceImplTest {
 
 	private AssignmentRepository assignmentRepository;
 
-    private AssetServiceImpl assetServiceImpl;
-    EditAssetRequestDto request;
-    AssetState newAssetState = AssetState.NOT_AVAILABLE;
+	private AssetServiceImpl assetServiceImpl;
+	EditAssetRequestDto request;
+	AssetState newAssetState = AssetState.NOT_AVAILABLE;
 
-    @BeforeEach
-    void setUp() {
-        asset = mock(Asset.class);
-        assetRepository = mock(AssetRepository.class);
-        assetMapper = mock(AssetMapper.class);
-        locationRepository = mock(LocationRepository.class);
-        categoryRepository = mock(CategoryRepository.class);
-        userRepository = mock(UserRepository.class);
+	@BeforeEach
+	void setUp() {
+		asset = mock(Asset.class);
+		assetRepository = mock(AssetRepository.class);
+		assetMapper = mock(AssetMapper.class);
+		locationRepository = mock(LocationRepository.class);
+		categoryRepository = mock(CategoryRepository.class);
+		userRepository = mock(UserRepository.class);
 		assignmentRepository = mock(AssignmentRepository.class);
-        assetServiceImpl = new AssetServiceImpl(assetRepository
-                , categoryRepository,
-                userRepository, locationRepository, assetMapper, assignmentRepository);
+		assetServiceImpl = new AssetServiceImpl(assetRepository, categoryRepository, userRepository, locationRepository,
+				assetMapper, assignmentRepository);
 
-        request = new EditAssetRequestDto(
-                "Dell inspriration 5432",
-                "CPU 7200U, RAM 16GB",
-                "2022-01-01",
-                newAssetState);
-    }
-
+		request = new EditAssetRequestDto("Dell inspriration 5432", "CPU 7200U, RAM 16GB", "2022-01-01", newAssetState);
+	}
 
 	@Test
 	public void createAsset_WhenRequestValid_Expect_ReturnAsset() {
-		CreateAssetRequestDto requestCreateAsset = new CreateAssetRequestDto("Lap top", "LT", "good", AssetState.AVAILABLE,
-				null, "HN", "SD0001");
+		CreateAssetRequestDto requestCreateAsset = new CreateAssetRequestDto("Lap top", "LT", "good",
+				AssetState.AVAILABLE, null, "HN", "SD0001");
 		// RequestCreateAsset requestCreateAsset=mock(RequestCreateAsset.class);
 		when(assetMapper.RequestAssetToAsset(requestCreateAsset)).thenReturn(asset);
 		Category category = mock(Category.class);
@@ -110,93 +103,86 @@ public class AssetServiceImplTest {
 		assertThat(actual).isEqualTo(expected);
 	}
 
-    //US584-CreateNewAssignment
-    @Test
-    void getAssetList_ShouldReturnResponseAssetDtoList_WhenAssetExist() {
-        Location location = mock(Location.class);
-        List<Asset> assetList = mock(ArrayList.class);
-        List<AssetResponseDto> responseList = mock(ArrayList.class);
-        when(locationRepository.findById("locationCode")).thenReturn(Optional.of(location));
-        when(assetRepository.findAssetByNameOrCodeAndLocationCode("text", "locationCode")).thenReturn(assetList);
-        when(assetMapper.getAssetListToResponseAssetDTOList(assetList)).thenReturn(responseList);
-        List<AssetResponseDto> result = assetServiceImpl.getAssetByCodeOrNameAndLocationCode("text", "locationCode");
-        assertThat(result).isEqualTo(responseList);
-    }
+	// US584-CreateNewAssignment
+	@Test
+	void getAssetList_ShouldReturnResponseAssetDtoList_WhenAssetExist() {
+		Location location = mock(Location.class);
+		List<Asset> assetList = mock(ArrayList.class);
+		List<AssetResponseDto> responseList = mock(ArrayList.class);
+		when(locationRepository.findById("locationCode")).thenReturn(Optional.of(location));
+		when(assetRepository.findAssetByNameOrCodeAndLocationCode("text", "locationCode")).thenReturn(assetList);
+		when(assetMapper.getAssetListToResponseAssetDTOList(assetList)).thenReturn(responseList);
+		List<AssetResponseDto> result = assetServiceImpl.getAssetByCodeOrNameAndLocationCode("text", "locationCode");
+		assertThat(result).isEqualTo(responseList);
+	}
 
-    @Test
-    void getAssetList_ShouldThrowResourceNotFoundEx_WhenLocationCodeIncorrect() {
-        when(locationRepository.findById("HCM")).thenReturn(Optional.empty());
-        ResourceNotFoundException e = Assertions.assertThrows(ResourceNotFoundException.class,
-                () -> assetServiceImpl.getAssetByCodeOrNameAndLocationCode("text", "HCM"));
-        AssertionsForClassTypes.assertThat(e.getMessage()).isEqualTo("Location code not found");
-    }
+	@Test
+	void getAssetList_ShouldThrowResourceNotFoundEx_WhenLocationCodeIncorrect() {
+		when(locationRepository.findById("HCM")).thenReturn(Optional.empty());
+		ResourceNotFoundException e = Assertions.assertThrows(ResourceNotFoundException.class,
+				() -> assetServiceImpl.getAssetByCodeOrNameAndLocationCode("text", "HCM"));
+		AssertionsForClassTypes.assertThat(e.getMessage()).isEqualTo("Location code not found");
+	}
 
-    @DisplayName("Given valid asset request then edit asset - positive case")
-    @Test
-    void givenValidAssetRequest_whenEditAsset_thenReturnEditAssetResponse() {
-        //given
-        String assetCode = "LA100001";
-        AssetState acceptableAssetState = AssetState.AVAILABLE;
+	@DisplayName("Given valid asset request then edit asset - positive case")
+	@Test
+	void givenValidAssetRequest_whenEditAsset_thenReturnEditAssetResponse() {
+		// given
+		String assetCode = "LA100001";
+		AssetState acceptableAssetState = AssetState.AVAILABLE;
 
-        Asset existAsset = mock(Asset.class);
-        Asset mappedAsset = mock(Asset.class);
-        Asset savedAsset = mock(Asset.class);
-        EditAssetResponseDto expectedResponse = mock(EditAssetResponseDto.class);
+		Asset existAsset = mock(Asset.class);
+		Asset mappedAsset = mock(Asset.class);
+		Asset savedAsset = mock(Asset.class);
+		EditAssetResponseDto expectedResponse = mock(EditAssetResponseDto.class);
 
+		when(assetRepository.findById(assetCode)).thenReturn(Optional.of(existAsset));
+		when(existAsset.getState()).thenReturn(acceptableAssetState);
+		when(assetMapper.mapEditAssetRequestToEntity(request, existAsset)).thenReturn(mappedAsset);
+		when(assetRepository.save(mappedAsset)).thenReturn(savedAsset);
+		when(assetMapper.mapToEditAssetResponse(savedAsset)).thenReturn(expectedResponse);
 
-        when(assetRepository.findById(assetCode)).thenReturn(Optional.of(existAsset));
-        when(existAsset.getState()).thenReturn(acceptableAssetState);
-        when(assetMapper.mapEditAssetRequestToEntity(request, existAsset)).thenReturn(mappedAsset);
-        when(assetRepository.save(mappedAsset)).thenReturn(savedAsset);
-        when(assetMapper.mapToEditAssetResponse(savedAsset)).thenReturn(expectedResponse);
+		// when
+		EditAssetResponseDto actualResponse = assetServiceImpl.editAsset(request, assetCode);
 
-        //when
-        EditAssetResponseDto actualResponse = assetServiceImpl.editAsset(request, assetCode);
+		// then
+		assertThat(actualResponse).isEqualTo(expectedResponse);
+	}
 
-        //then
-        assertThat(actualResponse).isEqualTo(expectedResponse);
-    }
+	@DisplayName("Given asset with ASSIGNED state then throw exception - negative case")
+	@Test
+	void givenInvalidState_whenEditAsset_thenThrowsException() {
+		// given
+		String assetCode = "LA100001";
+		Asset existAsset = mock(Asset.class);
+		AssetState invalidState = AssetState.ASSIGNED;
 
-    @DisplayName("Given asset with ASSIGNED state then throw exception - negative case")
-    @Test
-    void givenInvalidState_whenEditAsset_thenThrowsException() {
-        //given
-        String assetCode = "LA100001";
-        Asset existAsset = mock(Asset.class);
-        AssetState invalidState = AssetState.ASSIGNED;
+		EditAssetRequestDto wrongRequest = new EditAssetRequestDto("Dell inspriration 5432", "CPU 7200U, RAM 16GB",
+				"2022-01-01", invalidState);
 
-        EditAssetRequestDto wrongRequest = new EditAssetRequestDto(
-                "Dell inspriration 5432",
-                "CPU 7200U, RAM 16GB",
-                "2022-01-01",
-                invalidState);
+		when(assetRepository.findById(assetCode)).thenReturn(Optional.of(existAsset));
+		when(existAsset.getState()).thenReturn(AssetState.ASSIGNED);
+		// when
+		IllegalStateException exception = Assertions.assertThrows(IllegalStateException.class,
+				() -> assetServiceImpl.editAsset(wrongRequest, assetCode));
+		// then
+		assertThat(exception.getMessage()).isEqualTo("Asset." + assetCode + ".is.being.assigned.Cannot modify");
 
-        when(assetRepository.findById(assetCode)).thenReturn(Optional.of(existAsset));
-        when(existAsset.getState()).thenReturn(AssetState.ASSIGNED);
-        //when
-        IllegalStateException exception = Assertions.assertThrows(IllegalStateException.class,
-                () -> assetServiceImpl.editAsset(wrongRequest, assetCode));
-        //then
-        assertThat(exception.getMessage())
-                .isEqualTo("Asset."+ assetCode + ".is.being.assigned.Cannot modify");
+	}
 
-    }
+	@DisplayName("Given non exist asset then throw 404 exception - negative case")
+	@Test
+	void givenNonExistAsset_whenEditAsset_thenThrowsException() {
+		// given
+		String assetCode = "LA100001";
+		when(assetRepository.findById(assetCode)).thenReturn(Optional.empty());
+		// when
+		ResourceNotFoundException exception = Assertions.assertThrows(ResourceNotFoundException.class,
+				() -> assetServiceImpl.editAsset(request, assetCode));
 
-    @DisplayName("Given non exist asset then throw 404 exception - negative case")
-    @Test
-    void givenNonExistAsset_whenEditAsset_thenThrowsException() {
-        //given
-        String assetCode = "LA100001";
-        when(assetRepository.findById(assetCode)).thenReturn(Optional.empty());
-        //when
-        ResourceNotFoundException exception = Assertions.assertThrows(ResourceNotFoundException.class,
-                () -> assetServiceImpl.editAsset(request, assetCode));
-
-        //then
-        assertThat(exception.getMessage())
-                .isEqualTo("Asset." + assetCode + ".not.found");
-    }
-
+		// then
+		assertThat(exception.getMessage()).isEqualTo("Asset." + assetCode + ".not.found");
+	}
 
 	// ===========US 579=======
 	@DisplayName("Test for get list asset by user but user_id not found")
@@ -206,7 +192,8 @@ public class AssetServiceImplTest {
 		List<String> listcategories = mock(List.class);
 		when(userRepository.findById("SD001")).thenReturn(Optional.empty());
 		Exception exception = assertThrows(ResourceNotFoundException.class, () -> {
-			assetServiceImpl.getListAsset("SD001", listcategories, listStates, "keyword", "sortBy", "sortDirection", 1, 1);
+			assetServiceImpl.getListAsset("SD001", listcategories, listStates, "keyword", "sortBy", "sortDirection", 1,
+					1);
 		});
 		assertThat(exception.getMessage()).isEqualTo("user.not.found.with.code:SD001");
 	}
@@ -218,11 +205,11 @@ public class AssetServiceImplTest {
 		Page<Asset> pageAsset = mock(Page.class);
 		List<Asset> listAsset = mock(List.class);
 		List<AssetResponseDto> expectList = mock(List.class);
-		
+
 		List<String> listStates = new ArrayList<String>();
 		listStates.add("AVAILABLE");
 		listStates.add("NOT_AVAILABLE");
-		
+
 		List<String> listcategories = new ArrayList<String>();
 		listcategories.add("Laptop");
 		listcategories.add("PC");
@@ -233,22 +220,30 @@ public class AssetServiceImplTest {
 		when(pageAsset.getTotalPages()).thenReturn(2);
 		when(pageAsset.getContent()).thenReturn(listAsset);
 		when(assetMapper.mapperListAsset(listAsset)).thenReturn(expectList);
-		
-		ListAssetResponseDto actual = assetServiceImpl.getListAsset("SD001", listcategories, listStates ,"a", "code", "DESC", 1, 2);
+
+		ListAssetResponseDto actual = assetServiceImpl.getListAsset("SD001", listcategories, listStates, "a", "code",
+				"DESC", 1, 2);
 
 		ArgumentCaptor<Pageable> captor = ArgumentCaptor.forClass(Pageable.class);
 		ArgumentCaptor<List> captorlistCategories = ArgumentCaptor.forClass(List.class);
 		ArgumentCaptor<List> captorlistStates = ArgumentCaptor.forClass(List.class);
-		
-		verify(assetRepository).getListAsset(eq("SD001"), captorlistCategories.capture(), captorlistStates.capture(), eq("a"), captor.capture());
+
+		verify(assetRepository).getListAsset(eq("SD001"), captorlistCategories.capture(), captorlistStates.capture(),
+				eq("a"), captor.capture());
 		Pageable pageable = captor.getValue();
 		
+		List<String> listCategoriesExpect = captorlistCategories.getValue();
+		List<String> listStatesExpect = captorlistStates.getValue();
+
+		assertThat(listCategoriesExpect.size()).isEqualTo(listcategories.size());
+		assertThat(listStatesExpect.size()).isEqualTo(listStates.size());
+
 		assertThat(pageable.getPageNumber()).isEqualTo(0);
 		assertThat(pageable.getPageSize()).isEqualTo(2);
 		assertThat(actual.getList()).isEqualTo(expectList);
 		assertThat(actual.getTotalPages()).isEqualTo(2);
 	}
-	
+
 	@DisplayName("Test for get list asset by user and categories or asset name or asset code")
 	@Test
 	void getListAsset_ShouldReturnListAssetResponseDto_WhenUserIdExistAndCategories() {
@@ -256,7 +251,7 @@ public class AssetServiceImplTest {
 		Page<Asset> pageAsset = mock(Page.class);
 		List<Asset> listAsset = mock(List.class);
 		List<AssetResponseDto> expectList = mock(List.class);
-		
+
 		List<String> listStates = mock(List.class);
 		List<String> listcategories = new ArrayList<>();
 		listcategories.add("Laptop");
@@ -264,25 +259,31 @@ public class AssetServiceImplTest {
 
 		when(userRepository.findById("SD001")).thenReturn(Optional.of(entity));
 		when(listStates.size()).thenReturn(0);
-		when(assetRepository.getListAssetByCategory(eq("SD001"), Mockito.any(List.class), eq("a"), Mockito.any(Pageable.class))).thenReturn(pageAsset);
+		when(assetRepository.getListAssetByCategory(eq("SD001"), Mockito.any(List.class), eq("a"),
+				Mockito.any(Pageable.class))).thenReturn(pageAsset);
 		when(pageAsset.getTotalPages()).thenReturn(2);
 		when(pageAsset.getContent()).thenReturn(listAsset);
 		when(assetMapper.mapperListAsset(listAsset)).thenReturn(expectList);
-		
-		ListAssetResponseDto actual = assetServiceImpl.getListAsset("SD001", listcategories, listStates ,"a", "code", "DESC", 1, 2);
+
+		ListAssetResponseDto actual = assetServiceImpl.getListAsset("SD001", listcategories, listStates, "a", "code",
+				"DESC", 1, 2);
 
 		ArgumentCaptor<Pageable> captor = ArgumentCaptor.forClass(Pageable.class);
 		ArgumentCaptor<List> captorlist = ArgumentCaptor.forClass(List.class);
-		
+
 		verify(assetRepository).getListAssetByCategory(eq("SD001"), captorlist.capture(), eq("a"), captor.capture());
 		Pageable pageable = captor.getValue();
+
+		List<String> listCategoriesExpect = captorlist.getValue();
+
+		assertThat(listCategoriesExpect.size()).isEqualTo(listcategories.size());
 		
 		assertThat(pageable.getPageNumber()).isEqualTo(0);
 		assertThat(pageable.getPageSize()).isEqualTo(2);
 		assertThat(actual.getList()).isEqualTo(expectList);
 		assertThat(actual.getTotalPages()).isEqualTo(2);
 	}
-	
+
 	@DisplayName("Test for get list asset by user and states or asset name or asset code")
 	@Test
 	void getListAsset_ShouldReturnListAssetResponseDto_WhenUserIdExistAndState() {
@@ -290,36 +291,39 @@ public class AssetServiceImplTest {
 		Page<Asset> pageAsset = mock(Page.class);
 		List<Asset> listAsset = mock(List.class);
 		List<AssetResponseDto> expectList = mock(List.class);
-		
+
 		List<String> listStates = new ArrayList<>();
 		listStates.add("AVAILABLE");
 		listStates.add("NOT_AVAILABLE");
-		
+
 		List<String> listcategories = mock(List.class);
-		
+
 		when(userRepository.findById("SD001")).thenReturn(Optional.of(entity));
 		when(listcategories.size()).thenReturn(0);
-		when(assetRepository.getListAssetByState(eq("SD001"), Mockito.any(List.class), eq("a"), Mockito.any(Pageable.class))).thenReturn(pageAsset);
+		when(assetRepository.getListAssetByState(eq("SD001"), Mockito.any(List.class), eq("a"),
+				Mockito.any(Pageable.class))).thenReturn(pageAsset);
 		when(pageAsset.getTotalPages()).thenReturn(2);
 		when(pageAsset.getContent()).thenReturn(listAsset);
 		when(assetMapper.mapperListAsset(listAsset)).thenReturn(expectList);
-		
-		ListAssetResponseDto actual = assetServiceImpl.getListAsset("SD001", listcategories, listStates ,"a", "code", "DESC", 1, 2);
+
+		ListAssetResponseDto actual = assetServiceImpl.getListAsset("SD001", listcategories, listStates, "a", "code",
+				"DESC", 1, 2);
 		ArgumentCaptor<Pageable> captor = ArgumentCaptor.forClass(Pageable.class);
 		ArgumentCaptor<List> captorlist = ArgumentCaptor.forClass(List.class);
-		
+
 		verify(assetRepository).getListAssetByState(eq("SD001"), captorlist.capture(), eq("a"), captor.capture());
 		Pageable pageable = captor.getValue();
 		
-//		List<String> listStatesExpect =  captorlist.getValue();
-		
+		List<String> listStatesExpect = captorlist.getValue();
+
+		assertThat(listStatesExpect.size()).isEqualTo(listStates.size());
 		assertThat(pageable.getPageNumber()).isEqualTo(0);
 		assertThat(pageable.getPageSize()).isEqualTo(2);
 		assertThat(actual.getList()).isEqualTo(expectList);
 		assertThat(actual.getTotalPages()).isEqualTo(2);
 	}
 
-	//582 - Delete asset
+	// 582 - Delete asset
 	@Test
 	void deleteAsset_ShouldThrowResourceNotFoundException_WhenAssetCodeIncorrect() {
 		when(assetRepository.findById("LT1111")).thenReturn(Optional.empty());
