@@ -31,7 +31,7 @@ public interface AssignmentRepository extends JpaRepository<Assignment, String> 
     @Query(value = "from Assignment a where " +
             "(lower(a.asset.code)  like concat('%', :text, '%')" +
             "or lower(a.asset.name) like concat('%', :text, '%')" +
-            "or lower(a.assignedBy.userName) like concat('%', :text, '%'))" +
+            "or lower(a.assignedTo.userName) like concat('%', :text, '%'))" +
             "and a.state in :states " +
             "and a.id.assignedDate = :assignedDate " +
             "order by a.asset.code asc ")
@@ -43,7 +43,7 @@ public interface AssignmentRepository extends JpaRepository<Assignment, String> 
     @Query(value = "from Assignment a where " +
             "(lower(a.asset.code)  like concat('%', :text, '%')" +
             "or lower(a.asset.name) like concat('%', :text, '%')" +
-            "or lower(a.assignedBy.userName) like concat('%', :text, '%'))" +
+            "or lower(a.assignedTo.userName) like concat('%', :text, '%'))" +
             "and a.state in :states " +
             "order by a.asset.code asc " )
     Page<Assignment> getAssignmentWithoutAssignedDate(@Param("text") String textSearch,
