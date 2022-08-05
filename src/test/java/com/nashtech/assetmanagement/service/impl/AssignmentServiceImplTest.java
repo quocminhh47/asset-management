@@ -131,18 +131,12 @@ class AssignmentServiceImplTest {
 		// given
 		List<String> assignedState = states.stream().map(StateConverter::getAssignmentState)
 				.collect(Collectors.toList());
-		String dateInFuture = "2023-06-06";
 		String invalidFormatDate = "20230-06-06";
 		// when
-		DateInvalidException dateFutureExcep = Assertions.assertThrows(DateInvalidException.class,
-				() -> assignmentServiceImpl.getAssignmentsByCondition(0, 1, "", assignedState, dateInFuture));
-
-		IllegalArgumentException invalidDateFormatExcep = Assertions.assertThrows(IllegalArgumentException.class,
+		DateInvalidException invalidDateFormatExcep = Assertions.assertThrows(DateInvalidException.class,
 				() -> assignmentServiceImpl.getAssignmentsByCondition(0, 1, "", assignedState, invalidFormatDate));
 		// then
 		Date dateNow = new Date(new java.util.Date().getTime());
-		assertThat(dateFutureExcep.getMessage())
-				.isEqualTo("Date.is.must.before.today:" + dateNow.toString().replaceAll(" ", "."));
 		assertThat(invalidDateFormatExcep.getMessage()).isEqualTo("Date.format.is.not.valid");
 	}
 
