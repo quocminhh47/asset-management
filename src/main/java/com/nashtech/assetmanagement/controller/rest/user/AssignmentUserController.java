@@ -18,10 +18,9 @@ import lombok.AllArgsConstructor;
 
 @RestController
 @AllArgsConstructor
-@RequestMapping("/user/api/assignment")
+@RequestMapping("/users/api/assignments")
 public class AssignmentUserController {
 
-	@Autowired
 	private AssignmentService assignmentService;
 
 	@GetMapping("/{userId}")

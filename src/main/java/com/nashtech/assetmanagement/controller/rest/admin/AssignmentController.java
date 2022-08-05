@@ -24,12 +24,12 @@ import lombok.AllArgsConstructor;
 
 @RestController
 @AllArgsConstructor
-@RequestMapping("/admin/api/assignment")
+@RequestMapping("/admin/api/assignments")
 public class AssignmentController {
 
     private final AssignmentService assignmentService;
 
-    @GetMapping("/all")
+    @GetMapping()
     @ResponseStatus(HttpStatus.OK)
     public ListAssignmentResponseDto getAssignmentListOrderByDefaultOrFilter(
             @RequestParam(
@@ -46,14 +46,14 @@ public class AssignmentController {
                 .getAssignmentsByCondition(pageNo, pageSize,  text, states, assignedDate);
     }
 
-    @PostMapping("/create")
+    @PostMapping()
     public ResponseEntity<AssignmentResponseDto> createNewAssignment(@RequestBody AssignmentRequestDto request) {
         return ResponseEntity.created(URI.create("/admin/api/assignment/create"))
                 .body(this.assignmentService.createNewAssignment(request));
     }
 
-    @GetMapping
-    public ResponseEntity<List<AssignmentResponseDto>> getListAssignmentByAsset(@RequestParam(required = true, name = "assetId") String assetId) {
+    @GetMapping("/{assetId}")
+    public ResponseEntity<List<AssignmentResponseDto>> getListAssignmentByAsset(@PathVariable("assetId")String assetId) {
         return new ResponseEntity<List<AssignmentResponseDto>>(assignmentService.getListAssignmentByAssetCode(assetId), HttpStatus.OK);
     }
 }

@@ -15,15 +15,6 @@ import com.nashtech.assetmanagement.entities.Users;
 
 public interface AssignmentRepository extends JpaRepository<Assignment, String> {
 
-    Page<Assignment> findByOrderByAssetCodeAsc(Pageable pageable);
-
-    Page<Assignment> findByState(Pageable pageable, String state);
-
-
-    Page<Assignment> findById_AssignedDate(Pageable pageable, Date assignedDate);
-
-    Page<Assignment> findByStateAndId_AssignedDate(Pageable pageable, String state, Date assignedDate);
-
     List<Assignment> findByAsset(Asset asset);
 
     Boolean existsByAssignedToOrAssignedBy(Users assignedTo, Users assignedBy);

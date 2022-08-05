@@ -17,43 +17,16 @@ import javax.validation.Valid;
 import java.util.HashMap;
 import java.util.List;
 
-@RequestMapping("")
+@RequestMapping("/users/api")
 @RestController
 public class UserController {
     private final UserService userService;
 
-    @Autowired
     public UserController(UserService userService){
         this.userService = userService;
     }
 
-    @PostMapping("/admin/api/create")
-    @ResponseStatus(HttpStatus.OK)
-    public UserContentResponseDto createNewUser(@RequestBody @Valid UserRequestDto user){
-       return userService.createNewUser(user);
-    }
-
-    @PutMapping("/admin/api/edit/{id}")
-    @ResponseStatus(HttpStatus.OK)
-    public UserContentResponseDto editUser(@RequestBody @Valid UserRequestDto user, @PathVariable("id") String staffCode){
-        return userService.editUser(user,staffCode);
-    }
-
-    @GetMapping("/admin/api/location/{staffCode}")
-    public ResponseEntity<LocationResponseDto> getLocationByStaffCode(@PathVariable("staffCode")String id){
-        return ResponseEntity.ok(this.userService.getLocationByStaffCode(id));
-    }
-
-    @GetMapping("admin/api/searchUser/{location}")
-    public ResponseEntity<HashMap> getUserListByStaffCodeOrName(@RequestParam("text")String text,@PathVariable("location")String locationCode){
-        HashMap hashMap = new HashMap();
-        List<UserContentResponseDto> result = this.userService.getUsersByStaffCodeOrNameAndLocationCode(text,locationCode);
-        hashMap.put("list_user",result);
-        hashMap.put("total",result.size());
-        return ResponseEntity.ok(hashMap);
-    }
-
-    @PostMapping("/user/api/first-login")
+    @PutMapping("/first-login")
     public ResponseEntity<?> changePasswordFirstLogin(@Valid @RequestBody FirstLoginRequestDto requestFirstLogin) {
         MessageResponse responseMessage=
                 userService.changePasswordFirstLogin(requestFirstLogin.getUserName(),
@@ -61,7 +34,7 @@ public class UserController {
 
         return new ResponseEntity<>(responseMessage,responseMessage.getStatus());
     }
-    @PostMapping("/user/api/change-password")
+    @PutMapping("/password")
     public ResponseEntity<UserResponseDto> changePassword(@Valid @RequestBody ChangePassRequestDto requestChangePassDto){
         return ResponseEntity.ok(userService.changePassword(requestChangePassDto));
     }

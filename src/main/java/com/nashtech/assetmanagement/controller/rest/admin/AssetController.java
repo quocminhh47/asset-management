@@ -1,10 +1,12 @@
 package com.nashtech.assetmanagement.controller.rest.admin;
 
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 
 import javax.validation.Valid;
 
+import com.nashtech.assetmanagement.enums.AssetState;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -35,13 +37,12 @@ public class AssetController {
 
 	private final AssetService assetService;
 
-	@Autowired
 	public AssetController(AssetService assetService) {
 		this.assetService = assetService;
 	}
 
 	@PostMapping
-	@ResponseStatus(HttpStatus.OK)
+	@ResponseStatus(HttpStatus.CREATED)
 	public ResponseAssetDto createAsset(@Valid @RequestBody CreateAssetRequestDto requestCreateAsset) {
 		return assetService.createAsset(requestCreateAsset);
 	}
@@ -53,14 +54,14 @@ public class AssetController {
 			@RequestParam(required = false, defaultValue = "", value = "keyword") String keyword,
 			@RequestParam(required = false, defaultValue = "", value = "sortBy") String sortBy,
 			@RequestParam(required = false, defaultValue = "" , value = "sortDirection") String sortDirection,
-			@RequestParam(required = false, defaultValue = "", value = "categoryId") List<String> categoryId,
-			@RequestParam(required = false, defaultValue = "", value = "state") List<String> state) {
-		ListAssetResponseDto result = assetService.getListAsset(userId, categoryId, state, keyword, sortBy,
+			@RequestParam(required = false, defaultValue = "", value = "categoryIds") List<String> categoryIds,
+			@RequestParam(required = false, defaultValue = "", value = "states") List<String> states) {
+		ListAssetResponseDto result = assetService.getListAsset(userId, categoryIds, states, keyword, sortBy,
 				sortDirection, page, size);
 		return new ResponseEntity<ListAssetResponseDto>(result, HttpStatus.OK);
 	}
 
-	@GetMapping("/searchAsset/{location}")
+	@GetMapping("/searching/{location}")
 	public ResponseEntity<HashMap> searchAssetByCodeOrName(@RequestParam("text") String text,
 			@PathVariable("location") String locationCode) {
 		HashMap hashMap = new HashMap<>();
@@ -79,10 +80,14 @@ public class AssetController {
 
 //	582 - Delete asset
 	@DeleteMapping("/{assetCode}")
-	@CrossOrigin(origins = "*")
 	public ResponseEntity<?> deleteAssetByAssetCode(@PathVariable("assetCode") String assetCode) {
 		MessageResponse responseMessage = assetService.deleteAssetByAssetCode(assetCode);
 		return new ResponseEntity<>(responseMessage, responseMessage.getStatus());
 	}
 
+	@GetMapping("/asset/states")
+	public ResponseEntity<List<AssetState>> getListAssetState() {
+		List<AssetState> list = Arrays.asList(AssetState.values());
+		return new ResponseEntity<List<AssetState>>(list, HttpStatus.OK);
+	}
 }
