@@ -15,6 +15,7 @@ import java.util.Date;
 public class ResponseAssetDto {
     private String assetCode;
     private String assetName;
+    private String categoryName;
     private String specification;
     private Date installedDate;
     private AssetState state;

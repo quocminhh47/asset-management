@@ -15,7 +15,8 @@ public class CorsConfiguration {
                 registry
                         .addMapping("/**")
                         .allowedMethods("GET", "POST", "PUT", "DELETE")
-                        .allowedOrigins("*");
+                        .allowedOrigins("http://localhost:3000","https://black-meadow" +
+                                "-0e73cc200.1.azurestaticapps.net","https://agreeable-pebble-0ba2d4100.1.azurestaticapps.net");
             }
         };
     }
