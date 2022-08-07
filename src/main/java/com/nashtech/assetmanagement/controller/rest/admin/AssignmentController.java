@@ -1,5 +1,14 @@
 package com.nashtech.assetmanagement.controller.rest.admin;
 
+import java.net.URI;
+import java.util.List;
+
+import com.nashtech.assetmanagement.dto.request.ChangeAssignmentStateRequestDto;
+import com.nashtech.assetmanagement.dto.response.MessageResponse;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.*;
+
 import com.nashtech.assetmanagement.dto.request.AssignmentRequestDto;
 import com.nashtech.assetmanagement.dto.response.AssignmentResponseDto;
 import com.nashtech.assetmanagement.dto.response.ListAssignmentResponseDto;
@@ -18,7 +27,7 @@ import org.springframework.web.bind.annotation.*;
 
 import java.net.URI;
 import java.util.List;
-
+import javax.validation.Valid;
 @Tag(name = "Assignment Resources Management",
         description = "Provide the ability of assignment management and information")
 @RestController
@@ -97,5 +106,12 @@ public class AssignmentController {
     @GetMapping("/{assetId}")
     public ResponseEntity<List<AssignmentResponseDto>> getListAssignmentByAsset(@PathVariable("assetId")String assetId) {
         return new ResponseEntity<>(assignmentService.getListAssignmentByAssetCode(assetId), HttpStatus.OK);
+    }
+
+    //589 - Respond to his/her own assignment
+    @PutMapping("/update-state")
+    public ResponseEntity<?> updateAssignmentStatus(@Valid @RequestBody ChangeAssignmentStateRequestDto changeAssignmentStateRequestDto) {
+        MessageResponse messageResponse = assignmentService.updateAssignmentState(changeAssignmentStateRequestDto);
+        return new ResponseEntity<>(messageResponse, messageResponse.getStatus());
     }
 }

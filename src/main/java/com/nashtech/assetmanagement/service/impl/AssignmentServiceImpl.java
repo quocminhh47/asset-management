@@ -7,10 +7,14 @@ import java.util.stream.Collectors;
 
 import com.nashtech.assetmanagement.exception.DateInvalidException;
 import lombok.extern.slf4j.Slf4j;
+import com.nashtech.assetmanagement.dto.request.ChangeAssignmentStateRequestDto;
+import com.nashtech.assetmanagement.dto.response.MessageResponse;
+import com.nashtech.assetmanagement.entities.AssignmentId;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 
 import com.nashtech.assetmanagement.dto.request.AssignmentRequestDto;
@@ -31,6 +35,10 @@ import com.nashtech.assetmanagement.service.AssignmentService;
 import com.nashtech.assetmanagement.utils.StateConverter;
 import lombok.AllArgsConstructor;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.bind.annotation.RequestBody;
+
+import javax.validation.Valid;
+import java.sql.Date;
 import java.sql.SQLException;
 
 import static java.rmi.server.LogStream.log;
@@ -138,4 +146,33 @@ public class AssignmentServiceImpl implements AssignmentService {
 		List<AssignmentResponseDto> listResponse = assignmentMapper.mapperListAssignment(listEntity);
 		return listResponse;
 	}
+
+    //589 - Respond to his/her own assignment
+    @Override
+    public MessageResponse updateAssignmentState(ChangeAssignmentStateRequestDto changeAssignmentStateRequestDto) {
+        if(changeAssignmentStateRequestDto.getState().equalsIgnoreCase("Waiting for acceptance")) {
+            return new MessageResponse(HttpStatus.CONFLICT, "Assignment state request is not valid", new java.util.Date());
+        }
+        AssignmentId assignmentId = new AssignmentId(
+                changeAssignmentStateRequestDto.getAssignedTo(),
+                changeAssignmentStateRequestDto.getAssetCode(),
+                changeAssignmentStateRequestDto.getAssignedDate());
+        Assignment assignment = assignmentRepository.findById(assignmentId).orElseThrow(
+                () -> new ResourceNotFoundException("Cannot find assignment with assignment id: " + assignmentId));
+        if(!assignment.getState().equalsIgnoreCase("Waiting for acceptance")) {
+            return new MessageResponse(HttpStatus.CONFLICT, "Assignment state must be: Waiting for acceptance", new java.util.Date());
+        }
+
+        // Change asset state -> Available When Decline assignment
+        if(changeAssignmentStateRequestDto.getState().equalsIgnoreCase("Decline")) {
+            Asset asset = assetRepository.findById(changeAssignmentStateRequestDto.getAssetCode()).orElseThrow(
+                    () -> new ResourceNotFoundException("Cannot find asset with asset code: " + changeAssignmentStateRequestDto.getAssetCode()));
+            asset.setState(AssetState.AVAILABLE);
+            assetRepository.save(asset);
+        }
+
+        assignment.setState(changeAssignmentStateRequestDto.getState());
+        assignmentRepository.save(assignment);
+        return new MessageResponse(HttpStatus.OK, "Update assignment state to " + changeAssignmentStateRequestDto.getState() + " successfully!", new java.util.Date());
+    }
 }

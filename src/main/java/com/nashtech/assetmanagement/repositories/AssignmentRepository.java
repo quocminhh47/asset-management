@@ -3,6 +3,7 @@ package com.nashtech.assetmanagement.repositories;
 import java.sql.Date;
 import java.util.List;
 
+import com.nashtech.assetmanagement.entities.AssignmentId;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -13,7 +14,7 @@ import com.nashtech.assetmanagement.entities.Asset;
 import com.nashtech.assetmanagement.entities.Assignment;
 import com.nashtech.assetmanagement.entities.Users;
 
-public interface AssignmentRepository extends JpaRepository<Assignment, String> {
+public interface AssignmentRepository extends JpaRepository<Assignment, AssignmentId> {
 
     List<Assignment> findByAsset(Asset asset);
 
