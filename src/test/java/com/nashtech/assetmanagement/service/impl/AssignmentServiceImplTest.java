@@ -1,21 +1,23 @@
 package com.nashtech.assetmanagement.service.impl;
 
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.mockito.ArgumentMatchers.eq;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
 
-import java.sql.Date;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Optional;
-import java.util.stream.Collectors;
-
+import com.nashtech.assetmanagement.dto.request.AssignmentRequestDto;
 import com.nashtech.assetmanagement.dto.request.ChangeAssignmentStateRequestDto;
+import com.nashtech.assetmanagement.dto.response.AssignmentResponseDto;
 import com.nashtech.assetmanagement.dto.response.MessageResponse;
+import com.nashtech.assetmanagement.entities.Asset;
+import com.nashtech.assetmanagement.entities.Assignment;
 import com.nashtech.assetmanagement.entities.AssignmentId;
+import com.nashtech.assetmanagement.entities.Users;
+import com.nashtech.assetmanagement.enums.AssetState;
+import com.nashtech.assetmanagement.exception.DateInvalidException;
+import com.nashtech.assetmanagement.exception.NotUniqueException;
+import com.nashtech.assetmanagement.exception.ResourceNotFoundException;
+import com.nashtech.assetmanagement.mapper.AssignmentContent;
+import com.nashtech.assetmanagement.mapper.AssignmentMapper;
+import com.nashtech.assetmanagement.repositories.AssetRepository;
+import com.nashtech.assetmanagement.repositories.AssignmentRepository;
+import com.nashtech.assetmanagement.repositories.UserRepository;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -27,170 +29,177 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 
-import com.nashtech.assetmanagement.dto.request.AssignmentRequestDto;
-import com.nashtech.assetmanagement.dto.response.AssignmentResponseDto;
-import com.nashtech.assetmanagement.dto.response.ListAssignmentResponseDto;
-import com.nashtech.assetmanagement.entities.Asset;
-import com.nashtech.assetmanagement.entities.Assignment;
-import com.nashtech.assetmanagement.entities.Users;
-import com.nashtech.assetmanagement.enums.AssetState;
-import com.nashtech.assetmanagement.exception.DateInvalidException;
-import com.nashtech.assetmanagement.exception.NotUniqueException;
-import com.nashtech.assetmanagement.exception.ResourceNotFoundException;
-import com.nashtech.assetmanagement.mapper.AssignmentContent;
-import com.nashtech.assetmanagement.mapper.AssignmentMapper;
-import com.nashtech.assetmanagement.repositories.AssetRepository;
-import com.nashtech.assetmanagement.repositories.AssignmentRepository;
-import com.nashtech.assetmanagement.repositories.UserRepository;
-import com.nashtech.assetmanagement.utils.StateConverter;
+import java.sql.Date;
+import java.util.List;
+import java.util.Optional;
+
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.*;
 
 class AssignmentServiceImplTest {
 
-	AssignmentRepository assignmentRepository;
-	AssignmentContent assignmentContent;
-	UserRepository userRepository;
-	AssetRepository assetRepository;
-	AssignmentMapper assignmentMapper;
-	AssignmentServiceImpl assignmentServiceImpl;
-	List<String> states;
+    AssignmentRepository assignmentRepository;
+    AssignmentContent assignmentContent;
+    UserRepository userRepository;
+    AssetRepository assetRepository;
+    AssignmentMapper assignmentMapper;
+    AssignmentServiceImpl assignmentServiceImpl;
+    List<String> states;
 
-	@BeforeEach
-	void setUp() {
-		assignmentRepository = mock(AssignmentRepository.class);
-		assignmentContent = mock(AssignmentContent.class);
-		userRepository = mock(UserRepository.class);
-		assetRepository = mock(AssetRepository.class);
-		assignmentMapper = mock(AssignmentMapper.class);
-		assignmentServiceImpl = new AssignmentServiceImpl(assignmentRepository, assignmentContent, userRepository,
-				assetRepository, assignmentMapper);
 
-		String[] stateArray = { "accepted", "declined" };
+    @BeforeEach
+    void setUp() {
+        assignmentRepository = mock(AssignmentRepository.class);
+        assignmentContent = mock(AssignmentContent.class);
+        userRepository = mock(UserRepository.class);
+        assetRepository = mock(AssetRepository.class);
+        assignmentMapper = mock(AssignmentMapper.class);
+        assignmentServiceImpl = new AssignmentServiceImpl(assignmentRepository, assignmentContent, userRepository,
+                assetRepository, assignmentMapper);
 
-		states = Arrays.asList(stateArray);
+    }
 
-	}
+    @DisplayName("When all parameters of the request are valid then return ListAssignmentResponseDto - positive case")
+    @Test
+    void getAssignmentsByCondition_ShouldReturnListAssignmentResponseDto_WhenAllParametersIsValid() {
+        // given
+        int pageNo = 0;
+        int pageSize = 1;
+        String text = "SD0001";
+        String assignedDate = "2022-02-02";
+        states = List.of("accepted", "declined");
 
-	@DisplayName("Given valid date and valid condition then return list assignment response positive case")
-	@Test
-	void givenValidCondition_whenGetAssignmentsByCondition_thenReturnListAssignmentResponse() {
-		// given
-		ListAssignmentResponseDto expectedResponse = mock(ListAssignmentResponseDto.class);
+        var textCaptor = ArgumentCaptor.forClass(String.class);
+        var listCaptor = ArgumentCaptor.forClass(List.class);
+        var pageableCaptor = ArgumentCaptor.forClass(Pageable.class);
+        var dateCaptor = ArgumentCaptor.forClass(Date.class);
+        var pageCaptor = ArgumentCaptor.forClass(Page.class);
 
-		List<String> assignedState = states.stream().map(StateConverter::getAssignmentState)
-				.collect(Collectors.toList());
+        //when
+        assignmentServiceImpl.getAssignmentsByCondition(pageNo, pageSize, text, states, assignedDate);
+        //then
+        verify(assignmentRepository).getAssignmentByConditions(
+                textCaptor.capture(),
+                listCaptor.capture(),
+                dateCaptor.capture(),
+                pageableCaptor.capture());
 
-		assertThat(assignedState.size()).isEqualTo(2);
-		assertThat(assignedState.get(0)).isEqualTo("Accepted");
-		assertThat(assignedState.get(1)).isEqualTo("Declined");
+        assertThat(textCaptor.getValue()).isEqualTo(text.toLowerCase());
+        assertThat(listCaptor.getValue()).isEqualTo(List.of("Accepted", "Declined"));
+        assertThat(dateCaptor.getValue()).isEqualTo(Date.valueOf(assignedDate));
+        assertThat(pageableCaptor.getValue()).isEqualTo(PageRequest.of(pageNo, pageSize));
 
-		Pageable pageable = PageRequest.of(0, 1);
-		Page<Assignment> assignmentPage = mock(Page.class);
-		String assignedDateStr = "2022-06-06";
-		Date assignedDate = Date.valueOf(assignedDateStr); // pattern: yyyy/mm/dd
-		Date dateNow = new Date(new java.util.Date().getTime());
-		assertThat(assignedDate.before(dateNow)).isTrue();
-		when(assignmentRepository.getAssignmentByConditions("SD".toLowerCase(), assignedState, assignedDate, pageable))
-				.thenReturn(assignmentPage);
-		when(assignmentContent.getAssignmentResponse(assignmentPage)).thenReturn(expectedResponse);
+        verify(assignmentContent).getAssignmentResponse(pageCaptor.capture());
+        assertThat(pageCaptor.getValue()).isEqualTo(assignmentRepository.getAssignmentByConditions(
+                textCaptor.capture(),
+                listCaptor.capture(),
+                dateCaptor.capture(),
+                pageableCaptor.capture()));
+    }
 
-		// when
-		ListAssignmentResponseDto actualResponse = assignmentServiceImpl.getAssignmentsByCondition(0, 1, "SD", states,
-				assignedDateStr);
-		// then
-		assertThat(actualResponse).isEqualTo(expectedResponse);
-	}
+    @DisplayName("When the date string of the request is blank then get assignments without assigned date")
+    @Test
+    void getAssignmentsByCondition_ShouldReturnListAssignmentResponseDto_WhenDateStringIsBlank() {
+        //given
+        int pageNo = 0;
+        int pageSize = 1;
+        String text = "SD0001";
+        String assignedDate = "";
+        states = List.of("accepted", "declined");
 
-	@Test
-	void givenWithoutDateCondition_whenGetAssignmentsByCondition_thenReturnListAssignmentResponse() {
-		// given
-		ListAssignmentResponseDto expectedResponse = mock(ListAssignmentResponseDto.class);
+        var textCaptor = ArgumentCaptor.forClass(String.class);
+        var listCaptor = ArgumentCaptor.forClass(List.class);
+        var pageableCaptor = ArgumentCaptor.forClass(Pageable.class);
+        var pageCaptor = ArgumentCaptor.forClass(Page.class);
 
-		List<String> assignedState = states.stream().map(StateConverter::getAssignmentState)
-				.collect(Collectors.toList());
+        //when
+        assignmentServiceImpl.getAssignmentsByCondition(pageNo, pageSize, text, states, assignedDate);
 
-        assertThat(assignedState.size()).isEqualTo(2);
-        assertThat(assignedState.get(0)).isEqualTo("Accepted");
-        assertThat(assignedState.get(1)).isEqualTo("Declined");
+        //then
+        verify(assignmentRepository)
+                .getAssignmentWithoutAssignedDate(textCaptor.capture(), listCaptor.capture(), pageableCaptor.capture());
 
-        String assignedDateStr = " ";
+        assertThat(textCaptor.getValue()).isEqualTo(text.toLowerCase());
+        assertThat(listCaptor.getValue()).isEqualTo(List.of("Accepted", "Declined"));
+        assertThat(pageableCaptor.getValue()).isEqualTo(PageRequest.of(pageNo, pageSize));
 
-		Pageable pageable = PageRequest.of(0, 1);
-		Page<Assignment> assignmentPage = mock(Page.class);
-		when(assignmentRepository.getAssignmentWithoutAssignedDate("SD".toLowerCase(), assignedState, pageable))
-				.thenReturn(assignmentPage);
-		when(assignmentContent.getAssignmentResponse(assignmentPage)).thenReturn(expectedResponse);
+        verify(assignmentContent).getAssignmentResponse(pageCaptor.capture());
+        assertThat(pageCaptor.getValue()).isEqualTo(assignmentRepository.getAssignmentWithoutAssignedDate(
+                textCaptor.getValue(),
+                listCaptor.getValue(),
+                pageableCaptor.getValue()));
+    }
 
-		// when
-		ListAssignmentResponseDto actualResponse = assignmentServiceImpl.getAssignmentsByCondition(0, 1, "SD", states,
-				assignedDateStr);
-		// then
-		assertThat(actualResponse).isEqualTo(expectedResponse);
+    @Test
+    void getAssignmentsByCondition_ShouldThrowsException_whenTheDateFormatIsInvalid() {
+        // given
+        int pageNo = 0;
+        int pageSize = 1;
+        String text = "SD0001";
+        String assignedDateStr = "abc-123";
+        states = List.of("accepted", "declined");
 
-	}
+        // when
+        DateInvalidException exception = assertThrows(DateInvalidException.class,
+                () -> assignmentServiceImpl.getAssignmentsByCondition(
+                        pageNo, pageSize, text, states,  assignedDateStr));
 
-	@DisplayName("Given invalid date when get list assignments then throw exception- negative case")
-	@Test
-	void givenInvalidDate_whenGetAssignmentsByCondition_thenThrowsException() {
-		// given
-		List<String> assignedState = states.stream().map(StateConverter::getAssignmentState)
-				.collect(Collectors.toList());
-		String invalidFormatDate = "20230-06-06";
-		// when
-		DateInvalidException invalidDateFormatExcep = Assertions.assertThrows(DateInvalidException.class,
-				() -> assignmentServiceImpl.getAssignmentsByCondition(0, 1, "", assignedState, invalidFormatDate));
-		// then
-		Date dateNow = new Date(new java.util.Date().getTime());
-		assertThat(invalidDateFormatExcep.getMessage()).isEqualTo("Date.format.is.not.valid");
-	}
+        //then
+        assertThat(exception.getMessage()).isEqualTo("Date.format.is.not.valid");
 
-	// US584 Create New Assignment
-	@Test
-	void createNewAssignment_ShouldReturnResponseAssignmentDto_WhenRequestValid() {
-		AssignmentRequestDto request = mock(AssignmentRequestDto.class);
-		when(request.getAssignedTo()).thenReturn("assignTo");
-		when(request.getAssignedBy()).thenReturn("assignBy");
-		when(request.getAssetCode()).thenReturn("assetCode");
-		Asset asset = mock(Asset.class);
-		Users assignBy = mock(Users.class);
-		Users assignTo = mock(Users.class);
-		Assignment assignment = mock(Assignment.class);
-		AssignmentResponseDto response = mock(AssignmentResponseDto.class);
-		when(assetRepository.findById("assetCode")).thenReturn(Optional.of(asset));
-		when(userRepository.findById("assignBy")).thenReturn(Optional.of(assignBy));
-		when(userRepository.findById("assignTo")).thenReturn(Optional.of(assignTo));
-		when(assignmentMapper.MapRequestAssignmentToAssignment(request)).thenReturn(assignment);
-		when(assignmentMapper.MapAssignmentToResponseDto(assignment)).thenReturn(response);
-		AssignmentResponseDto result = assignmentServiceImpl.createNewAssignment(request);
-		verify(asset).setState(AssetState.ASSIGNED);
-		verify(assignment).setAssignedTo(assignTo);
-		verify(assignment).setAssignedBy(assignBy);
-		verify(assignment).setAsset(asset);
-		verify(assignmentRepository).save(assignment);
-		assertThat(result).isEqualTo(response);
-	}
+    }
 
-	@Test
-	void createNewAssignment_ShouldThrowResourceNotFoundEx_WhenAssetCodeNotExist() {
-		Asset asset = mock(Asset.class);
-		AssignmentRequestDto request = mock(AssignmentRequestDto.class);
-		when(assetRepository.findById("assetCode")).thenReturn(Optional.empty());
-		ResourceNotFoundException e = Assertions.assertThrows(ResourceNotFoundException.class,
-				() -> assignmentServiceImpl.createNewAssignment(request));
-		assertThat(e.getMessage()).isEqualTo("AssetCode not found");
-	}
 
-	@Test
-	void createNewAssignment_ShouldThrowResourceNotFoundEx_WhenUserAssignToNotExist() {
-		Asset asset = mock(Asset.class);
-		AssignmentRequestDto request = mock(AssignmentRequestDto.class);
-		when(request.getAssetCode()).thenReturn("assetCode");
-		when(request.getAssignedTo()).thenReturn("assignTo");
-		when(assetRepository.findById("assetCode")).thenReturn(Optional.of(asset));
-		when(userRepository.findById("assignTo")).thenReturn(Optional.empty());
-		ResourceNotFoundException e = Assertions.assertThrows(ResourceNotFoundException.class,
-				() -> assignmentServiceImpl.createNewAssignment(request));
-		assertThat(e.getMessage()).isEqualTo("Assign to User not found");
-	}
+    // US584 Create New Assignment
+    @Test
+    void createNewAssignment_ShouldReturnResponseAssignmentDto_WhenRequestValid() {
+        AssignmentRequestDto request = mock(AssignmentRequestDto.class);
+        when(request.getAssignedTo()).thenReturn("assignTo");
+        when(request.getAssignedBy()).thenReturn("assignBy");
+        when(request.getAssetCode()).thenReturn("assetCode");
+        Asset asset = mock(Asset.class);
+        Users assignBy = mock(Users.class);
+        Users assignTo = mock(Users.class);
+        Assignment assignment = mock(Assignment.class);
+        AssignmentResponseDto response = mock(AssignmentResponseDto.class);
+        when(assetRepository.findById("assetCode")).thenReturn(Optional.of(asset));
+        when(userRepository.findById("assignBy")).thenReturn(Optional.of(assignBy));
+        when(userRepository.findById("assignTo")).thenReturn(Optional.of(assignTo));
+        when(assignmentMapper.MapRequestAssignmentToAssignment(request)).thenReturn(assignment);
+        when(assignmentMapper.MapAssignmentToResponseDto(assignment)).thenReturn(response);
+        AssignmentResponseDto result = assignmentServiceImpl.createNewAssignment(request);
+        verify(asset).setState(AssetState.ASSIGNED);
+        verify(assignment).setAssignedTo(assignTo);
+        verify(assignment).setAssignedBy(assignBy);
+        verify(assignment).setAsset(asset);
+        verify(assignmentRepository).save(assignment);
+        assertThat(result).isEqualTo(response);
+    }
+
+    @Test
+    void createNewAssignment_ShouldThrowResourceNotFoundEx_WhenAssetCodeNotExist() {
+        Asset asset = mock(Asset.class);
+        AssignmentRequestDto request = mock(AssignmentRequestDto.class);
+        when(assetRepository.findById("assetCode")).thenReturn(Optional.empty());
+        ResourceNotFoundException e = Assertions.assertThrows(ResourceNotFoundException.class,
+                () -> assignmentServiceImpl.createNewAssignment(request));
+        assertThat(e.getMessage()).isEqualTo("AssetCode not found");
+    }
+
+    @Test
+    void createNewAssignment_ShouldThrowResourceNotFoundEx_WhenUserAssignToNotExist() {
+        Asset asset = mock(Asset.class);
+        AssignmentRequestDto request = mock(AssignmentRequestDto.class);
+        when(request.getAssetCode()).thenReturn("assetCode");
+        when(request.getAssignedTo()).thenReturn("assignTo");
+        when(assetRepository.findById("assetCode")).thenReturn(Optional.of(asset));
+        when(userRepository.findById("assignTo")).thenReturn(Optional.empty());
+        ResourceNotFoundException e = Assertions.assertThrows(ResourceNotFoundException.class,
+                () -> assignmentServiceImpl.createNewAssignment(request));
+        assertThat(e.getMessage()).isEqualTo("Assign to User not found");
+    }
 
     @Test
     void createNewAssignment_ShouldThrowResourceNotFoundEx_WhenUserAssignByNotExist() {
@@ -207,6 +216,7 @@ class AssignmentServiceImplTest {
                 () -> assignmentServiceImpl.createNewAssignment(request));
         assertThat(e.getMessage()).isEqualTo("Assign by User not found");
     }
+
     @Test
     void createNewAssignment_ShouldThrowNotUniqueEx_WhenRequestSameId() {
         AssignmentRequestDto request = mock(AssignmentRequestDto.class);
@@ -221,61 +231,61 @@ class AssignmentServiceImplTest {
         assertThat(e.getMessage()).isEqualTo("AssignmentId.is.exist");
     }
 
-	@Test
-	void getListAssignmentByAsset_ShouldReturnListAssignmentDto_WhenAssetIdExist() {
-		Asset entity = mock(Asset.class);
-		List<Assignment> listEntity = mock(List.class);
-		List<AssignmentResponseDto> expected = mock(List.class);
-    	when(assetRepository.findById("Laptop001")).thenReturn(Optional.of(entity));
-    	when(assignmentRepository.findByAsset(entity)).thenReturn(listEntity);
-    	when(assignmentMapper.mapperListAssignment(listEntity)).thenReturn(expected);
+    @Test
+    void getListAssignmentByAsset_ShouldReturnListAssignmentDto_WhenAssetIdExist() {
+        Asset entity = mock(Asset.class);
+        List<Assignment> listEntity = mock(List.class);
+        List<AssignmentResponseDto> expected = mock(List.class);
+        when(assetRepository.findById("Laptop001")).thenReturn(Optional.of(entity));
+        when(assignmentRepository.findByAsset(entity)).thenReturn(listEntity);
+        when(assignmentMapper.mapperListAssignment(listEntity)).thenReturn(expected);
 
-    	List<AssignmentResponseDto> actual = assignmentServiceImpl.getListAssignmentByAssetCode("Laptop001");
-    	assertThat(actual).isEqualTo(expected);
+        List<AssignmentResponseDto> actual = assignmentServiceImpl.getListAssignmentByAssetCode("Laptop001");
+        assertThat(actual).isEqualTo(expected);
     }
 
     @Test
     void getListAssignmentByAsset_ShouldReturnListAssignmentDto_WhenAssetIdNotExist() {
-    	when(assetRepository.findById("Laptop001")).thenReturn(Optional.empty());
-    	Exception exception = assertThrows(ResourceNotFoundException.class, () -> {
-    		assignmentServiceImpl.getListAssignmentByAssetCode("Laptop001");
-		});
-		assertThat(exception.getMessage()).isEqualTo("asset.not.found.with.code:Laptop001");
-	}
+        when(assetRepository.findById("Laptop001")).thenReturn(Optional.empty());
+        Exception exception = assertThrows(ResourceNotFoundException.class, () -> {
+            assignmentServiceImpl.getListAssignmentByAssetCode("Laptop001");
+        });
+        assertThat(exception.getMessage()).isEqualTo("asset.not.found.with.code:Laptop001");
+    }
 
-	@Test
-	void getListAssignmentByUser_whenThrowResourceNotFound_whenUserIdNotExist() {
-		Users user = mock(Users.class);
-		when(userRepository.findById("SD001")).thenReturn(Optional.empty());
-		Exception exception = assertThrows(ResourceNotFoundException.class, () -> {
-			assignmentServiceImpl.getListAssignmentByUser("SD001", "code", "ASC");
-		});
-		assertThat(exception.getMessage()).isEqualTo("user.not.found.with.code:SD001");
-	}
+    @Test
+    void getListAssignmentByUser_whenThrowResourceNotFound_whenUserIdNotExist() {
+        Users user = mock(Users.class);
+        when(userRepository.findById("SD001")).thenReturn(Optional.empty());
+        Exception exception = assertThrows(ResourceNotFoundException.class, () -> {
+            assignmentServiceImpl.getListAssignmentByUser("SD001", "code", "ASC");
+        });
+        assertThat(exception.getMessage()).isEqualTo("user.not.found.with.code:SD001");
+    }
 
 	@Test
 	void getListAssignmentByUser_whenReturnListAssignmentDto_whenUserIdExist() {
-		Users user = mock(Users.class);
-		Page<Assignment> pageAssignment = mock(Page.class);
-		List<Assignment> listAssignment = mock(List.class);
-		List<AssignmentResponseDto> expectList = mock(List.class);
-		
-		when(userRepository.findById("SD001")).thenReturn(Optional.of(user));
-		when(assignmentRepository.getListAssignmentByUser(eq("SD001"), Mockito.any(Pageable.class))).thenReturn(pageAssignment);
-		when(pageAssignment.getContent()).thenReturn(listAssignment);
-		when(assignmentMapper.mapperListAssignment(listAssignment)).thenReturn(expectList);
-		
-	
-		List<AssignmentResponseDto> actual = assignmentServiceImpl.getListAssignmentByUser("SD001", "code", "ASC");
-	
-		ArgumentCaptor<Pageable> captor = ArgumentCaptor.forClass(Pageable.class);
-		verify(assignmentRepository).getListAssignmentByUser(eq("SD001"), captor.capture());
-		Pageable pageable = captor.getValue();
-		
-		assertThat(pageable.getPageSize()).isEqualTo(20);
-		assertThat(pageable.getPageNumber()).isEqualTo(0);
-		assertThat(pageable.getSort().ascending()).isEqualTo(Sort.by("code"));
-		assertThat(actual).isEqualTo(expectList);
+        Users user = mock(Users.class);
+        Page<Assignment> pageAssignment = mock(Page.class);
+        List<Assignment> listAssignment = mock(List.class);
+        List<AssignmentResponseDto> expectList = mock(List.class);
+
+        when(userRepository.findById("SD001")).thenReturn(Optional.of(user));
+        when(assignmentRepository.getListAssignmentByUser(eq("SD001"), Mockito.any(Pageable.class))).thenReturn(pageAssignment);
+        when(pageAssignment.getContent()).thenReturn(listAssignment);
+        when(assignmentMapper.mapperListAssignment(listAssignment)).thenReturn(expectList);
+
+
+        List<AssignmentResponseDto> actual = assignmentServiceImpl.getListAssignmentByUser("SD001", "code", "ASC");
+
+        ArgumentCaptor<Pageable> captor = ArgumentCaptor.forClass(Pageable.class);
+        verify(assignmentRepository).getListAssignmentByUser(eq("SD001"), captor.capture());
+        Pageable pageable = captor.getValue();
+
+        assertThat(pageable.getPageSize()).isEqualTo(20);
+        assertThat(pageable.getPageNumber()).isEqualTo(0);
+        assertThat(pageable.getSort().ascending()).isEqualTo(Sort.by("code"));
+        assertThat(actual).isEqualTo(expectList);
 	}
 
 	//589 - Respond to his/her own assignment

@@ -141,9 +141,9 @@ public class AssetServiceImpl implements AssetService {
 		Asset asset = assetRepository.findById(assetCode).orElseThrow(
 				() -> new ResourceNotFoundException("Asset." + assetCode + ".not.found"));
 
-		if(asset.getState().equals(AssetState.ASSIGNED))
+		if(asset.getState().equals(AssetState.ASSIGNED)) {
 			throw new IllegalStateException("Asset."+ assetCode + ".is.being.assigned.Cannot modify");
-
+		}
 		Asset mappedAsset = assetMapper.mapEditAssetRequestToEntity(editAssetRequest, asset);
 		Asset savedAsset = assetRepository.save(mappedAsset);
 		return assetMapper.mapToEditAssetResponse(savedAsset);

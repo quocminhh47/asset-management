@@ -127,18 +127,16 @@ public class AssetServiceImplTest {
 
 	@DisplayName("Given valid asset request then edit asset - positive case")
 	@Test
-	void givenValidAssetRequest_whenEditAsset_thenReturnEditAssetResponse() {
+	void editAsset_ShouldReturnEditAssetResponseDto_whenTheRequestIsValid() {
 		// given
 		String assetCode = "LA100001";
-		AssetState acceptableAssetState = AssetState.AVAILABLE;
-
 		Asset existAsset = mock(Asset.class);
 		Asset mappedAsset = mock(Asset.class);
 		Asset savedAsset = mock(Asset.class);
 		EditAssetResponseDto expectedResponse = mock(EditAssetResponseDto.class);
 
 		when(assetRepository.findById(assetCode)).thenReturn(Optional.of(existAsset));
-		when(existAsset.getState()).thenReturn(acceptableAssetState);
+		when(existAsset.getState()).thenReturn(request.getState());
 		when(assetMapper.mapEditAssetRequestToEntity(request, existAsset)).thenReturn(mappedAsset);
 		when(assetRepository.save(mappedAsset)).thenReturn(savedAsset);
 		when(assetMapper.mapToEditAssetResponse(savedAsset)).thenReturn(expectedResponse);
@@ -152,7 +150,7 @@ public class AssetServiceImplTest {
 
 	@DisplayName("Given asset with ASSIGNED state then throw exception - negative case")
 	@Test
-	void givenInvalidState_whenEditAsset_thenThrowsException() {
+	void editAsset_ShouldThrowsException_whenAssetStateIsAssigned() {
 		// given
 		String assetCode = "LA100001";
 		Asset existAsset = mock(Asset.class);
@@ -173,7 +171,7 @@ public class AssetServiceImplTest {
 
 	@DisplayName("Given non exist asset then throw 404 exception - negative case")
 	@Test
-	void givenNonExistAsset_whenEditAsset_thenThrowsException() {
+	void editAsset_ShouldThrowsException_WhenAssetIsNotExist() {
 		// given
 		String assetCode = "LA100001";
 		when(assetRepository.findById(assetCode)).thenReturn(Optional.empty());

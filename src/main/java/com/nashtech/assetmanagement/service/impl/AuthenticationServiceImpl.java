@@ -23,7 +23,6 @@ public class AuthenticationServiceImpl implements AuthenticationService {
     @Override
     public Users getUser() {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-//        if(authentication.getName().equals(ANONYMOUS_USER)) return null;
         return userRepository.findByUserName(authentication.getName())
                 .orElseThrow(() -> new ResourceNotFoundException(
                         String.format("User %s not found", authentication.getName())));

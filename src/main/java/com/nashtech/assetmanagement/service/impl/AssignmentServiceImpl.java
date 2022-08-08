@@ -1,29 +1,16 @@
 package com.nashtech.assetmanagement.service.impl;
 
-import java.sql.Date;
-import java.util.List;
-import java.util.Optional;
-import java.util.stream.Collectors;
-
-import com.nashtech.assetmanagement.exception.DateInvalidException;
-import lombok.extern.slf4j.Slf4j;
-import com.nashtech.assetmanagement.dto.request.ChangeAssignmentStateRequestDto;
-import com.nashtech.assetmanagement.dto.response.MessageResponse;
-import com.nashtech.assetmanagement.entities.AssignmentId;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Pageable;
-import org.springframework.data.domain.Sort;
-import org.springframework.http.HttpStatus;
-import org.springframework.stereotype.Service;
-
 import com.nashtech.assetmanagement.dto.request.AssignmentRequestDto;
+import com.nashtech.assetmanagement.dto.request.ChangeAssignmentStateRequestDto;
 import com.nashtech.assetmanagement.dto.response.AssignmentResponseDto;
 import com.nashtech.assetmanagement.dto.response.ListAssignmentResponseDto;
+import com.nashtech.assetmanagement.dto.response.MessageResponse;
 import com.nashtech.assetmanagement.entities.Asset;
 import com.nashtech.assetmanagement.entities.Assignment;
+import com.nashtech.assetmanagement.entities.AssignmentId;
 import com.nashtech.assetmanagement.entities.Users;
 import com.nashtech.assetmanagement.enums.AssetState;
+import com.nashtech.assetmanagement.exception.DateInvalidException;
 import com.nashtech.assetmanagement.exception.NotUniqueException;
 import com.nashtech.assetmanagement.exception.ResourceNotFoundException;
 import com.nashtech.assetmanagement.mapper.AssignmentContent;
@@ -34,14 +21,19 @@ import com.nashtech.assetmanagement.repositories.UserRepository;
 import com.nashtech.assetmanagement.service.AssignmentService;
 import com.nashtech.assetmanagement.utils.StateConverter;
 import lombok.AllArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
+import org.springframework.http.HttpStatus;
+import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.web.bind.annotation.RequestBody;
 
-import javax.validation.Valid;
 import java.sql.Date;
 import java.sql.SQLException;
-
-import static java.rmi.server.LogStream.log;
+import java.util.List;
+import java.util.Optional;
+import java.util.stream.Collectors;
 
 @Service
 @AllArgsConstructor
@@ -64,7 +56,7 @@ public class AssignmentServiceImpl implements AssignmentService {
                 .collect(Collectors.toList());
 
         Pageable pageable = PageRequest.of(pageNo, pageSize);
-        Page<Assignment> assignmentPage = null;
+        Page<Assignment> assignmentPage ;
         Date assignedDate;
 
         if (!assignedDateStr.replaceAll(" ", "").isBlank()) {

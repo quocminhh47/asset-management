@@ -22,6 +22,7 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.ArgumentCaptor;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
@@ -92,40 +93,52 @@ public class UserServiceImplTest {
     }
 
     @Test
-    void givenSearchCondition_whenGetUsersBySearchOrFilter_thenReturnListUsersResponse() {
+    void getAllUsersBySearchingStaffCodeOrNameOrRole_ShouldReturnListUsersResponseDto_WhenTheRequestIsValid() {
         //given
+        int pageNo = 1;
+        int pageSize = 10;
+        String sortBy = "firstName";
+        String sortDirection = "ASC";
+        String searchText = "SD0001";
         Users user = mock(Users.class);
+        List roles = List.of("ADMIN", "STAFF");
         Location location = mock(Location.class);
-        ListUsersResponseDto expectedResponse = mock(ListUsersResponseDto.class);
+
         when(authenticationService.getUser()).thenReturn(user);
-        when(user.getStaffCode()).thenReturn("SD001");
+        when(user.getStaffCode()).thenReturn("SD0001");
         when(user.getLocation()).thenReturn(location);
         when(location.getCode()).thenReturn("HCM");
-        Sort sort = mock(Sort.class);
-        Pageable pageable = PageRequest.of(0, 1, defaultSorting("fistName", "ASC"));
-        Page<Users> usersPage = mock(Page.class);
-        List<String> roles = mock(List.class);
-        when(userRepository.searchByStaffCodeOrNameWithRole(
-                "SD".toLowerCase(),
-                "SD001".replaceAll(" ", ""),
-                "HCM".toLowerCase(),
-                roles,
-                pageable
-        )).thenReturn(usersPage);
-        when(usersContent.getUsersContent(usersPage)).thenReturn(expectedResponse);
+        PageRequest pageRequest = mock(PageRequest.class);
 
+        var pageableCaptor = ArgumentCaptor.forClass(Pageable.class);
+        var pageCaptor = ArgumentCaptor.forClass(Page.class);
+        var textCaptor = ArgumentCaptor.forClass(String.class);
+        var staffCodeCaptor = ArgumentCaptor.forClass(String.class);
+        var locationCaptor = ArgumentCaptor.forClass(String.class);
         //when
-        ListUsersResponseDto actualResponse =
-                userServiceImpl.getAllUsersBySearchingStaffCodeOrNameOrRole(
-                        0,
-                        1,
-                        "fistName",
-                        "ASC",
-                        "SD",
-                        roles);
+        userServiceImpl.getAllUsersBySearchingStaffCodeOrNameOrRole(
+                pageNo, pageSize, sortBy, sortDirection, searchText, roles);
 
         //then
-        assertThat(actualResponse).isEqualTo(expectedResponse);
+        verify(userRepository).searchByStaffCodeOrNameWithRole(
+                textCaptor.capture(),
+                staffCodeCaptor.capture(),
+                locationCaptor.capture(),
+                eq(roles),
+                pageableCaptor.capture());
+        assertThat(textCaptor.getValue()).isEqualTo(searchText.toLowerCase());
+        assertThat(staffCodeCaptor.getValue()).isEqualTo("SD0001".replaceAll(" ",""));
+        assertThat(locationCaptor.getValue()).isEqualTo("HCM".toLowerCase());
+        assertThat(pageableCaptor.getValue())
+                .isEqualTo(PageRequest.of(pageNo, pageSize, Sort.by(sortBy).ascending()));
+
+        verify(usersContent).getUsersContent(pageCaptor.capture());
+        assertThat(pageCaptor.getValue()).isEqualTo(userRepository.searchByStaffCodeOrNameWithRole(
+                textCaptor.capture(),
+                staffCodeCaptor.capture(),
+                locationCaptor.capture(),
+                eq(roles),
+                pageableCaptor.capture()));
     }
 
     @Test
