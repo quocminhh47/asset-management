@@ -154,14 +154,12 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public List<UserContentResponseDto> getUsersByStaffCodeOrNameAndLocationCode(String text, String locationCode) {
-        Optional<Location> location = locationRepository.findById(locationCode);
-        if (location.isEmpty()) {
-            throw new ResourceNotFoundException("Location code not found");
-        }
-        List<Users> usersList = userRepository.findByStaffCodeOrNameAndLocationCode(text.toLowerCase(), locationCode);
-        List<UserContentResponseDto> userDtoList = userMapper.mapListUserToListUserDto(usersList);
-        return userDtoList;
+    public List<UserContentResponseDto> getUsersByStaffCodeOrNameAndLocationCode(String text) {
+        Users users = authenticationService.getUser();
+        Location location = users.getLocation();
+        List<Users> usersList = userRepository.findByStaffCodeOrNameAndLocationCode(text.toLowerCase(), location.getCode());
+        List<UserContentResponseDto> responseList = userMapper.mapListUserToListUserDto(usersList);
+        return responseList;
     }
 
 

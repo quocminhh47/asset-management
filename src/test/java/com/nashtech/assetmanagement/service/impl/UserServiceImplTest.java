@@ -222,19 +222,14 @@ public class UserServiceImplTest {
         List<Users> usersList = mock(ArrayList.class);
         List<UserContentResponseDto> responseList = mock(ArrayList.class);
         Location location = mock(Location.class);
-        when(locationRepository.findById("HCM")).thenReturn(Optional.of(location));
+        Users users = mock(Users.class);
+        when(authenticationService.getUser()).thenReturn(users);
+        when(users.getLocation()).thenReturn(location);
+        when(location.getCode()).thenReturn("HCM");
         when(userRepository.findByStaffCodeOrNameAndLocationCode("text", "HCM")).thenReturn(usersList);
         when(userMapper.mapListUserToListUserDto(usersList)).thenReturn(responseList);
-        List<UserContentResponseDto> result = userServiceImpl.getUsersByStaffCodeOrNameAndLocationCode("text", "HCM");
+        List<UserContentResponseDto> result = userServiceImpl.getUsersByStaffCodeOrNameAndLocationCode("text");
         assertThat(result).isEqualTo(responseList);
-    }
-
-    @Test
-    void getUserByStaffCodeOrName_ShouldThrowResourceNotFoundEx_WhenLocationCodeIncorrect() {
-        when(locationRepository.findById("HCM")).thenReturn(Optional.empty());
-        ResourceNotFoundException e = Assertions.assertThrows(ResourceNotFoundException.class,
-                () -> userServiceImpl.getUsersByStaffCodeOrNameAndLocationCode("text", "HCM"));
-        assertThat(e.getMessage()).isEqualTo("Location code not found");
     }
 
     @Test

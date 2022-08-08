@@ -94,16 +94,15 @@ public class AssetController {
                     content = {@Content(examples = {@ExampleObject()})}),
             @ApiResponse(responseCode = "401", description = "UNAUTHORIZED - The request is unauthorized"),
             @ApiResponse(responseCode = "403", description = "FORBIDDEN - You don’t have permission to access"),
-            @ApiResponse(responseCode = "404", description = "NOT FOUND - The asset resource is not found"),
+            @ApiResponse(responseCode = "404", description = "NOT FOUND - Can not read user in authentication"),
             @ApiResponse(responseCode = "500",
                     description = "Internal Error - There were some error while processing in server",
                     content = {@Content(examples = {@ExampleObject()})})
     })
-    @GetMapping("/searching/{location}")
-    public ResponseEntity<?> searchAssetByCodeOrName(@RequestParam("text") String text,
-                                                           @PathVariable("location") String locationCode) {
+    @GetMapping("/searching")
+    public ResponseEntity<?> searchAssetByCodeOrName(@RequestParam("text") String text) {
         HashMap<String,Object> hashMap = new HashMap<>();
-        List<AssetResponseDto> result = assetService.getAssetByCodeOrNameAndLocationCode(text, locationCode);
+        List<AssetResponseDto> result = assetService.getAssetByCodeOrNameAndLocationCode(text);
         hashMap.put("list_asset", result);
         hashMap.put("total", result.size());
         return ResponseEntity.ok(hashMap);

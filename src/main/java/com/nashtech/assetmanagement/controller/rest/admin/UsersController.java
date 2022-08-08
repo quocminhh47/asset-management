@@ -101,15 +101,15 @@ public class UsersController {
                     content = {@Content(examples = {@ExampleObject()})}),
             @ApiResponse(responseCode = "401", description = "UNAUTHORIZED - The request is unauthorized"),
             @ApiResponse(responseCode = "403", description = "FORBIDDEN - You don’t have permission to access"),
-            @ApiResponse(responseCode = "404", description = "NOT FOUND - The user resource is not found"),
+            @ApiResponse(responseCode = "404", description = "NOT FOUND - Can not read user in authentication"),
             @ApiResponse(responseCode = "500",
                     description = "Internal Error - There were some error while processing in server",
                     content = {@Content(examples = {@ExampleObject()})})
     })
-    @GetMapping("/searching/{location}")
-    public ResponseEntity<?> getUserListByStaffCodeOrName(@RequestParam("text") String text, @PathVariable("location") String locationCode) {
+    @GetMapping("/searching")
+    public ResponseEntity<?> getUserListByStaffCodeOrName(@RequestParam("text") String text) {
         HashMap<String,Object> hashMap = new HashMap<>();
-        List<UserContentResponseDto> result = this.userService.getUsersByStaffCodeOrNameAndLocationCode(text, locationCode);
+        List<UserContentResponseDto> result = this.userService.getUsersByStaffCodeOrNameAndLocationCode(text);
         hashMap.put("list_user", result);
         hashMap.put("total", result.size());
         return ResponseEntity.ok(hashMap);

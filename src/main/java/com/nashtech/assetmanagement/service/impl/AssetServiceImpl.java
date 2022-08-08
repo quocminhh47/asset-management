@@ -124,12 +124,10 @@ public class AssetServiceImpl implements AssetService {
 	}
 
 	@Override
-	public List<AssetResponseDto> getAssetByCodeOrNameAndLocationCode(String text, String locationCode) {
-		Optional<Location> locationOptional = locationRepository.findById(locationCode);
-		if (locationOptional.isEmpty()) {
-			throw new ResourceNotFoundException("Location code not found");
-		}
-		List<Asset> assetList = assetRepository.findAssetByNameOrCodeAndLocationCode(text.toLowerCase(), locationCode);
+	public List<AssetResponseDto> getAssetByCodeOrNameAndLocationCode(String text) {
+		Users users = authenticationService.getUser();
+		Location location = users.getLocation();
+		List<Asset> assetList = assetRepository.findAssetByNameOrCodeAndLocationCode(text.toLowerCase(), location.getCode());
 		List<AssetResponseDto> responseList = assetMapper.getAssetListToResponseAssetDTOList(assetList);
 		return responseList;
 	}

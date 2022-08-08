@@ -104,22 +104,17 @@ public class AssetServiceImplTest {
 	// US584-CreateNewAssignment
 	@Test
 	void getAssetList_ShouldReturnResponseAssetDtoList_WhenAssetExist() {
+		Users users = mock(Users.class);
 		Location location = mock(Location.class);
 		List<Asset> assetList = mock(ArrayList.class);
 		List<AssetResponseDto> responseList = mock(ArrayList.class);
-		when(locationRepository.findById("locationCode")).thenReturn(Optional.of(location));
+		when(authenticationServiceImpl.getUser()).thenReturn(users);
+		when(users.getLocation()).thenReturn(location);
+		when(location.getCode()).thenReturn("locationCode");
 		when(assetRepository.findAssetByNameOrCodeAndLocationCode("text", "locationCode")).thenReturn(assetList);
 		when(assetMapper.getAssetListToResponseAssetDTOList(assetList)).thenReturn(responseList);
-		List<AssetResponseDto> result = assetServiceImpl.getAssetByCodeOrNameAndLocationCode("text", "locationCode");
+		List<AssetResponseDto> result = assetServiceImpl.getAssetByCodeOrNameAndLocationCode("text");
 		assertThat(result).isEqualTo(responseList);
-	}
-
-	@Test
-	void getAssetList_ShouldThrowResourceNotFoundEx_WhenLocationCodeIncorrect() {
-		when(locationRepository.findById("HCM")).thenReturn(Optional.empty());
-		ResourceNotFoundException e = Assertions.assertThrows(ResourceNotFoundException.class,
-				() -> assetServiceImpl.getAssetByCodeOrNameAndLocationCode("text", "HCM"));
-		AssertionsForClassTypes.assertThat(e.getMessage()).isEqualTo("Location code not found");
 	}
 
 	@DisplayName("Given valid asset request then edit asset - positive case")

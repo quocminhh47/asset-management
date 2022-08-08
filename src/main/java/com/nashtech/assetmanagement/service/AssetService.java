@@ -12,7 +12,7 @@ public interface AssetService {
     ListAssetResponseDto getListAsset(String userId, List<String> categoryId, List<String> state, String keyword,
                                       String sortBy, String sortDirection, Integer page, Integer size);
 
-    List<AssetResponseDto> getAssetByCodeOrNameAndLocationCode(String text, String locationCode);
+    List<AssetResponseDto> getAssetByCodeOrNameAndLocationCode(String text);
 
     EditAssetResponseDto editAsset(EditAssetRequestDto editAssetRequest, String assetCode);
 
