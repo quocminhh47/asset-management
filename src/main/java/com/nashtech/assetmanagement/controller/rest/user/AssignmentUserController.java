@@ -10,7 +10,6 @@ import io.swagger.v3.oas.annotations.media.ExampleObject;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -60,20 +59,20 @@ public class AssignmentUserController {
 	@Operation(summary = "Change state of assignments",
 			description = "User is able to respond to his/her own assignments")
 	@ApiResponses(value = {
-			@ApiResponse(responseCode = "200", description = "OK - Successfully retrieved"),
+			@ApiResponse(responseCode = "200", description = "OK - Successfully updated"),
 			@ApiResponse(responseCode = "400",
-					description = "Bad Request - The request is invalid",
+					description = "Bad Request - Assignment state request is not valid",
 					content = {@Content(examples = {@ExampleObject()})}),
 			@ApiResponse(responseCode = "401", description = "UNAUTHORIZED - The request is unauthorized"),
 			@ApiResponse(responseCode = "403", description = "FORBIDDEN - You don’t have permission to access"),
 			@ApiResponse(responseCode = "404", description = "NOT FOUND - The assignment is not found "),
 			@ApiResponse(responseCode = "409",
-					description = "CONFLICT - Assignment state request is not valid"),
+					description = "CONFLICT - Assignment state in database is Accepted or Declined"),
 			@ApiResponse(responseCode = "500",
 					description = "Internal Error - There were some error while processing in server",
 					content = {@Content(examples = {@ExampleObject()})})
 	})
-	@PutMapping("/update-state")
+	@PutMapping("/state")
 	public ResponseEntity<?> updateAssignmentStatus(@Valid @RequestBody ChangeAssignmentStateRequestDto changeAssignmentStateRequestDto) {
 		MessageResponse messageResponse = assignmentService.updateAssignmentState(changeAssignmentStateRequestDto);
 		return new ResponseEntity<>(messageResponse, messageResponse.getStatus());

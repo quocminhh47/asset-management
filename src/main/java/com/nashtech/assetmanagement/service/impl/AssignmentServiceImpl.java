@@ -19,6 +19,7 @@ import com.nashtech.assetmanagement.repositories.AssetRepository;
 import com.nashtech.assetmanagement.repositories.AssignmentRepository;
 import com.nashtech.assetmanagement.repositories.UserRepository;
 import com.nashtech.assetmanagement.service.AssignmentService;
+import com.nashtech.assetmanagement.utils.AppConstants;
 import com.nashtech.assetmanagement.utils.StateConverter;
 import lombok.AllArgsConstructor;
 import org.springframework.data.domain.Page;
@@ -142,9 +143,9 @@ public class AssignmentServiceImpl implements AssignmentService {
     //589 - Respond to his/her own assignment
     @Override
     public MessageResponse updateAssignmentState(ChangeAssignmentStateRequestDto changeAssignmentStateRequestDto) {
-        if( !(changeAssignmentStateRequestDto.getState().equalsIgnoreCase("Accepted"))
-            && !(changeAssignmentStateRequestDto.getState().equalsIgnoreCase("Declined"))) {
-            return new MessageResponse(HttpStatus.CONFLICT, "Assignment state request is not valid", new java.util.Date());
+        if( !(changeAssignmentStateRequestDto.getState().equalsIgnoreCase(AppConstants.ACCEPTED))
+            && !(changeAssignmentStateRequestDto.getState().equalsIgnoreCase(AppConstants.DECLINED))) {
+            return new MessageResponse(HttpStatus.BAD_REQUEST, "Assignment state request is not valid", new java.util.Date());
         }
         Users users = userRepository.findByUserName(changeAssignmentStateRequestDto.getAssignedTo()).orElseThrow(
                 () -> new ResourceNotFoundException("Cannot find user with username: " + changeAssignmentStateRequestDto.getAssignedTo()));
@@ -155,12 +156,12 @@ public class AssignmentServiceImpl implements AssignmentService {
                 changeAssignmentStateRequestDto.getAssignedDate());
         Assignment assignment = assignmentRepository.findById(assignmentId).orElseThrow(
                 () -> new ResourceNotFoundException("Cannot find assignment with assignment id: " + assignmentId));
-        if(!assignment.getState().equalsIgnoreCase("Waiting for acceptance")) {
+        if(!assignment.getState().equalsIgnoreCase(AppConstants.WAITING_FOR_ACCEPTANCE)) {
             return new MessageResponse(HttpStatus.CONFLICT, "Assignment state in database is Accepted or Declined", new java.util.Date());
         }
 
         // Change asset state -> Available When Decline assignment
-        if(changeAssignmentStateRequestDto.getState().equalsIgnoreCase("Declined")) {
+        if(changeAssignmentStateRequestDto.getState().equalsIgnoreCase(AppConstants.DECLINED)) {
             Asset asset = assetRepository.findById(changeAssignmentStateRequestDto.getAssetCode()).orElseThrow(
                     () -> new ResourceNotFoundException("Cannot find asset with asset code: " + changeAssignmentStateRequestDto.getAssetCode()));
             asset.setState(AssetState.AVAILABLE);
