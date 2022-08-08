@@ -146,8 +146,11 @@ public class AssignmentServiceImpl implements AssignmentService {
             && !(changeAssignmentStateRequestDto.getState().equalsIgnoreCase("Declined"))) {
             return new MessageResponse(HttpStatus.CONFLICT, "Assignment state request is not valid", new java.util.Date());
         }
+        Users users = userRepository.findByUserName(changeAssignmentStateRequestDto.getAssignedTo()).orElseThrow(
+                () -> new ResourceNotFoundException("Cannot find user with username: " + changeAssignmentStateRequestDto.getAssignedTo()));
+
         AssignmentId assignmentId = new AssignmentId(
-                changeAssignmentStateRequestDto.getAssignedTo(),
+                users.getStaffCode(),
                 changeAssignmentStateRequestDto.getAssetCode(),
                 changeAssignmentStateRequestDto.getAssignedDate());
         Assignment assignment = assignmentRepository.findById(assignmentId).orElseThrow(
