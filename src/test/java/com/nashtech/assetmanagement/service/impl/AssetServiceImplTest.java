@@ -78,7 +78,7 @@ public class AssetServiceImplTest {
 	}
 
     @Test
-    public void createAsset_WhenRequestValid_Expect_ReturnAsset() {
+    public void createAsset_ShouldReturnAsset_WhenRequestValid() {
         CreateAssetRequestDto requestCreateAsset = new CreateAssetRequestDto("Lap top", "LT", "good", AssetState.AVAILABLE,
                 null, "HN", "SD0001");
         // RequestCreateAsset requestCreateAsset=mock(RequestCreateAsset.class);

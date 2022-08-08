@@ -18,6 +18,9 @@ public class AppConstants {
             // other public endpoints of your API may be appended to this array
     };
 
+    private AppConstants() {
+    }
+
     public static final String ACCEPTED = "Accepted";
     public static final String WAITING_FOR_ACCEPTANCE = "Waiting for acceptance";
     public static final String DECLINED = "Declined";

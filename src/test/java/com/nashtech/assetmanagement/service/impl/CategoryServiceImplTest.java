@@ -33,7 +33,7 @@ public class CategoryServiceImplTest {
     }
 
     @Test
-    public void getAllCategory_WhenRequestValid_Expect_ReturnListCategory() {
+    public void getAllCategory_ShouldReturnListCategory_WhenRequestValid() {
         List<Category> categories = mock(List.class);
         List<CategoryResponseDto> expected = mock(List.class);
         when(categoryRepository.findAll()).thenReturn(categories);
@@ -43,7 +43,7 @@ public class CategoryServiceImplTest {
     }
 
     @Test
-    public void createCategory_WhenRequestValid_Expect_ReturnCategory() {
+    public void createCategory_ShouldReturnCategory_WhenRequestValid() {
         CategoryRequestDto requestCategoryDTO = mock(CategoryRequestDto.class);
         when(categoryMapper.RequestCategoryToCategory(requestCategoryDTO)).thenReturn(category);
         when(categoryRepository.save(category)).thenReturn(category);
@@ -54,7 +54,7 @@ public class CategoryServiceImplTest {
     }
 
     @Test
-    public void createCategory_WhenCategoryPrefixNotUnique_Expect_ReturnCategory() {
+    public void createCategory_ShouldThrowNotUniqueException_WhenCategoryPrefixNotUnique() {
         CategoryRequestDto requestCategoryDTO = new CategoryRequestDto("LT", "Laptop");
         when(categoryRepository.existsCategoriesById("LT")).thenReturn(true);
         when(categoryRepository.existsCategoriesByName("Laptop")).thenReturn(false);
@@ -65,7 +65,7 @@ public class CategoryServiceImplTest {
     }
 
     @Test
-    public void createCategory_WhenCategoryNotUnique_Expect_ReturnCategory() {
+    public void createCategory_ShouldThrowNotUniqueException_WhenCategoryNotUnique() {
         CategoryRequestDto requestCategoryDTO = new CategoryRequestDto("LT", "Laptop");
         when(categoryRepository.existsCategoriesById("LT")).thenReturn(false);
         when(categoryRepository.existsCategoriesByName("Laptop")).thenReturn(true);
