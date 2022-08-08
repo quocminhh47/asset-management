@@ -25,9 +25,7 @@ public class UserRepositoryTest {
     @Test
     void findStaffCodeList_ShouldReturnStaffCodeList_WhenStaffCodeBeginWithSDExist() {
         List<String> staffCode = userRepository.findAllStaffCode();
-        assertEquals(9, staffCode.size());
-        for (int i = 0; i < staffCode.size(); i++) {
-            String result = staffCode.get(i);
+        for (String result : staffCode) {
             assertEquals("SD", result.substring(0, 2));
         }
     }
@@ -36,10 +34,10 @@ public class UserRepositoryTest {
     void findByStaffCodeOrNameAndLocationCode_ShouldReturnUserList_WhenNameOrCodeAndLocationCodeExist() {
         List<Users> userList = userRepository.findByStaffCodeOrNameAndLocationCode(" p", "HCM");
         String pattern = "(.* [pP].*)";
-        for (int i = 0; i < userList.size(); i++) {
-            String fullname = userList.get(i).getFirstName() + ' ' + userList.get(i).getLastName();
+        for (Users users : userList) {
+            String fullname = users.getFirstName() + ' ' + users.getLastName();
             assertTrue(fullname.matches(pattern));
-            assertEquals("HCM", userList.get(i).getLocation().getCode());
+            assertEquals("HCM", users.getLocation().getCode());
         }
     }
 

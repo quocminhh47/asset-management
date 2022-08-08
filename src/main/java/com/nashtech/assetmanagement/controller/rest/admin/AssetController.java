@@ -86,7 +86,7 @@ public class AssetController {
 
 
     @Operation(summary = "Retrieved assets by asset code, name or location",
-            description = "Create new asset with name, installed date , specification and asset state ")
+            description = "Get assets with  given name or code and location of asset")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "OK - Successfully retrieved"),
             @ApiResponse(responseCode = "400",
@@ -100,9 +100,9 @@ public class AssetController {
                     content = {@Content(examples = {@ExampleObject()})})
     })
     @GetMapping("/searching/{location}")
-    public ResponseEntity<HashMap> searchAssetByCodeOrName(@RequestParam("text") String text,
+    public ResponseEntity<?> searchAssetByCodeOrName(@RequestParam("text") String text,
                                                            @PathVariable("location") String locationCode) {
-        HashMap hashMap = new HashMap<>();
+        HashMap<String,Object> hashMap = new HashMap<>();
         List<AssetResponseDto> result = assetService.getAssetByCodeOrNameAndLocationCode(text, locationCode);
         hashMap.put("list_asset", result);
         hashMap.put("total", result.size());
