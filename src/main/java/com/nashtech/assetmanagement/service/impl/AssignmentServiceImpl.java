@@ -150,7 +150,8 @@ public class AssignmentServiceImpl implements AssignmentService {
     //589 - Respond to his/her own assignment
     @Override
     public MessageResponse updateAssignmentState(ChangeAssignmentStateRequestDto changeAssignmentStateRequestDto) {
-        if(changeAssignmentStateRequestDto.getState().equalsIgnoreCase("Waiting for acceptance")) {
+        if( !(changeAssignmentStateRequestDto.getState().equalsIgnoreCase("Accepted"))
+            && !(changeAssignmentStateRequestDto.getState().equalsIgnoreCase("Declined"))) {
             return new MessageResponse(HttpStatus.CONFLICT, "Assignment state request is not valid", new java.util.Date());
         }
         AssignmentId assignmentId = new AssignmentId(
@@ -160,11 +161,11 @@ public class AssignmentServiceImpl implements AssignmentService {
         Assignment assignment = assignmentRepository.findById(assignmentId).orElseThrow(
                 () -> new ResourceNotFoundException("Cannot find assignment with assignment id: " + assignmentId));
         if(!assignment.getState().equalsIgnoreCase("Waiting for acceptance")) {
-            return new MessageResponse(HttpStatus.CONFLICT, "Assignment state must be: Waiting for acceptance", new java.util.Date());
+            return new MessageResponse(HttpStatus.CONFLICT, "Assignment state in database is Accepted or Declined", new java.util.Date());
         }
 
         // Change asset state -> Available When Decline assignment
-        if(changeAssignmentStateRequestDto.getState().equalsIgnoreCase("Decline")) {
+        if(changeAssignmentStateRequestDto.getState().equalsIgnoreCase("Declined")) {
             Asset asset = assetRepository.findById(changeAssignmentStateRequestDto.getAssetCode()).orElseThrow(
                     () -> new ResourceNotFoundException("Cannot find asset with asset code: " + changeAssignmentStateRequestDto.getAssetCode()));
             asset.setState(AssetState.AVAILABLE);

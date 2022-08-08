@@ -108,10 +108,4 @@ public class AssignmentController {
         return new ResponseEntity<>(assignmentService.getListAssignmentByAssetCode(assetId), HttpStatus.OK);
     }
 
-    //589 - Respond to his/her own assignment
-    @PutMapping("/update-state")
-    public ResponseEntity<?> updateAssignmentStatus(@Valid @RequestBody ChangeAssignmentStateRequestDto changeAssignmentStateRequestDto) {
-        MessageResponse messageResponse = assignmentService.updateAssignmentState(changeAssignmentStateRequestDto);
-        return new ResponseEntity<>(messageResponse, messageResponse.getStatus());
-    }
 }
