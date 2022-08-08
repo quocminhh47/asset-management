@@ -9,6 +9,7 @@ import com.nashtech.assetmanagement.exception.UnauthorizedException;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.validation.FieldError;
 import org.springframework.validation.ObjectError;
 import org.springframework.web.bind.MethodArgumentNotValidException;
@@ -66,7 +67,7 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
     @ExceptionHandler({NotUniqueException.class})
     protected ResponseEntity<ErrorResponseMessageDto> handleNotUniqueException(RuntimeException exception) {
         ErrorResponseMessageDto responseErrorMessage =
-                new ErrorResponseMessageDto(HttpStatus.CONFLICT, exception.getMessage(),
+                new ErrorResponseMessageDto(HttpStatus.BAD_REQUEST, exception.getMessage(),
                         new Date());
         return new ResponseEntity<>(responseErrorMessage, responseErrorMessage.getStatus());
     }
@@ -93,6 +94,12 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
         return handleExceptionInternal(
                 ex, apiError, headers, apiError.getStatus(), request);
     }
-
+    @ExceptionHandler(BadCredentialsException.class)
+    protected ResponseEntity<ErrorResponseMessageDto> handleBadCredentialsException(RuntimeException exception) {
+        ErrorResponseMessageDto responseErrorMessage =
+                new ErrorResponseMessageDto(HttpStatus.UNAUTHORIZED, exception.getMessage(),
+                        new Date());
+        return new ResponseEntity<>(responseErrorMessage, responseErrorMessage.getStatus());
+    }
 
 }

@@ -5,6 +5,7 @@ import java.util.Date;
 import java.util.List;
 import java.util.Optional;
 
+import com.nashtech.assetmanagement.service.AuthenticationService;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -55,6 +56,8 @@ public class AssetServiceImpl implements AssetService {
 
 	private final AssignmentRepository assignmentRepository;
 
+	private final AuthenticationService authenticationService;
+
 	public String generateAssetCode(String prefix) {
 		String code;
 		do {
@@ -65,19 +68,14 @@ public class AssetServiceImpl implements AssetService {
 
 	@Override
 	public ResponseAssetDto createAsset(CreateAssetRequestDto requestCreateAsset) {
+		Users users=authenticationService.getUser();
 		Asset asset = assetMapper.requestAssetToAsset(requestCreateAsset);
 		asset.setCode(generateAssetCode(requestCreateAsset.getCategoryId()));
 		Category category = categoryRepository.findById(requestCreateAsset.getCategoryId())
 				.orElseThrow(() -> new ResourceNotFoundException(
 						"Can not find category has code: " + requestCreateAsset.getCategoryId()));
 		asset.setCategory(category);
-		Location location = locationRepository.findById(requestCreateAsset.getLocationId())
-				.orElseThrow(() -> new ResourceNotFoundException(
-						"Can not find " + "category has code: " + requestCreateAsset.getLocationId()));
-		asset.setLocation(location);
-		Users users = userRepository.findById(requestCreateAsset.getUserId())
-				.orElseThrow(() -> new ResourceNotFoundException(
-						"Can not find " + "user has id: " + requestCreateAsset.getUserId()));
+		asset.setLocation(users.getLocation());
 		asset.setUser(users);
 		asset = assetRepository.save(asset);
 		return assetMapper.assetToResponseAssetDTO(asset);

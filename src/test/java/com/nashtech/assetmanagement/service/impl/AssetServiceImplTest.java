@@ -13,6 +13,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 
+import org.apache.catalina.User;
 import org.assertj.core.api.AssertionsForClassTypes;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
@@ -59,12 +60,15 @@ public class AssetServiceImplTest {
 	private AssignmentRepository assignmentRepository;
 
 	private AssetServiceImpl assetServiceImpl;
+
+	private AuthenticationServiceImpl authenticationServiceImpl;
 	EditAssetRequestDto request;
 	AssetState newAssetState = AssetState.NOT_AVAILABLE;
 
 	@BeforeEach
 	void setUp() {
 		asset = mock(Asset.class);
+		authenticationServiceImpl=mock(AuthenticationServiceImpl.class);
 		assetRepository = mock(AssetRepository.class);
 		assetMapper = mock(AssetMapper.class);
 		locationRepository = mock(LocationRepository.class);
@@ -72,7 +76,7 @@ public class AssetServiceImplTest {
 		userRepository = mock(UserRepository.class);
 		assignmentRepository = mock(AssignmentRepository.class);
 		assetServiceImpl = new AssetServiceImpl(assetRepository, categoryRepository, userRepository, locationRepository,
-				assetMapper, assignmentRepository);
+				assetMapper, assignmentRepository,authenticationServiceImpl);
 
 		request = new EditAssetRequestDto("Dell inspriration 5432", "CPU 7200U, RAM 16GB", "2022-01-01", newAssetState);
 	}
@@ -80,27 +84,20 @@ public class AssetServiceImplTest {
     @Test
     public void createAsset_ShouldReturnAsset_WhenRequestValid() {
         CreateAssetRequestDto requestCreateAsset = new CreateAssetRequestDto("Lap top", "LT", "good", AssetState.AVAILABLE,
-                null, "HN", "SD0001");
-        // RequestCreateAsset requestCreateAsset=mock(RequestCreateAsset.class);
+                null);
+		Users users=mock(Users.class);
+		when(authenticationServiceImpl.getUser()).thenReturn(users);
         when(assetMapper.requestAssetToAsset(requestCreateAsset)).thenReturn(asset);
         Category category = mock(Category.class);
         Optional<Category> categoryOptional = Optional.of(category);
-        Location location = mock(Location.class);
-        Optional<Location> locationOptional = Optional.of(location);
-        Users users = mock(Users.class);
-        Optional<Users> usersOptional = Optional.of(users);
-        when(userRepository.findById("SD0001")).thenReturn(usersOptional);
         when(categoryRepository.findById("LT")).thenReturn(categoryOptional);
-        when(locationRepository.findById("HN")).thenReturn(locationOptional);
         when(assetRepository.save(asset)).thenReturn(asset);
         ResponseAssetDto expected = mock(ResponseAssetDto.class);
         when(assetMapper.assetToResponseAssetDTO(asset)).thenReturn(expected);
         ResponseAssetDto actual = assetServiceImpl.createAsset(requestCreateAsset);
         ArgumentCaptor<String> assetCodeCapture = ArgumentCaptor.forClass(java.lang.String.class);
         verify(asset).setCode(assetCodeCapture.capture());
-        verify(asset).setLocation(location);
         verify(asset).setCategory(category);
-        verify(asset).setUser(users);
         assertThat(actual).isEqualTo(expected);
     }
 
