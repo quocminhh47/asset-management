@@ -38,4 +38,7 @@ public class Assignment {
     @Column()
     private String note;
 
+    @OneToOne(mappedBy = "assignment")
+    private RequestReturning requestReturning;
+
 }
