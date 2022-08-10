@@ -1,6 +1,7 @@
 package com.nashtech.assetmanagement.mapper;
 
 import com.nashtech.assetmanagement.dto.request.UserRequestDto;
+import com.nashtech.assetmanagement.dto.response.ListSearchingUserResponseDto;
 import com.nashtech.assetmanagement.dto.response.SingleUserResponseDto;
 import com.nashtech.assetmanagement.dto.response.UserContentResponseDto;
 import com.nashtech.assetmanagement.dto.response.UserResponseDto;
@@ -47,9 +48,10 @@ public class UserMapper {
         users.setRole(role);
     }
 
-    public List<UserContentResponseDto> mapListUserToListUserDto(List<Users> usersList) {
-        List<UserContentResponseDto> result = usersList.stream().map(users -> mapper.map(users, UserContentResponseDto.class)).collect(Collectors.toList());
-        return result;
+    public ListSearchingUserResponseDto mapListUserToListUserDto(List<Users> usersList) {
+        List<UserContentResponseDto> responseList = usersList.stream().map(users -> mapper.map(users, UserContentResponseDto.class)).collect(Collectors.toList());
+        ListSearchingUserResponseDto responseDto = new ListSearchingUserResponseDto(responseList.size(),responseList);
+        return responseDto;
     }
 
 }

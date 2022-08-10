@@ -102,13 +102,13 @@ public class AssetServiceImplTest {
 		Users users = mock(Users.class);
 		Location location = mock(Location.class);
 		List<Asset> assetList = mock(ArrayList.class);
-		List<AssetResponseDto> responseList = mock(ArrayList.class);
+		ListSearchingAssetResponseDto responseList = mock(ListSearchingAssetResponseDto.class);
 		when(authenticationServiceImpl.getUser()).thenReturn(users);
 		when(users.getLocation()).thenReturn(location);
 		when(location.getCode()).thenReturn("locationCode");
 		when(assetRepository.findAssetByNameOrCodeAndLocationCode("text", "locationCode")).thenReturn(assetList);
 		when(assetMapper.getAssetListToResponseAssetDTOList(assetList)).thenReturn(responseList);
-		List<AssetResponseDto> result = assetServiceImpl.getAssetByCodeOrNameAndLocationCode("text");
+		ListSearchingAssetResponseDto result = assetServiceImpl.getAssetByCodeOrNameAndLocationCode("text");
 		assertThat(result).isEqualTo(responseList);
 	}
 

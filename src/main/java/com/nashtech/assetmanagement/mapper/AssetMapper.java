@@ -36,10 +36,11 @@ public class AssetMapper {
         return result;
     }
 
-    public List<AssetResponseDto> getAssetListToResponseAssetDTOList(List<Asset> assetList) {
+    public ListSearchingAssetResponseDto getAssetListToResponseAssetDTOList(List<Asset> assetList) {
         List<AssetResponseDto> responseList = assetList.stream()
                 .map(asset -> mapper.map(asset, AssetResponseDto.class)).collect(Collectors.toList());
-        return responseList;
+        ListSearchingAssetResponseDto responseDto = new ListSearchingAssetResponseDto(responseList.size(),responseList);
+        return responseDto;
     }
 
     public Asset mapEditAssetRequestToEntity(EditAssetRequestDto request, Asset asset) {

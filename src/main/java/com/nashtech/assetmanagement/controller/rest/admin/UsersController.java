@@ -107,12 +107,8 @@ public class UsersController {
                     content = {@Content(examples = {@ExampleObject()})})
     })
     @GetMapping("/searching")
-    public ResponseEntity<?> getUserListByStaffCodeOrName(@RequestParam("text") String text) {
-        HashMap<String,Object> hashMap = new HashMap<>();
-        List<UserContentResponseDto> result = this.userService.getUsersByStaffCodeOrNameAndLocationCode(text);
-        hashMap.put("list_user", result);
-        hashMap.put("total", result.size());
-        return ResponseEntity.ok(hashMap);
+    public ResponseEntity<ListSearchingUserResponseDto> getUserListByStaffCodeOrName(@RequestParam("text") String text) {
+        return ResponseEntity.ok(this.userService.getUsersByStaffCodeOrNameAndLocationCode(text));
     }
 
 

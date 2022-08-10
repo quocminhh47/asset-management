@@ -120,12 +120,12 @@ public class AssetServiceImpl implements AssetService {
 	}
 
 	@Override
-	public List<AssetResponseDto> getAssetByCodeOrNameAndLocationCode(String text) {
+	public ListSearchingAssetResponseDto getAssetByCodeOrNameAndLocationCode(String text) {
 		Users users = authenticationService.getUser();
 		Location location = users.getLocation();
 		List<Asset> assetList = assetRepository.findAssetByNameOrCodeAndLocationCode(text.toLowerCase(), location.getCode());
-		List<AssetResponseDto> responseList = assetMapper.getAssetListToResponseAssetDTOList(assetList);
-		return responseList;
+		ListSearchingAssetResponseDto listSearchingAssetResponseDto = assetMapper.getAssetListToResponseAssetDTOList(assetList);
+		return listSearchingAssetResponseDto;
 	}
 
 	@Override

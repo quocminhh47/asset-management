@@ -22,7 +22,7 @@ public interface UserService {
 
     LocationResponseDto getLocationByStaffCode(String staffCode);
 
-    List<UserContentResponseDto> getUsersByStaffCodeOrNameAndLocationCode(String text);
+    ListSearchingUserResponseDto getUsersByStaffCodeOrNameAndLocationCode(String text);
 
     UserPrinciple loadUserByUsername(String userName)
             throws UsernameNotFoundException;

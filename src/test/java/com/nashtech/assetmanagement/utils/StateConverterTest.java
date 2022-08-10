@@ -25,7 +25,7 @@ class StateConverterTest {
         assertThat(convertedState1).isEqualTo(WAITING_FOR_ACCEPTANCE);
         assertThat(convertedState2).isEqualTo(ACCEPTED);
         assertThat(convertedState3).isEqualTo(DECLINED);
-        assertThat(convertedState4).isEqualTo(null);
+        assertThat(convertedState4).isNull();
 
     }
 

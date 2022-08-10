@@ -101,12 +101,8 @@ public class AssetController {
                     content = {@Content(examples = {@ExampleObject()})})
     })
     @GetMapping("/searching")
-    public ResponseEntity<?> searchAssetByCodeOrName(@RequestParam("text") String text) {
-        HashMap<String,Object> hashMap = new HashMap<>();
-        List<AssetResponseDto> result = assetService.getAssetByCodeOrNameAndLocationCode(text);
-        hashMap.put("list_asset", result);
-        hashMap.put("total", result.size());
-        return ResponseEntity.ok(hashMap);
+    public ResponseEntity<ListSearchingAssetResponseDto> searchAssetByCodeOrName(@RequestParam("text") String text) {
+        return ResponseEntity.ok(this.assetService.getAssetByCodeOrNameAndLocationCode(text));
     }
 
 

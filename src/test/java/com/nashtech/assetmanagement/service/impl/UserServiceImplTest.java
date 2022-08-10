@@ -220,16 +220,16 @@ public class UserServiceImplTest {
     @Test
     void getUserByStaffCodeOrName_ShouldReturnUserDtoList_WhenStaffCodeOrNameExist() {
         List<Users> usersList = mock(ArrayList.class);
-        List<UserContentResponseDto> responseList = mock(ArrayList.class);
+        ListSearchingUserResponseDto responseDto = mock(ListSearchingUserResponseDto.class);
         Location location = mock(Location.class);
         Users users = mock(Users.class);
         when(authenticationService.getUser()).thenReturn(users);
         when(users.getLocation()).thenReturn(location);
         when(location.getCode()).thenReturn("HCM");
         when(userRepository.findByStaffCodeOrNameAndLocationCode("text", "HCM")).thenReturn(usersList);
-        when(userMapper.mapListUserToListUserDto(usersList)).thenReturn(responseList);
-        List<UserContentResponseDto> result = userServiceImpl.getUsersByStaffCodeOrNameAndLocationCode("text");
-        assertThat(result).isEqualTo(responseList);
+        when(userMapper.mapListUserToListUserDto(usersList)).thenReturn(responseDto);
+        ListSearchingUserResponseDto result = userServiceImpl.getUsersByStaffCodeOrNameAndLocationCode("text");
+        assertThat(result).isEqualTo(responseDto);
     }
 
     @Test
