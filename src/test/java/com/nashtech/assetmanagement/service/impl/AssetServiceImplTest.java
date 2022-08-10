@@ -13,8 +13,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 
-import org.apache.catalina.User;
-import org.assertj.core.api.AssertionsForClassTypes;
+import com.nashtech.assetmanagement.dto.response.*;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -22,15 +21,11 @@ import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Mockito;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 
 import com.nashtech.assetmanagement.dto.request.EditAssetRequestDto;
 import com.nashtech.assetmanagement.dto.request.CreateAssetRequestDto;
-import com.nashtech.assetmanagement.dto.response.AssetResponseDto;
-import com.nashtech.assetmanagement.dto.response.EditAssetResponseDto;
-import com.nashtech.assetmanagement.dto.response.ListAssetResponseDto;
-import com.nashtech.assetmanagement.dto.response.ResponseAssetDto;
-import com.nashtech.assetmanagement.dto.response.MessageResponse;
 import com.nashtech.assetmanagement.entities.Asset;
 import com.nashtech.assetmanagement.entities.Assignment;
 import com.nashtech.assetmanagement.entities.Category;
@@ -345,5 +340,23 @@ public class AssetServiceImplTest {
 		verify(assetRepository).delete(asset);
 
 		assertThat(responseMessage.getMessage()).isEqualTo("Delete asset successfully!");
+	}
+
+
+	@DisplayName("Given page number and page size when get report list then return AssetReportResponseDto Object")
+	@Test
+	void getAssetReportList_ShouldReturnAssetReportResponseDto_WhenRequestIsValid() {
+		//given
+		var pageableCaptor = ArgumentCaptor.forClass(Pageable.class);
+		var assetPageCaptor = ArgumentCaptor.forClass(Page.class);
+
+		//when
+		assetServiceImpl.getAssetReportList(0, 1);
+
+		//then
+		verify(assetRepository).getAssetReportList(pageableCaptor.capture());
+		assertThat(pageableCaptor.getValue()).isEqualTo(PageRequest.of(0, 1));
+
+		verify(assetMapper).mapToAssetReportDto(assetPageCaptor.capture());
 	}
 }

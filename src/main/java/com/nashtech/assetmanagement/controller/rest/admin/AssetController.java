@@ -6,6 +6,7 @@ import com.nashtech.assetmanagement.dto.request.EditAssetRequestDto;
 import com.nashtech.assetmanagement.dto.response.*;
 import com.nashtech.assetmanagement.enums.AssetState;
 import com.nashtech.assetmanagement.service.AssetService;
+import com.nashtech.assetmanagement.utils.AppConstants;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.ExampleObject;
@@ -171,5 +172,35 @@ public class AssetController {
     public ResponseEntity<List<AssetState>> getListAssetState() {
         List<AssetState> list = Arrays.asList(AssetState.values());
         return new ResponseEntity<>(list, HttpStatus.OK);
+    }
+
+
+    @Operation(summary = "Get asset report",
+            description = "As an admin, I want to view report about number of assets by" +
+                    " category and state, so that I can make decision for purchasing asset")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "OK - Successfully retrieved"),
+            @ApiResponse(responseCode = "400",
+                    description = "Bad Request - The request is invalid",
+                    content = {@Content(examples = {@ExampleObject()})}),
+            @ApiResponse(responseCode = "401", description = "UNAUTHORIZED - The request is unauthorized"),
+            @ApiResponse(responseCode = "403", description = "FORBIDDEN - You don’t have permission to access"),
+            @ApiResponse(responseCode = "404", description = "NOT FOUND - The asset resource is not found"),
+            @ApiResponse(responseCode = "409",
+                    description = "CONFLICT - The asset cannot deleted cause it's already belonged to an existing assignment"),
+            @ApiResponse(responseCode = "500",
+                    description = "Internal Error - There were some error while processing in server",
+                    content = {@Content(examples = {@ExampleObject()})})
+    })
+    @GetMapping("/report")
+    @ResponseStatus(HttpStatus.OK)
+    public AssetReportResponseDto getAssetReport(
+            @RequestParam(
+                    value = "pageNo", defaultValue = AppConstants.DEFAULT_PAGE_NUMBER, required = false)
+                    int pageNo,
+            @RequestParam(
+                    value = "pageSize", defaultValue = "12", required = false)
+                    int pageSize) {
+        return assetService.getAssetReportList(pageNo, pageSize);
     }
 }

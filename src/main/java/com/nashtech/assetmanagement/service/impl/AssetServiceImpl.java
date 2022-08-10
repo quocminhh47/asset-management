@@ -5,6 +5,7 @@ import java.util.Date;
 import java.util.List;
 import java.util.Optional;
 
+import com.nashtech.assetmanagement.dto.response.*;
 import com.nashtech.assetmanagement.service.AuthenticationService;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -15,11 +16,6 @@ import org.springframework.stereotype.Service;
 
 import com.nashtech.assetmanagement.dto.request.EditAssetRequestDto;
 import com.nashtech.assetmanagement.dto.request.CreateAssetRequestDto;
-import com.nashtech.assetmanagement.dto.response.AssetResponseDto;
-import com.nashtech.assetmanagement.dto.response.EditAssetResponseDto;
-import com.nashtech.assetmanagement.dto.response.ListAssetResponseDto;
-import com.nashtech.assetmanagement.dto.response.ResponseAssetDto;
-import com.nashtech.assetmanagement.dto.response.MessageResponse;
 import com.nashtech.assetmanagement.entities.Asset;
 import com.nashtech.assetmanagement.entities.Assignment;
 import com.nashtech.assetmanagement.entities.Category;
@@ -157,4 +153,13 @@ public class AssetServiceImpl implements AssetService {
 		assetRepository.delete(asset);
 		return new MessageResponse(HttpStatus.OK, "Delete asset successfully!", new Date());
 	}
+
+	@Override
+	public AssetReportResponseDto getAssetReportList( int pageNo, int pageSize) {
+		Pageable pageable = PageRequest.of(pageNo, pageSize);
+		Page<IAssetReportResponseDto> assetReportPage = assetRepository.getAssetReportList(pageable);
+		return assetMapper.mapToAssetReportDto(assetReportPage);
+	}
+
+
 }

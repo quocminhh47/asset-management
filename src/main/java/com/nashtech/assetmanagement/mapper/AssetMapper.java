@@ -3,12 +3,11 @@ package com.nashtech.assetmanagement.mapper;
 
 import com.nashtech.assetmanagement.dto.request.CreateAssetRequestDto;
 import com.nashtech.assetmanagement.dto.request.EditAssetRequestDto;
-import com.nashtech.assetmanagement.dto.response.AssetResponseDto;
-import com.nashtech.assetmanagement.dto.response.EditAssetResponseDto;
-import com.nashtech.assetmanagement.dto.response.ResponseAssetDto;
+import com.nashtech.assetmanagement.dto.response.*;
 import com.nashtech.assetmanagement.entities.Asset;
 import com.nashtech.assetmanagement.exception.DateInvalidException;
 import org.modelmapper.ModelMapper;
+import org.springframework.data.domain.Page;
 import org.springframework.stereotype.Component;
 
 import java.sql.Date;
@@ -62,5 +61,19 @@ public class AssetMapper {
 
     public EditAssetResponseDto mapToEditAssetResponse(Asset asset) {
         return mapper.map(asset, EditAssetResponseDto.class);
+    }
+
+
+    public AssetReportResponseDto mapToAssetReportDto(Page<IAssetReportResponseDto> iAssetPage) {
+        List<IAssetReportResponseDto> assetReportContent = iAssetPage.getContent();
+        return AssetReportResponseDto.builder()
+                .assetContent(assetReportContent)
+                .pageNo(iAssetPage.getNumber())
+                .pageSize(iAssetPage.getSize())
+                .totalElements(iAssetPage.getTotalElements())
+                .totalPages(iAssetPage.getTotalPages())
+                .last(iAssetPage.isLast())
+                .build();
+
     }
 }

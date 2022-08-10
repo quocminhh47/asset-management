@@ -1,5 +1,6 @@
 package com.nashtech.assetmanagement.repositories;
 
+import com.nashtech.assetmanagement.dto.response.IAssetReportResponseDto;
 import com.nashtech.assetmanagement.entities.Asset;
 import com.nashtech.assetmanagement.entities.Users;
 import com.nashtech.assetmanagement.enums.AssetState;
@@ -40,4 +41,16 @@ public interface AssetRepository extends JpaRepository<Asset, String> {
             " and asset.location_id =:locationCode" +
             " and state='AVAILABLE'", nativeQuery = true)
     List<Asset> findAssetByNameOrCodeAndLocationCode(String text, String locationCode);
+
+
+    @Query(value = "select c.name , " +
+            "count(1) as total ," +
+            "count(1) filter (where a.state='AVAILABLE') as available," +
+            "count(1) filter (where a.state='NOT_AVAILABLE') as notAvailable, " +
+            "count(1) filter (where a.state='RECYCLED') as recycled, " +
+            "count(1) filter (where a.state='ASSIGNED') as assigned, " +
+            "count(1) filter (where a.state='WAITING_FOR_RECYCLED') as waitingForRecycled " +
+            "from asset a inner join category c on a.category_id  = c.id " +
+            "group by c.name ", nativeQuery = true)
+    Page<IAssetReportResponseDto> getAssetReportList(Pageable pageable);
 }
