@@ -46,7 +46,7 @@ public class RequestReturning {
     @JoinColumns({
             @JoinColumn(name = "asset_code"),
             @JoinColumn(name = "assigned_date"),
-            @JoinColumn(name = "assgined_to")
+            @JoinColumn(name = "assigned_to")
     })
     private Assignment assignment;
 

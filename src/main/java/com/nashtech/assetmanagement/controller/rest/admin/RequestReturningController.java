@@ -1,7 +1,5 @@
 package com.nashtech.assetmanagement.controller.rest.admin;
 
-import java.util.Arrays;
-import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 
@@ -31,8 +29,9 @@ public class RequestReturningController {
             @RequestParam(required = false, defaultValue = "", value = "keyword") String keyword,
             @RequestParam(required = false, defaultValue = "", value = "sortBy") String sortBy,
             @RequestParam(required = false, defaultValue = "", value = "sortDirection") String sortDirection,
-            @RequestParam(required = false, defaultValue = "", value = "returnDate") Date returnDate,
-            @RequestParam(required = false, defaultValue = "", value = "states") List<String> states) {
+
+            @RequestParam(required = false, defaultValue = "", value = "returnDate") String returnDate,
+            @RequestParam(required = false, defaultValue = "", value = "states") List<String> states){
 		ListRequestReturningResponseDto result = requestReturningService.getListRequestReturning(states, returnDate, keyword, sortBy, sortDirection, page, size);
         return new ResponseEntity<ListRequestReturningResponseDto>(result, HttpStatus.OK);
     }
