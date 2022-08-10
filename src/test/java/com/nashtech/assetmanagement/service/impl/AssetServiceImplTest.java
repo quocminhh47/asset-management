@@ -359,4 +359,19 @@ public class AssetServiceImplTest {
 
 		verify(assetMapper).mapToAssetReportDto(assetPageCaptor.capture());
 	}
+
+	@DisplayName("Given all list asset report for exporting to .xlsx file")
+	@Test
+	void getAllAssetReport_ShouldReturnListAssetReportResponseDto_WhenTheRequestIsValid() {
+		//given
+		List<IAssetReportResponseDto> expectedResponse = mock(List.class);
+		when(assetRepository.getAssetReportList()).thenReturn(expectedResponse);
+
+		//when
+		List<IAssetReportResponseDto> actualResponse = assetRepository.getAssetReportList();
+
+		//then
+		assertThat(actualResponse).isEqualTo(expectedResponse);
+
+	}
 }

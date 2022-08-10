@@ -161,5 +161,9 @@ public class AssetServiceImpl implements AssetService {
 		return assetMapper.mapToAssetReportDto(assetReportPage);
 	}
 
+	@Override
+	public List<IAssetReportResponseDto> getAllAssetReport() {
+		return assetRepository.getAssetReportList();
+	}
 
 }

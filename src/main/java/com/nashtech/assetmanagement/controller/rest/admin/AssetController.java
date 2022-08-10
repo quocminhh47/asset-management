@@ -185,9 +185,7 @@ public class AssetController {
                     content = {@Content(examples = {@ExampleObject()})}),
             @ApiResponse(responseCode = "401", description = "UNAUTHORIZED - The request is unauthorized"),
             @ApiResponse(responseCode = "403", description = "FORBIDDEN - You don’t have permission to access"),
-            @ApiResponse(responseCode = "404", description = "NOT FOUND - The asset resource is not found"),
-            @ApiResponse(responseCode = "409",
-                    description = "CONFLICT - The asset cannot deleted cause it's already belonged to an existing assignment"),
+            @ApiResponse(responseCode = "404", description = "NOT FOUND - The asset report resource is not found"),
             @ApiResponse(responseCode = "500",
                     description = "Internal Error - There were some error while processing in server",
                     content = {@Content(examples = {@ExampleObject()})})
@@ -202,5 +200,25 @@ public class AssetController {
                     value = "pageSize", defaultValue = "12", required = false)
                     int pageSize) {
         return assetService.getAssetReportList(pageNo, pageSize);
+    }
+
+    @Operation(summary = "Export asset report",
+            description = "As an admin, I want to export report about number of assets by category and state, so that I can send report for stake holder")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "OK - Successfully exported"),
+            @ApiResponse(responseCode = "400",
+                    description = "Bad Request - The request is invalid",
+                    content = {@Content(examples = {@ExampleObject()})}),
+            @ApiResponse(responseCode = "401", description = "UNAUTHORIZED - The request is unauthorized"),
+            @ApiResponse(responseCode = "403", description = "FORBIDDEN - You don’t have permission to access"),
+            @ApiResponse(responseCode = "404", description = "NOT FOUND - The asset report resource is not found"),
+            @ApiResponse(responseCode = "500",
+                    description = "Internal Error - There were some error while processing in server",
+                    content = {@Content(examples = {@ExampleObject()})})
+    })
+    @GetMapping("/excel")
+    @ResponseStatus(HttpStatus.OK)
+    public List<IAssetReportResponseDto> exportToExcel() {
+        return assetService.getAllAssetReport();
     }
 }

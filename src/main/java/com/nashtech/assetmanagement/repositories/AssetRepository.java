@@ -53,4 +53,15 @@ public interface AssetRepository extends JpaRepository<Asset, String> {
             "from asset a inner join category c on a.category_id  = c.id " +
             "group by c.name ", nativeQuery = true)
     Page<IAssetReportResponseDto> getAssetReportList(Pageable pageable);
+
+    @Query(value = "select c.name , " +
+            "count(1) as total ," +
+            "count(1) filter (where a.state='AVAILABLE') as available," +
+            "count(1) filter (where a.state='NOT_AVAILABLE') as notAvailable, " +
+            "count(1) filter (where a.state='RECYCLED') as recycled, " +
+            "count(1) filter (where a.state='ASSIGNED') as assigned, " +
+            "count(1) filter (where a.state='WAITING_FOR_RECYCLED') as waitingForRecycled " +
+            "from asset a inner join category c on a.category_id  = c.id " +
+            "group by c.name ", nativeQuery = true)
+    List<IAssetReportResponseDto> getAssetReportList();
 }

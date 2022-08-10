@@ -20,4 +20,6 @@ public interface AssetService {
     MessageResponse deleteAssetByAssetCode(String assetCode);
 
     AssetReportResponseDto getAssetReportList(int pageNo, int pageSize);
+
+    List<IAssetReportResponseDto> getAllAssetReport();
 }
