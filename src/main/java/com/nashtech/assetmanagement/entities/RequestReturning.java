@@ -1,12 +1,27 @@
 package com.nashtech.assetmanagement.entities;
 
+import java.sql.Date;
+
+import javax.persistence.CascadeType;
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.EnumType;
+import javax.persistence.Enumerated;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
+import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.JoinColumns;
+import javax.persistence.ManyToOne;
+import javax.persistence.OneToOne;
+import javax.persistence.Table;
+
+import com.nashtech.assetmanagement.enums.RequestReturningState;
+
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-
-import javax.persistence.*;
-import java.sql.Date;
 
 @Entity
 @Table(name = "request_returning")
@@ -25,7 +40,7 @@ public class RequestReturning {
 
     @ManyToOne(cascade = CascadeType.ALL)
     @JoinColumn(name = "accepted_by")
-    private Users accepted_by;
+    private Users acceptedBy;
 
     @OneToOne(cascade = CascadeType.ALL)
     @JoinColumns({
@@ -38,7 +53,8 @@ public class RequestReturning {
     @Column(name = "returned_date")
     private Date returnedDate;
 
-    @Column(name = "state",length = 50)
-    private String state;
+    @Column
+    @Enumerated(EnumType.STRING)
+    private RequestReturningState state;
 
 }
