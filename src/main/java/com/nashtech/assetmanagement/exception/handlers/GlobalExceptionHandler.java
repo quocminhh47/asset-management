@@ -2,10 +2,7 @@ package com.nashtech.assetmanagement.exception.handlers;
 
 import com.nashtech.assetmanagement.dto.response.ErrorResponseDto;
 import com.nashtech.assetmanagement.dto.response.ErrorResponseMessageDto;
-import com.nashtech.assetmanagement.exception.DateInvalidException;
-import com.nashtech.assetmanagement.exception.NotUniqueException;
-import com.nashtech.assetmanagement.exception.ResourceNotFoundException;
-import com.nashtech.assetmanagement.exception.UnauthorizedException;
+import com.nashtech.assetmanagement.exception.*;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -101,5 +98,11 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
                         new Date());
         return new ResponseEntity<>(responseErrorMessage, responseErrorMessage.getStatus());
     }
-
+    @ExceptionHandler(RequestNotAcceptException.class)
+    protected ResponseEntity<ErrorResponseMessageDto> handleRequestNotAcceptException(RuntimeException exception) {
+        ErrorResponseMessageDto responseErrorMessage =
+                new ErrorResponseMessageDto(HttpStatus.NOT_ACCEPTABLE, exception.getMessage(),
+                        new Date());
+        return new ResponseEntity<>(responseErrorMessage, responseErrorMessage.getStatus());
+    }
 }

@@ -1,5 +1,6 @@
 package com.nashtech.assetmanagement.service;
 
+import com.nashtech.assetmanagement.dto.DeleteAssignmentRequestDto;
 import com.nashtech.assetmanagement.dto.request.AssignmentRequestDto;
 import com.nashtech.assetmanagement.dto.request.ChangeAssignmentStateRequestDto;
 import com.nashtech.assetmanagement.dto.response.AssignmentResponseDto;
@@ -25,4 +26,6 @@ public interface AssignmentService {
 
     //589 - Respond to his/her own assignment
     MessageResponse updateAssignmentState(ChangeAssignmentStateRequestDto changeAssignmentStateRequestDto);
+
+    MessageResponse deleteAssignment(DeleteAssignmentRequestDto deleteAssignmentRequestDto);
 }

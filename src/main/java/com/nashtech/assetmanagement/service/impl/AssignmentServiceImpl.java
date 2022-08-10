@@ -1,5 +1,6 @@
 package com.nashtech.assetmanagement.service.impl;
 
+import com.nashtech.assetmanagement.dto.DeleteAssignmentRequestDto;
 import com.nashtech.assetmanagement.dto.request.AssignmentRequestDto;
 import com.nashtech.assetmanagement.dto.request.ChangeAssignmentStateRequestDto;
 import com.nashtech.assetmanagement.dto.response.AssignmentResponseDto;
@@ -12,6 +13,7 @@ import com.nashtech.assetmanagement.entities.Users;
 import com.nashtech.assetmanagement.enums.AssetState;
 import com.nashtech.assetmanagement.exception.DateInvalidException;
 import com.nashtech.assetmanagement.exception.NotUniqueException;
+import com.nashtech.assetmanagement.exception.RequestNotAcceptException;
 import com.nashtech.assetmanagement.exception.ResourceNotFoundException;
 import com.nashtech.assetmanagement.mapper.AssignmentContent;
 import com.nashtech.assetmanagement.mapper.AssignmentMapper;
@@ -35,6 +37,9 @@ import java.sql.SQLException;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
+
+import static com.nashtech.assetmanagement.utils.AppConstants.DECLINED;
+import static com.nashtech.assetmanagement.utils.AppConstants.WAITING_FOR_ACCEPTANCE;
 
 @Service
 @AllArgsConstructor
@@ -144,7 +149,7 @@ public class AssignmentServiceImpl implements AssignmentService {
     @Override
     public MessageResponse updateAssignmentState(ChangeAssignmentStateRequestDto changeAssignmentStateRequestDto) {
         if( !(changeAssignmentStateRequestDto.getState().equalsIgnoreCase(AppConstants.ACCEPTED))
-            && !(changeAssignmentStateRequestDto.getState().equalsIgnoreCase(AppConstants.DECLINED))) {
+            && !(changeAssignmentStateRequestDto.getState().equalsIgnoreCase(DECLINED))) {
             return new MessageResponse(HttpStatus.BAD_REQUEST, "Assignment state request is not valid", new java.util.Date());
         }
         Users users = userRepository.findByUserName(changeAssignmentStateRequestDto.getAssignedTo()).orElseThrow(
@@ -156,12 +161,12 @@ public class AssignmentServiceImpl implements AssignmentService {
                 changeAssignmentStateRequestDto.getAssignedDate());
         Assignment assignment = assignmentRepository.findById(assignmentId).orElseThrow(
                 () -> new ResourceNotFoundException("Cannot find assignment with assignment id: " + assignmentId));
-        if(!assignment.getState().equalsIgnoreCase(AppConstants.WAITING_FOR_ACCEPTANCE)) {
+        if(!assignment.getState().equalsIgnoreCase(WAITING_FOR_ACCEPTANCE)) {
             return new MessageResponse(HttpStatus.CONFLICT, "Assignment state in database is Accepted or Declined", new java.util.Date());
         }
 
         // Change asset state -> Available When Decline assignment
-        if(changeAssignmentStateRequestDto.getState().equalsIgnoreCase(AppConstants.DECLINED)) {
+        if(changeAssignmentStateRequestDto.getState().equalsIgnoreCase(DECLINED)) {
             Asset asset = assetRepository.findById(changeAssignmentStateRequestDto.getAssetCode()).orElseThrow(
                     () -> new ResourceNotFoundException("Cannot find asset with asset code: " + changeAssignmentStateRequestDto.getAssetCode()));
             asset.setState(AssetState.AVAILABLE);
@@ -171,5 +176,33 @@ public class AssignmentServiceImpl implements AssignmentService {
         assignment.setState(changeAssignmentStateRequestDto.getState());
         assignmentRepository.save(assignment);
         return new MessageResponse(HttpStatus.OK, "Update assignment state to " + changeAssignmentStateRequestDto.getState() + " successfully!", new java.util.Date());
+    }
+    @Override
+    public MessageResponse deleteAssignment(DeleteAssignmentRequestDto deleteAssignmentRequestDto){
+        Users users = userRepository.findByUserName(deleteAssignmentRequestDto.getAssignedTo()).orElseThrow(
+                () -> new ResourceNotFoundException("Cannot find user with username: " + deleteAssignmentRequestDto.getAssignedTo()));
+
+        AssignmentId assignmentId = new AssignmentId(
+                users.getStaffCode(),
+                deleteAssignmentRequestDto.getAssetCode(),
+                deleteAssignmentRequestDto.getAssignedDate());
+
+        Assignment assignment = assignmentRepository.findById(assignmentId).orElseThrow(
+                () -> new ResourceNotFoundException("Cannot find assignment"));
+        String assignmentState= assignment.getState();
+        if (!(assignmentState.equalsIgnoreCase(WAITING_FOR_ACCEPTANCE)||(assignmentState.equalsIgnoreCase(DECLINED)))){
+            throw new RequestNotAcceptException("can only be deleted when the status is" +
+                    " 'Waiting for accept' and 'Declined'. Current state: '"+assignmentState.toLowerCase()+"'.");
+        }
+        assignmentRepository.delete(assignment);
+        Asset asset=assetRepository.findById(deleteAssignmentRequestDto.getAssetCode()).orElseThrow(
+                () -> new ResourceNotFoundException("Cannot find asset with id: "+deleteAssignmentRequestDto.getAssetCode()));
+
+        asset.setState(AssetState.AVAILABLE);
+
+        assetRepository.save(asset);
+
+        return new MessageResponse(HttpStatus.OK,"Assignment deleted",
+                new java.util.Date());
     }
 }

@@ -1,17 +1,10 @@
 package com.nashtech.assetmanagement.controller.rest.admin;
 
-import java.net.URI;
-import java.util.List;
-
-import com.nashtech.assetmanagement.dto.request.ChangeAssignmentStateRequestDto;
-import com.nashtech.assetmanagement.dto.response.MessageResponse;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.*;
-
+import com.nashtech.assetmanagement.dto.DeleteAssignmentRequestDto;
 import com.nashtech.assetmanagement.dto.request.AssignmentRequestDto;
 import com.nashtech.assetmanagement.dto.response.AssignmentResponseDto;
 import com.nashtech.assetmanagement.dto.response.ListAssignmentResponseDto;
+import com.nashtech.assetmanagement.dto.response.MessageResponse;
 import com.nashtech.assetmanagement.service.AssignmentService;
 import com.nashtech.assetmanagement.utils.AppConstants;
 import io.swagger.v3.oas.annotations.Operation;
@@ -26,8 +19,8 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.net.URI;
+import java.sql.Date;
 import java.util.List;
-import javax.validation.Valid;
 @Tag(name = "Assignment Resources Management",
         description = "Provide the ability of assignment management and information")
 @RestController
@@ -108,4 +101,14 @@ public class AssignmentController {
         return new ResponseEntity<>(assignmentService.getListAssignmentByAssetCode(assetId), HttpStatus.OK);
     }
 
+    @DeleteMapping
+    public MessageResponse deleteAssignment(
+            @RequestParam(value = "assignedTo") String assignedTo,
+            @RequestParam(value = "assetCode") String assetCode,
+            @RequestParam(value = "assignedDate") Date assignedDate
+    ){
+        DeleteAssignmentRequestDto deleteAssignmentRequestDto=
+                new DeleteAssignmentRequestDto(assignedTo,assetCode,assignedDate);
+        return assignmentService.deleteAssignment(deleteAssignmentRequestDto);
+    }
 }
