@@ -19,19 +19,17 @@ public interface RequestReturningRepository extends JpaRepository<RequestReturni
 	@Query("select e from RequestReturning e where"
 			+ "( (lower(e.assignment.asset.code) like lower(concat('%', :search, '%')))  or "
 			+ "  (lower(e.assignment.asset.name) like lower(concat('%', :search, '%')))  or"
-			+ "  (lower(e.requestedBy.staffCode) like lower(concat('%', :search, '%'))) )"
+			+ "  (lower(e.requestedBy.userName) like lower(concat('%', :search, '%'))) )"
 			+ "and (e.state in :state) and (e.returnedDate = :returnedDate)")
 	Page<RequestReturning> getListRequestReturning(@Param("state") List<RequestReturningState> state,
 			@Param("returnedDate") Date returnedDate, @Param("search") String search, Pageable pageable);
 
-	//587 - Create request for returning asset
 	Optional<RequestReturning> getRequestReturningByAssignment(Assignment assignment);
-
 
 	@Query("select e from RequestReturning e where"
 			+ "( (lower(e.assignment.asset.code) like lower(concat('%', :search, '%')))  or "
 			+ "  (lower(e.assignment.asset.name) like lower(concat('%', :search, '%')))  or"
-			+ "  (lower(e.requestedBy.staffCode) like lower(concat('%', :search, '%'))) )"
+			+ "  (lower(e.requestedBy.userName) like lower(concat('%', :search, '%'))) )"
 			+ "and (e.state in :state)")
 	Page<RequestReturning> getListRequestReturningByStates(@Param("state") List<RequestReturningState> state,
 			@Param("search") String search, Pageable pageable);

@@ -1,8 +1,8 @@
 package com.nashtech.assetmanagement.service.impl;
 
-import java.text.SimpleDateFormat;
+import java.sql.Date;
+
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
 import java.util.Optional;
 
@@ -23,6 +23,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
+import com.nashtech.assetmanagement.dto.request.RequestReturningRequestGetListDto;
 import com.nashtech.assetmanagement.dto.response.ListRequestReturningResponseDto;
 import com.nashtech.assetmanagement.dto.response.RequestReturningResponseDto;
 import com.nashtech.assetmanagement.enums.RequestReturningState;
@@ -47,43 +48,37 @@ public class RequestReturningServiceImpl implements RequestReturningService {
 	private RequestReturningMapper requestReturningMapper;
 
 	@Override
-	public ListRequestReturningResponseDto getListRequestReturning(List<String> states, String returnedDate,
-			String keyword, String sortBy, String sortDirection, Integer page, Integer size){
+	public ListRequestReturningResponseDto getListRequestReturning(RequestReturningRequestGetListDto dto) {
+
+		long totalItems = 0;
+		List<RequestReturning> listEntity = new ArrayList<>();
 
 		Sort.Direction sort = Sort.Direction.ASC;
-		if (sortDirection.equals("DESC")) {
+		if (dto.getSortDirection().equals("DESC")) {
 			sort = Sort.Direction.DESC;
 		}
+		
+		Pageable pageable = PageRequest.of(dto.getPage() - 1, dto.getSize(), Sort.by(sort, dto.getSortBy()));
+		List<RequestReturningState> requestReturningState = requestReturningMapper.mapperListStates(dto.getStates());
 
-		Pageable pageable = PageRequest.of(page - 1, size, Sort.by(sort, sortBy));
-
-		List<RequestReturningState> requestReturningState = new ArrayList<>();
-
-		for (int i = 0; i < states.size(); i++) {
-			requestReturningState.add(RequestReturningState.valueOf(states.get(i)));
-		}
-		long totalItems = 0;
-		Page<RequestReturning> pageRequestReturning = null;
-		if (returnedDate.equals("01/01/1000")) {
-			pageRequestReturning = requestReturningRepository.getListRequestReturningByStates(requestReturningState,
-					keyword, pageable);
+		if (dto.getReturnedDate().equals("")) {
+			Page<RequestReturning> pageRequestReturning = requestReturningRepository
+					.getListRequestReturningByStates(requestReturningState, dto.getKeyword(), pageable);
 			totalItems = pageRequestReturning.getTotalPages();
+			listEntity = pageRequestReturning.getContent();
 		} else {
-			SimpleDateFormat formatter = new SimpleDateFormat("dd/MM/yyyy");
-			Date date;
 			try {
-				date = formatter.parse(returnedDate);
+				Date date = Date.valueOf(dto.getReturnedDate());
+				Page<RequestReturning> pageRequestReturning = requestReturningRepository
+						.getListRequestReturning(requestReturningState, date, dto.getKeyword(), pageable);
+				totalItems = pageRequestReturning.getTotalPages();
+				listEntity = pageRequestReturning.getContent();
 			} catch (Exception e) {
-				throw new DateInvalidException("Date.format.is.not.valid", e);
+				throw new DateInvalidException("Date.format.is.not.valid");
 			}
-			pageRequestReturning = requestReturningRepository.getListRequestReturning(requestReturningState, date,
-					keyword, pageable);
-			totalItems = pageRequestReturning.getTotalPages();
 		}
-		List<RequestReturning> dtoEntity = pageRequestReturning.getContent();
-
-		List<RequestReturningResponseDto> listDto = requestReturningMapper.mapperListRequestReturning(dtoEntity);
-
+		
+		List<RequestReturningResponseDto> listDto = requestReturningMapper.mapperListRequestReturning(listEntity);
 		ListRequestReturningResponseDto result = new ListRequestReturningResponseDto(listDto, totalItems);
 		return result;
 	}
