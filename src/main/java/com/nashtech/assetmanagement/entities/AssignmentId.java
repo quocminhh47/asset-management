@@ -27,4 +27,5 @@ public class AssignmentId implements Serializable {
 
     @Column(name = "assigned_date")
     private Date assignedDate;
+
 }

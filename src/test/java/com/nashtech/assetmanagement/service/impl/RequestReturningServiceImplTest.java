@@ -1,9 +1,13 @@
 package com.nashtech.assetmanagement.service.impl;
 
+
+import com.nashtech.assetmanagement.dto.request.ReturningRequestDto;
+import com.nashtech.assetmanagement.dto.response.RequestReturningResponseDto;
+import com.nashtech.assetmanagement.enums.AssetState;
+import com.nashtech.assetmanagement.enums.RequestReturningState;
+import com.nashtech.assetmanagement.exception.BadRequestException;
 import static com.nashtech.assetmanagement.enums.RequestReturningState.WAITING_FOR_RETURNING;
 import static com.nashtech.assetmanagement.utils.AppConstants.ACCEPTED;
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
@@ -14,6 +18,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
+import com.nashtech.assetmanagement.repositories.UserRepository;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -29,45 +34,174 @@ import com.nashtech.assetmanagement.dto.request.CreateRequestReturningAssetReque
 import com.nashtech.assetmanagement.dto.request.RequestReturningRequestGetListDto;
 import com.nashtech.assetmanagement.dto.response.CreateRequestReturningResponseDto;
 import com.nashtech.assetmanagement.dto.response.ListRequestReturningResponseDto;
-import com.nashtech.assetmanagement.dto.response.RequestReturningResponseDto;
 import com.nashtech.assetmanagement.entities.Asset;
 import com.nashtech.assetmanagement.entities.Assignment;
 import com.nashtech.assetmanagement.entities.AssignmentId;
 import com.nashtech.assetmanagement.entities.RequestReturning;
 import com.nashtech.assetmanagement.entities.Users;
-import com.nashtech.assetmanagement.enums.RequestReturningState;
 import com.nashtech.assetmanagement.exception.ResourceNotFoundException;
 import com.nashtech.assetmanagement.mapper.RequestReturningMapper;
 import com.nashtech.assetmanagement.repositories.AssetRepository;
 import com.nashtech.assetmanagement.repositories.AssignmentRepository;
 import com.nashtech.assetmanagement.repositories.RequestReturningRepository;
-import com.nashtech.assetmanagement.repositories.UserRepository;
+import com.nashtech.assetmanagement.service.AuthenticationService;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import org.mockito.MockitoAnnotations;
 
-public class RequestReturningServiceImplTest {
-    private UserRepository userRepository;
-    private AssetRepository assetRepository;
-    private AssignmentRepository assignmentRepository;
-    private ModelMapper modelMapper;
-    private RequestReturningRepository requestReturningRepository;
-    private RequestReturningServiceImpl requestReturningServiceImpl;
-    private RequestReturningMapper requestReturningMapper;
+import java.time.LocalDate;
+
+import static com.nashtech.assetmanagement.service.impl.RequestReturningServiceImpl.INVALID_STATE;
+import static com.nashtech.assetmanagement.utils.AppConstants.DONE;
+import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.mockito.Mockito.*;
+
+class RequestReturningServiceImplTest {
+
+    @Mock
+    UserRepository userRepository;
+    @Mock
+    RequestReturningRepository requestReturningRepository;
+    @Mock
+    AssetRepository assetRepository;
+    @Mock
+    RequestReturningMapper requestReturningMapper;
+    @Mock
+    AssignmentRepository assignmentRepository;
+    @Mock
+    ModelMapper modelMapper;
+    @Mock
+    AuthenticationService authenticationService;
+    @InjectMocks
+    RequestReturningServiceImpl requestReturningServiceImpl;
+
+    Assignment assignment;
+    RequestReturning returningRequest;
+    RequestReturning savedReturningRequest;
+    Asset asset;
+    Users acceptedUser;
+    RequestReturningResponseDto expectedResponse ;
 
     @BeforeEach
-    void setUp() {
-        userRepository = mock(UserRepository.class);
-        assetRepository = mock(AssetRepository.class);
-        assignmentRepository = mock(AssignmentRepository.class);
-        modelMapper = mock(ModelMapper.class);
-        requestReturningRepository = mock(RequestReturningRepository.class);
-        requestReturningMapper = mock(RequestReturningMapper.class);
-        requestReturningServiceImpl = new RequestReturningServiceImpl(
-                userRepository,
-                assetRepository,
-                assignmentRepository,
-                modelMapper,
-                requestReturningRepository,
-                requestReturningMapper);
+    void setup() {
+        MockitoAnnotations.openMocks(this);
+        assignment = mock(Assignment.class);
+        returningRequest = mock(RequestReturning.class);
+        savedReturningRequest = mock(RequestReturning.class);
+        asset = mock(Asset.class);
+        acceptedUser = mock(Users.class);
+        expectedResponse = mock(RequestReturningResponseDto.class);
+
     }
+
+    @DisplayName("Given all request is valid when complete returning request then " +
+            "return RequestReturningResponseDto - positive case")
+    @Test
+    void completeReturningRequest_ShouldReturnRequestReturningResponseDto_WhenTheRequestIsValid() {
+        //given
+        ReturningRequestDto requestDto =
+                new ReturningRequestDto("SD0001", "LA100005", "2022-08-11");
+        var assignmentIdCaptor = ArgumentCaptor.forClass(AssignmentId.class);
+        var returnDateCaptor = ArgumentCaptor.forClass(Date.class);
+
+        when(assignmentRepository.findById(any(AssignmentId.class))).thenReturn(Optional.of(assignment));
+        when(assignment.getRequestReturning()).thenReturn(returningRequest);
+        when(returningRequest.getState()).thenReturn(RequestReturningState.WAITING_FOR_RETURNING);
+        when(assignment.getAsset()).thenReturn(asset);
+        when(authenticationService.getUser()).thenReturn(acceptedUser);
+        when(requestReturningRepository.save(any(RequestReturning.class))).thenReturn(savedReturningRequest);
+        when(modelMapper.map(savedReturningRequest, RequestReturningResponseDto.class)).thenReturn(expectedResponse);
+
+        //when
+        RequestReturningResponseDto actualResponse = requestReturningServiceImpl.completeReturningRequest(requestDto);
+
+        //then
+        verify(assignmentRepository).findById(assignmentIdCaptor.capture());
+        AssignmentId assignmentIdValue = assignmentIdCaptor.getValue();
+        assertThat(assignmentIdValue.getAssignedTo()).isEqualTo(requestDto.getAssignedTo());
+        assertThat(assignmentIdValue.getAssetCode()).isEqualTo(requestDto.getAssetCode());
+        assertThat(assignmentIdValue.getAssignedDate()).isEqualTo(Date.valueOf(requestDto.getAssignedDate()));
+
+        verify(assignment).setState(DONE);
+        verify(returningRequest).setState(RequestReturningState.COMPLETED);
+        verify(returningRequest).setAssignment(assignment);
+
+        verify(returningRequest).setReturnedDate(returnDateCaptor.capture());
+        assertThat(returnDateCaptor.getValue()).isEqualTo(Date.valueOf(LocalDate.now()));
+
+        verify(returningRequest).setAcceptedBy(acceptedUser);
+        verify(asset).setState(AssetState.AVAILABLE);
+        verify(assetRepository).save(asset);
+
+        assertThat(actualResponse).isEqualTo(expectedResponse);
+    }
+
+    @DisplayName("Given request with invalid assigned date format then throws exception - negative case")
+    @Test
+    void completeReturningRequest_WhenAssignedDateFormatInvalid_ThenThrowsException() {
+        //given
+        ReturningRequestDto requestDto =
+                new ReturningRequestDto("SD0001", "LA100005", "202208-11");
+
+        //when
+        BadRequestException exception = assertThrows(BadRequestException.class,
+                () -> requestReturningServiceImpl.completeReturningRequest(requestDto));
+        //then
+        assertThat(exception.getMessage()).isEqualTo("Assigned date format is not valid !");
+    }
+
+
+    @DisplayName("Given non exist assignment ID when complete returning request then throws exception")
+    @Test
+    void completeReturningRequest_WhenAssignmentIsNonExist_ThenThrowsException() {
+        //given
+        ReturningRequestDto requestDto =
+                new ReturningRequestDto("SD0001", "LA100005", "2022-08-11");
+        var assignmentIdCaptor = ArgumentCaptor.forClass(AssignmentId.class);
+        when(assignmentRepository.findById(assignmentIdCaptor.capture())).thenReturn(Optional.empty());
+
+        //when
+        ResourceNotFoundException exception = assertThrows(ResourceNotFoundException.class,
+                () -> requestReturningServiceImpl.completeReturningRequest(requestDto));
+
+        //then
+        verify(assignmentRepository).findById(assignmentIdCaptor.capture());
+        AssignmentId assignmentIdValue = assignmentIdCaptor.getValue();
+        assertThat(assignmentIdValue.getAssignedTo()).isEqualTo(requestDto.getAssignedTo());
+        assertThat(assignmentIdValue.getAssetCode()).isEqualTo(requestDto.getAssetCode());
+
+        assertThat(exception.getMessage()).isEqualTo("Assignment is not exist !");
+    }
+
+    @DisplayName("Given returning request with state COMPLETED when complete returning request " +
+            "then throws exception")
+    @Test
+    void completeReturningRequest_WhenReturningRequestNonAcceptable_ThenThrowsException() {
+        //given
+        ReturningRequestDto requestDto =
+                new ReturningRequestDto("SD0001", "LA100005", "2022-08-11");
+        var assignmentIdCaptor = ArgumentCaptor.forClass(AssignmentId.class);
+        when(assignmentRepository.findById(assignmentIdCaptor.capture())).thenReturn(Optional.of(assignment));
+        when(assignment.getRequestReturning()).thenReturn(returningRequest);
+        when(returningRequest.getState()).thenReturn(RequestReturningState.COMPLETED);
+
+        //when
+
+        BadRequestException exception = assertThrows(BadRequestException.class,
+                () -> requestReturningServiceImpl.completeReturningRequest(requestDto));
+
+        // then
+        verify(assignmentRepository).findById(assignmentIdCaptor.capture());
+        AssignmentId assignmentIdValue = assignmentIdCaptor.getValue();
+        assertThat(assignmentIdValue.getAssignedTo()).isEqualTo(requestDto.getAssignedTo());
+        assertThat(assignmentIdValue.getAssetCode()).isEqualTo(requestDto.getAssetCode());
+        assertThat(assignmentIdValue.getAssignedDate()).isEqualTo(Date.valueOf(requestDto.getAssignedDate()));
+
+        assertThat(exception.getMessage()).isEqualTo(INVALID_STATE);
+
+    }
+
 
     @DisplayName("Given invalid requestedBy username when create request returning asset then return exception - negative case")
     @Test
@@ -309,3 +443,4 @@ public class RequestReturningServiceImplTest {
 		assertThat(exception.getMessage()).isEqualTo("Date.format.is.not.valid");
 	}
 }
+

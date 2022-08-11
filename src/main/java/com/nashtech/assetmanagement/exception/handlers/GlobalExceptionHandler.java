@@ -42,25 +42,19 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
         return new ResponseEntity<>(error, HttpStatus.UNAUTHORIZED);
     }
 
+    @ExceptionHandler({BadRequestException.class})
+    protected ResponseEntity<ErrorResponseDto> handleBadRequestException(RuntimeException exception) {
+        ErrorResponseDto error = new ErrorResponseDto(HttpStatus.BAD_REQUEST.toString(), exception.getMessage());
+        return new ResponseEntity<>(error, HttpStatus.UNAUTHORIZED);
+    }
+
     @ExceptionHandler({DateInvalidException.class, IllegalArgumentException.class, IllegalStateException.class})
     protected ResponseEntity<ErrorResponseDto> handleDateInvalidException(RuntimeException exception) {
         ErrorResponseDto error = new ErrorResponseDto(HttpStatus.BAD_REQUEST.toString(), exception.getMessage());
         return new ResponseEntity<>(error, HttpStatus.BAD_REQUEST);
     }
 
-    //    @Override
-//    protected ResponseEntity<Object> handleMethodArgumentNotValid(MethodArgumentNotValidException ex, HttpHeaders headers, HttpStatus status, WebRequest request) {
-//        Map<String, List<String>> body = new HashMap<>();
-//
-//        List<String> errors = ex.getBindingResult()
-//                .getAllErrors()
-//                .stream()
-//                .map(DefaultMessageSourceResolvable::getDefaultMessage)
-//                .collect(Collectors.toList());
-//        body.put("errors", errors);
-//
-//        return new ResponseEntity<>(body, HttpStatus.BAD_REQUEST);
-//    }
+
     @ExceptionHandler({NotUniqueException.class})
     protected ResponseEntity<ErrorResponseMessageDto> handleNotUniqueException(RuntimeException exception) {
         ErrorResponseMessageDto responseErrorMessage =

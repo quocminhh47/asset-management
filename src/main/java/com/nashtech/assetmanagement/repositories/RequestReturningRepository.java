@@ -5,6 +5,7 @@ import java.util.List;
 import java.util.Optional;
 
 import com.nashtech.assetmanagement.entities.Assignment;
+import com.nashtech.assetmanagement.entities.AssignmentId;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -33,5 +34,7 @@ public interface RequestReturningRepository extends JpaRepository<RequestReturni
 			+ "and (e.state in :state)")
 	Page<RequestReturning> getListRequestReturningByStates(@Param("state") List<RequestReturningState> state,
 			@Param("search") String search, Pageable pageable);
+
+	Optional<RequestReturning> findByAssignment (Assignment assignment);
 
 }

@@ -26,6 +26,7 @@ public interface AssignmentRepository extends JpaRepository<Assignment, Assignme
             "or lower(a.assignedTo.userName) like concat('%', :text, '%'))" +
             "and a.state in :states " +
             "and a.id.assignedDate = :assignedDate " +
+            "and a.state <> 'Done' " +
             "order by a.asset.code asc ")
     Page<Assignment> getAssignmentByConditions(@Param("text") String textSearch,
                                                @Param("states") List<String> states,
@@ -37,6 +38,7 @@ public interface AssignmentRepository extends JpaRepository<Assignment, Assignme
             "or lower(a.asset.name) like concat('%', :text, '%')" +
             "or lower(a.assignedTo.userName) like concat('%', :text, '%'))" +
             "and a.state in :states " +
+            "and a.state <> 'Done' " +
             "order by a.asset.code asc " )
     Page<Assignment> getAssignmentWithoutAssignedDate(@Param("text") String textSearch,
                                                @Param("states") List<String> states,
