@@ -292,17 +292,17 @@ class AssignmentServiceImplTest {
         assertThat(actual).isEqualTo(expectList);
     }
 
-    //589 - Respond to his/her own assignment
-    @DisplayName("Given invalid state when update assignments status then return message response - negative case")
-    @Test
-    void updateAssignmentStatus_ShouldReturnMessageResponse_WhenStateInvalid() {
-        ChangeAssignmentStateRequestDto changeAssignmentStateRequestDto = mock(ChangeAssignmentStateRequestDto.class);
+	//589 - Respond to his/her own assignment
+	@DisplayName("Given invalid state when update assignments status then return message response - negative case")
+	@Test
+	void updateAssignmentStatus_ShouldReturnMessageResponse_WhenStateInvalid() {
+		ChangeAssignmentStateRequestDto changeAssignmentStateRequestDto = mock(ChangeAssignmentStateRequestDto.class);
 
-        when(changeAssignmentStateRequestDto.getState()).thenReturn("Waiting for acceptance");
-        MessageResponse messageResponse = assignmentServiceImpl.updateAssignmentState(changeAssignmentStateRequestDto);
+		when(changeAssignmentStateRequestDto.getState()).thenReturn("Waiting for acceptance");
+		MessageResponse messageResponse = assignmentServiceImpl.updateAssignmentState(changeAssignmentStateRequestDto);
 
-        assertThat(messageResponse.getMessage()).isEqualTo("Assignment state request is not valid");
-    }
+		assertThat(messageResponse.getMessage()).isEqualTo("Assignment state request is not valid");
+	}
 
     @DisplayName("Given invalid assignedTo when update assignments status then return exception - negative case")
     @Test
@@ -310,109 +310,117 @@ class AssignmentServiceImplTest {
         ChangeAssignmentStateRequestDto changeAssignmentStateRequestDto = mock(ChangeAssignmentStateRequestDto.class);
 
         when(changeAssignmentStateRequestDto.getState()).thenReturn("Accepted");
-        when(userRepository.findByUserName(changeAssignmentStateRequestDto.getAssignedTo())).thenReturn(Optional.empty());
+        when(changeAssignmentStateRequestDto.getAssignedTo()).thenReturn("longt");
+        when(userRepository.findByUserName("longt")).thenReturn(Optional.empty());
         ResourceNotFoundException exception = Assertions.assertThrows(ResourceNotFoundException.class,
                 () -> assignmentServiceImpl.updateAssignmentState(changeAssignmentStateRequestDto));
 
         assertThat(exception.getMessage())
-                .isEqualTo("Cannot find user with username: " + changeAssignmentStateRequestDto.getAssignedTo());
+                .isEqualTo("Cannot find user with username: longt");
     }
 
-    @DisplayName("Given invalid assignment id when update assignments status then return exception - negative case")
-    @Test
-    void updateAssignmentStatus_ShouldReturnResourceNotFoundException_WhenAssignmentIdInvalid() {
-        ChangeAssignmentStateRequestDto changeAssignmentStateRequestDto = mock(ChangeAssignmentStateRequestDto.class);
+	@DisplayName("Given invalid assignment id when update assignments status then return exception - negative case")
+	@Test
+	void updateAssignmentStatus_ShouldReturnResourceNotFoundException_WhenAssignmentIdInvalid() {
+		ChangeAssignmentStateRequestDto changeAssignmentStateRequestDto = mock(ChangeAssignmentStateRequestDto.class);
+        Users users = mock(Users.class);
+
+		when(changeAssignmentStateRequestDto.getState()).thenReturn("Accepted");
+        when(changeAssignmentStateRequestDto.getAssignedTo()).thenReturn("longt");
+        when(userRepository.findByUserName("longt")).thenReturn(Optional.of(users));
+		ArgumentCaptor<AssignmentId> assignmentIdArgumentCaptor = ArgumentCaptor.forClass(AssignmentId.class);
+		when(assignmentRepository.findById(assignmentIdArgumentCaptor.capture())).thenReturn(Optional.empty());
+
+		ResourceNotFoundException exception = Assertions.assertThrows(ResourceNotFoundException.class,
+				() -> assignmentServiceImpl.updateAssignmentState(changeAssignmentStateRequestDto));
+
+		assertThat(exception.getMessage())
+				.isEqualTo("Cannot find assignment with assignment id: " + assignmentIdArgumentCaptor.getValue());
+	}
+
+	@DisplayName("Given assignment state in database is not Waiting for acceptance when update assignments status then return message response - negative case")
+	@Test
+	void updateAssignmentStatus_ShouldReturnMessageResponse_WhenAssignmentStateInDatabaseIsNotWaitingForAcceptance() {
+		ChangeAssignmentStateRequestDto changeAssignmentStateRequestDto = mock(ChangeAssignmentStateRequestDto.class);
+		Assignment assignment = mock(Assignment.class);
         Users users = mock(Users.class);
 
         when(changeAssignmentStateRequestDto.getState()).thenReturn("Accepted");
-        when(userRepository.findByUserName(changeAssignmentStateRequestDto.getAssignedTo())).thenReturn(Optional.of(users));
+        when(changeAssignmentStateRequestDto.getAssignedTo()).thenReturn("longt");
+        when(userRepository.findByUserName("longt")).thenReturn(Optional.of(users));
         ArgumentCaptor<AssignmentId> assignmentIdArgumentCaptor = ArgumentCaptor.forClass(AssignmentId.class);
-        when(assignmentRepository.findById(assignmentIdArgumentCaptor.capture())).thenReturn(Optional.empty());
+		when(assignmentRepository.findById(assignmentIdArgumentCaptor.capture())).thenReturn(Optional.of(assignment));
+		when(assignment.getState()).thenReturn("Accepted");
 
-        ResourceNotFoundException exception = Assertions.assertThrows(ResourceNotFoundException.class,
-                () -> assignmentServiceImpl.updateAssignmentState(changeAssignmentStateRequestDto));
+		MessageResponse messageResponse = assignmentServiceImpl.updateAssignmentState(changeAssignmentStateRequestDto);
 
-        assertThat(exception.getMessage())
-                .isEqualTo("Cannot find assignment with assignment id: " + assignmentIdArgumentCaptor.getValue());
-    }
+		assertThat(messageResponse.getMessage()).isEqualTo("Assignment state in database is Accepted or Declined");
+	}
 
-    @DisplayName("Given assignment state in database is not Waiting for acceptance when update assignments status then return message response - negative case")
-    @Test
-    void updateAssignmentStatus_ShouldReturnMessageResponse_WhenAssignmentStateInDatabaseIsNotWaitingForAcceptance() {
-        ChangeAssignmentStateRequestDto changeAssignmentStateRequestDto = mock(ChangeAssignmentStateRequestDto.class);
-        Assignment assignment = mock(Assignment.class);
-        Users users = mock(Users.class);
-
-        when(changeAssignmentStateRequestDto.getState()).thenReturn("Accepted");
-        when(userRepository.findByUserName(changeAssignmentStateRequestDto.getAssignedTo())).thenReturn(Optional.of(users));
-        ArgumentCaptor<AssignmentId> assignmentIdArgumentCaptor = ArgumentCaptor.forClass(AssignmentId.class);
-        when(assignmentRepository.findById(assignmentIdArgumentCaptor.capture())).thenReturn(Optional.of(assignment));
-        when(assignment.getState()).thenReturn("Accepted");
-
-        MessageResponse messageResponse = assignmentServiceImpl.updateAssignmentState(changeAssignmentStateRequestDto);
-
-        assertThat(messageResponse.getMessage()).isEqualTo("Assignment state in database is Accepted or Declined");
-    }
-
-    @DisplayName("Given request assignment state is Declined and asset code invalid when update assignments status then return exception - negative case")
-    @Test
-    void updateAssignmentStatus_ShouldReturnResourceNotFoundException_WhenRequestAssignmentStateIsDeclinedAndAssetCodeInvalid() {
-        ChangeAssignmentStateRequestDto changeAssignmentStateRequestDto = mock(ChangeAssignmentStateRequestDto.class);
-        Assignment assignment = mock(Assignment.class);
+	@DisplayName("Given request assignment state is Declined and asset code invalid when update assignments status then return exception - negative case")
+	@Test
+	void updateAssignmentStatus_ShouldReturnResourceNotFoundException_WhenRequestAssignmentStateIsDeclinedAndAssetCodeInvalid() {
+		ChangeAssignmentStateRequestDto changeAssignmentStateRequestDto = mock(ChangeAssignmentStateRequestDto.class);
+		Assignment assignment = mock(Assignment.class);
         Users users = mock(Users.class);
 
         when(changeAssignmentStateRequestDto.getState()).thenReturn("Declined");
-        when(userRepository.findByUserName(changeAssignmentStateRequestDto.getAssignedTo())).thenReturn(Optional.of(users));
+        when(changeAssignmentStateRequestDto.getAssignedTo()).thenReturn("longt");
+        when(userRepository.findByUserName("longt")).thenReturn(Optional.of(users));
         ArgumentCaptor<AssignmentId> assignmentIdArgumentCaptor = ArgumentCaptor.forClass(AssignmentId.class);
-        when(assignmentRepository.findById(assignmentIdArgumentCaptor.capture())).thenReturn(Optional.of(assignment));
-        when(assignment.getState()).thenReturn("Waiting for acceptance");
-        when(assetRepository.findById(changeAssignmentStateRequestDto.getAssetCode())).thenReturn(Optional.empty());
-        ResourceNotFoundException exception = Assertions.assertThrows(ResourceNotFoundException.class,
-                () -> assignmentServiceImpl.updateAssignmentState(changeAssignmentStateRequestDto));
+		when(assignmentRepository.findById(assignmentIdArgumentCaptor.capture())).thenReturn(Optional.of(assignment));
+		when(assignment.getState()).thenReturn("Waiting for acceptance");
+        when(changeAssignmentStateRequestDto.getAssetCode()).thenReturn("CT123456");
+		when(assetRepository.findById("CT123456")).thenReturn(Optional.empty());
+		ResourceNotFoundException exception = Assertions.assertThrows(ResourceNotFoundException.class,
+				() -> assignmentServiceImpl.updateAssignmentState(changeAssignmentStateRequestDto));
 
-        assertThat(exception.getMessage()).isEqualTo("Cannot find asset with asset code: " + changeAssignmentStateRequestDto.getAssetCode());
-    }
+		assertThat(exception.getMessage()).isEqualTo("Cannot find asset with asset code: CT123456");
+	}
 
-    @DisplayName("Given request assignment state is Declined and changeAssignmentStateRequestDto valid when update assignments status then return message response - positive case")
-    @Test
-    void updateAssignmentStatus_ShouldReturnMessageResponse_WhenRequestAssignmentStateIsDeclinedAndChangeAssignmentStateRequestDtoValid() {
-        ChangeAssignmentStateRequestDto changeAssignmentStateRequestDto = mock(ChangeAssignmentStateRequestDto.class);
-        Assignment assignment = mock(Assignment.class);
-        Asset asset = mock(Asset.class);
+	@DisplayName("Given request assignment state is Declined and changeAssignmentStateRequestDto valid when update assignments status then return message response - positive case")
+	@Test
+	void updateAssignmentStatus_ShouldReturnMessageResponse_WhenRequestAssignmentStateIsDeclinedAndChangeAssignmentStateRequestDtoValid() {
+		ChangeAssignmentStateRequestDto changeAssignmentStateRequestDto = mock(ChangeAssignmentStateRequestDto.class);
+		Assignment assignment = mock(Assignment.class);
+		Asset asset = mock(Asset.class);
         Users users = mock(Users.class);
 
-        when(changeAssignmentStateRequestDto.getState()).thenReturn("Declined");
-        when(userRepository.findByUserName(changeAssignmentStateRequestDto.getAssignedTo())).thenReturn(Optional.of(users));
+		when(changeAssignmentStateRequestDto.getState()).thenReturn("Declined");
+        when(changeAssignmentStateRequestDto.getAssignedTo()).thenReturn("longt");
+        when(userRepository.findByUserName("longt")).thenReturn(Optional.of(users));
         ArgumentCaptor<AssignmentId> assignmentIdArgumentCaptor = ArgumentCaptor.forClass(AssignmentId.class);
-        when(assignmentRepository.findById(assignmentIdArgumentCaptor.capture())).thenReturn(Optional.of(assignment));
-        when(assignment.getState()).thenReturn("Waiting for acceptance");
-        when(assetRepository.findById(changeAssignmentStateRequestDto.getAssetCode())).thenReturn(Optional.of(asset));
+		when(assignmentRepository.findById(assignmentIdArgumentCaptor.capture())).thenReturn(Optional.of(assignment));
+		when(assignment.getState()).thenReturn("Waiting for acceptance");
+        when(changeAssignmentStateRequestDto.getAssetCode()).thenReturn("CT123456");
+		when(assetRepository.findById("CT123456")).thenReturn(Optional.of(asset));
 
-        MessageResponse messageResponse = assignmentServiceImpl.updateAssignmentState(changeAssignmentStateRequestDto);
-        verify(asset).setState(AssetState.AVAILABLE);
-        verify(assetRepository).save(asset);
-        verify(assignment).setState("Declined");
-        verify(assignmentRepository).save(assignment);
+		MessageResponse messageResponse = assignmentServiceImpl.updateAssignmentState(changeAssignmentStateRequestDto);
+		verify(asset).setState(AssetState.AVAILABLE);
+		verify(assetRepository).save(asset);
+		verify(assignment).setState("Declined");
+		verify(assignmentRepository).save(assignment);
 
-        assertThat(messageResponse.getMessage()).isEqualTo("Update assignment state to Declined successfully!");
-    }
+		assertThat(messageResponse.getMessage()).isEqualTo("Update assignment state to Declined successfully!");
+	}
 
-    @DisplayName("Given request assignment state is Accepted and changeAssignmentStateRequestDto valid when update assignments status then return message response - positive case")
-    @Test
-    void updateAssignmentStatus_ShouldReturnMessageResponse_WhenRequestAssignmentStateIsAcceptedAndChangeAssignmentStateRequestDtoValid() {
-        ChangeAssignmentStateRequestDto changeAssignmentStateRequestDto = mock(ChangeAssignmentStateRequestDto.class);
-        Assignment assignment = mock(Assignment.class);
+	@DisplayName("Given request assignment state is Accepted and changeAssignmentStateRequestDto valid when update assignments status then return message response - positive case")
+	@Test
+	void updateAssignmentStatus_ShouldReturnMessageResponse_WhenRequestAssignmentStateIsAcceptedAndChangeAssignmentStateRequestDtoValid() {
+		ChangeAssignmentStateRequestDto changeAssignmentStateRequestDto = mock(ChangeAssignmentStateRequestDto.class);
+		Assignment assignment = mock(Assignment.class);
         Users users = mock(Users.class);
 
-        when(changeAssignmentStateRequestDto.getState()).thenReturn("Accepted");
-        when(userRepository.findByUserName(changeAssignmentStateRequestDto.getAssignedTo())).thenReturn(Optional.of(users));
-        ArgumentCaptor<AssignmentId> assignmentIdArgumentCaptor = ArgumentCaptor.forClass(AssignmentId.class);
-        when(assignmentRepository.findById(assignmentIdArgumentCaptor.capture())).thenReturn(Optional.of(assignment));
-        when(assignment.getState()).thenReturn("Waiting for acceptance");
+		when(changeAssignmentStateRequestDto.getState()).thenReturn("Accepted");
+        when(changeAssignmentStateRequestDto.getAssignedTo()).thenReturn("longt");
+        when(userRepository.findByUserName("longt")).thenReturn(Optional.of(users));
+		ArgumentCaptor<AssignmentId> assignmentIdArgumentCaptor = ArgumentCaptor.forClass(AssignmentId.class);
+		when(assignmentRepository.findById(assignmentIdArgumentCaptor.capture())).thenReturn(Optional.of(assignment));
+		when(assignment.getState()).thenReturn("Waiting for acceptance");
 
-        MessageResponse messageResponse = assignmentServiceImpl.updateAssignmentState(changeAssignmentStateRequestDto);
-        verify(assignment).setState("Accepted");
-        verify(assignmentRepository).save(assignment);
+		MessageResponse messageResponse = assignmentServiceImpl.updateAssignmentState(changeAssignmentStateRequestDto);
+		verify(assignment).setState("Accepted");
+		verify(assignmentRepository).save(assignment);
 
         assertThat(messageResponse.getMessage()).isEqualTo("Update assignment state to Accepted successfully!");
     }

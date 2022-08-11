@@ -17,16 +17,18 @@ import javax.persistence.OneToOne;
 import javax.persistence.Table;
 
 import com.nashtech.assetmanagement.enums.RequestReturningState;
-
-import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import lombok.AllArgsConstructor;
+
 
 @Entity
 @Table(name = "request_returning")
 @Getter
 @Setter
+@Builder
 @NoArgsConstructor
 @AllArgsConstructor
 public class RequestReturning {

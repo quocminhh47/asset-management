@@ -40,5 +40,4 @@ public class Assignment {
 
     @OneToOne(mappedBy = "assignment")
     private RequestReturning requestReturning;
-
 }

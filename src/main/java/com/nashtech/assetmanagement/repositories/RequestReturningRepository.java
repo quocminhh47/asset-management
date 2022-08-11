@@ -2,7 +2,9 @@ package com.nashtech.assetmanagement.repositories;
 
 import java.util.Date;
 import java.util.List;
+import java.util.Optional;
 
+import com.nashtech.assetmanagement.entities.Assignment;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -22,7 +24,10 @@ public interface RequestReturningRepository extends JpaRepository<RequestReturni
 	Page<RequestReturning> getListRequestReturning(@Param("state") List<RequestReturningState> state,
 			@Param("returnedDate") Date returnedDate, @Param("search") String search, Pageable pageable);
 
-	
+	//587 - Create request for returning asset
+	Optional<RequestReturning> getRequestReturningByAssignment(Assignment assignment);
+
+
 	@Query("select e from RequestReturning e where"
 			+ "( (lower(e.assignment.asset.code) like lower(concat('%', :search, '%')))  or "
 			+ "  (lower(e.assignment.asset.name) like lower(concat('%', :search, '%')))  or"

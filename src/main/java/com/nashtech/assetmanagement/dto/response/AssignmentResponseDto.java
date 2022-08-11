@@ -34,4 +34,6 @@ public class AssignmentResponseDto {
 
     private String assetSpecification;
 
+    private Long requestReturningId;
+
 }

@@ -1,0 +1,25 @@
+package com.nashtech.assetmanagement.dto.request;
+
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
+
+import javax.validation.constraints.NotEmpty;
+import java.sql.Date;
+
+@Getter
+@Setter
+@NoArgsConstructor
+@AllArgsConstructor
+public class CreateRequestReturningAssetRequestDto {
+    @NotEmpty(message = "requestedBy must not be empty.")
+    private String requestedBy;
+
+    @NotEmpty(message = "assetCode must not be empty.")
+    private String assetCode;
+
+    private Date assignedDate;
+
+    private Date returnedDate;
+}
