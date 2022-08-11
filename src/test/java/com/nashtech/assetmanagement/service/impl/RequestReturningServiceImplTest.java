@@ -1,60 +1,49 @@
 package com.nashtech.assetmanagement.service.impl;
 
 
+import com.nashtech.assetmanagement.dto.request.CreateRequestReturningAssetRequestDto;
+import com.nashtech.assetmanagement.dto.request.RequestReturningRequestGetListDto;
 import com.nashtech.assetmanagement.dto.request.ReturningRequestDto;
+import com.nashtech.assetmanagement.dto.response.CreateRequestReturningResponseDto;
+import com.nashtech.assetmanagement.dto.response.ListRequestReturningResponseDto;
+import com.nashtech.assetmanagement.dto.response.MessageResponse;
 import com.nashtech.assetmanagement.dto.response.RequestReturningResponseDto;
+import com.nashtech.assetmanagement.entities.*;
 import com.nashtech.assetmanagement.enums.AssetState;
 import com.nashtech.assetmanagement.enums.RequestReturningState;
 import com.nashtech.assetmanagement.exception.BadRequestException;
-import static com.nashtech.assetmanagement.enums.RequestReturningState.WAITING_FOR_RETURNING;
-import static com.nashtech.assetmanagement.utils.AppConstants.ACCEPTED;
-import static org.mockito.ArgumentMatchers.eq;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
-
-import java.sql.Date;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
-
-import com.nashtech.assetmanagement.repositories.UserRepository;
-import org.junit.jupiter.api.Assertions;
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.DisplayName;
-import org.junit.jupiter.api.Test;
-import org.mockito.ArgumentCaptor;
-import org.mockito.Mockito;
-import org.modelmapper.ModelMapper;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.Pageable;
-import org.springframework.data.domain.Sort;
-
-import com.nashtech.assetmanagement.dto.request.CreateRequestReturningAssetRequestDto;
-import com.nashtech.assetmanagement.dto.request.RequestReturningRequestGetListDto;
-import com.nashtech.assetmanagement.dto.response.CreateRequestReturningResponseDto;
-import com.nashtech.assetmanagement.dto.response.ListRequestReturningResponseDto;
-import com.nashtech.assetmanagement.entities.Asset;
-import com.nashtech.assetmanagement.entities.Assignment;
-import com.nashtech.assetmanagement.entities.AssignmentId;
-import com.nashtech.assetmanagement.entities.RequestReturning;
-import com.nashtech.assetmanagement.entities.Users;
+import com.nashtech.assetmanagement.exception.RequestNotAcceptException;
 import com.nashtech.assetmanagement.exception.ResourceNotFoundException;
 import com.nashtech.assetmanagement.mapper.RequestReturningMapper;
 import com.nashtech.assetmanagement.repositories.AssetRepository;
 import com.nashtech.assetmanagement.repositories.AssignmentRepository;
 import com.nashtech.assetmanagement.repositories.RequestReturningRepository;
+import com.nashtech.assetmanagement.repositories.UserRepository;
 import com.nashtech.assetmanagement.service.AuthenticationService;
-import org.mockito.InjectMocks;
-import org.mockito.Mock;
-import org.mockito.MockitoAnnotations;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Test;
+import org.mockito.*;
+import org.modelmapper.ModelMapper;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
+import org.springframework.http.HttpStatus;
 
+import java.sql.Date;
 import java.time.LocalDate;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Optional;
 
+import static com.nashtech.assetmanagement.enums.RequestReturningState.WAITING_FOR_RETURNING;
 import static com.nashtech.assetmanagement.service.impl.RequestReturningServiceImpl.INVALID_STATE;
+import static com.nashtech.assetmanagement.utils.AppConstants.ACCEPTED;
 import static com.nashtech.assetmanagement.utils.AppConstants.DONE;
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.*;
 
 class RequestReturningServiceImplTest {
@@ -81,7 +70,9 @@ class RequestReturningServiceImplTest {
     RequestReturning savedReturningRequest;
     Asset asset;
     Users acceptedUser;
-    RequestReturningResponseDto expectedResponse ;
+    RequestReturningResponseDto expectedResponse;
+
+    private RequestReturning requestReturning;
 
     @BeforeEach
     void setup() {
@@ -92,6 +83,7 @@ class RequestReturningServiceImplTest {
         asset = mock(Asset.class);
         acceptedUser = mock(Users.class);
         expectedResponse = mock(RequestReturningResponseDto.class);
+        requestReturning=mock(RequestReturning.class);
 
     }
 
@@ -333,114 +325,148 @@ class RequestReturningServiceImplTest {
         verify(modelMapper).map(returningValue, CreateRequestReturningResponseDto.class);
     }
 
-	@Test
-	void getListRequestReturning_ShouldReturnListRequestReturningResponseDto_whenTheRequestIsValid() {
-		List<String> listStatesActual = List.of("COMPLETED", "WAITING_FOR_RETURNING");
-		RequestReturningRequestGetListDto dtoValue = new RequestReturningRequestGetListDto(listStatesActual,
-				"2022-08-09", "a", "assignment.asset.code", "ASC", 1, 2);
+    @Test
+    void getListRequestReturning_ShouldReturnListRequestReturningResponseDto_whenTheRequestIsValid() {
+        List<String> listStatesActual = List.of("COMPLETED", "WAITING_FOR_RETURNING");
+        RequestReturningRequestGetListDto dtoValue = new RequestReturningRequestGetListDto(listStatesActual,
+                "2022-08-09", "a", "assignment.asset.code", "ASC", 1, 2);
 
-		RequestReturningRequestGetListDto dto = mock(RequestReturningRequestGetListDto.class);
-		Page<RequestReturning> pageRequestReturning = mock(Page.class);
-		List<RequestReturning> listEntity = mock(List.class);
-		List<RequestReturningResponseDto> expectList = mock(List.class);
-		List<RequestReturningState> requestReturningState = mock(List.class);
-		List<String> listStates = mock(List.class);
-		
-		when(requestReturningMapper.mapperListStates(dto.getStates())).thenReturn(requestReturningState);
-		when(requestReturningRepository.getListRequestReturning(Mockito.any(List.class), Mockito.any(Date.class),
-				eq("a"), Mockito.any(Pageable.class))).thenReturn(pageRequestReturning);
-		when(pageRequestReturning.getTotalPages()).thenReturn(2);
-		when(pageRequestReturning.getContent()).thenReturn(listEntity);
+        RequestReturningRequestGetListDto dto = mock(RequestReturningRequestGetListDto.class);
+        Page<RequestReturning> pageRequestReturning = mock(Page.class);
+        List<RequestReturning> listEntity = mock(List.class);
+        List<RequestReturningResponseDto> expectList = mock(List.class);
+        List<RequestReturningState> requestReturningState = mock(List.class);
+        List<String> listStates = mock(List.class);
 
-		when(requestReturningMapper.mapperListRequestReturning(listEntity)).thenReturn(expectList);
+        when(requestReturningMapper.mapperListStates(dto.getStates())).thenReturn(requestReturningState);
+        when(requestReturningRepository.getListRequestReturning(Mockito.any(List.class), Mockito.any(Date.class),
+                eq("a"), Mockito.any(Pageable.class))).thenReturn(pageRequestReturning);
+        when(pageRequestReturning.getTotalPages()).thenReturn(2);
+        when(pageRequestReturning.getContent()).thenReturn(listEntity);
 
-		ListRequestReturningResponseDto actual = requestReturningServiceImpl.getListRequestReturning(dtoValue);
+        when(requestReturningMapper.mapperListRequestReturning(listEntity)).thenReturn(expectList);
 
-		ArgumentCaptor<List> captorlistStates = ArgumentCaptor.forClass(List.class);
-		ArgumentCaptor<Date> captorDate = ArgumentCaptor.forClass(Date.class);
-		ArgumentCaptor<Pageable> captorPageable = ArgumentCaptor.forClass(Pageable.class);
+        ListRequestReturningResponseDto actual = requestReturningServiceImpl.getListRequestReturning(dtoValue);
 
-		verify(requestReturningRepository).getListRequestReturning(captorlistStates.capture(), captorDate.capture(),
-				eq("a"), captorPageable.capture());
+        ArgumentCaptor<List> captorlistStates = ArgumentCaptor.forClass(List.class);
+        ArgumentCaptor<Date> captorDate = ArgumentCaptor.forClass(Date.class);
+        ArgumentCaptor<Pageable> captorPageable = ArgumentCaptor.forClass(Pageable.class);
 
-		Pageable pageable = captorPageable.getValue();
-		Date dateExpect = captorDate.getValue();
-		List<String> listStatesExpect = captorlistStates.getValue();
+        verify(requestReturningRepository).getListRequestReturning(captorlistStates.capture(), captorDate.capture(),
+                eq("a"), captorPageable.capture());
 
-		assertThat(listStatesExpect.size()).isEqualTo(listStates.size());
-		assertThat(dateExpect).isEqualTo(dtoValue.getReturnedDate());
+        Pageable pageable = captorPageable.getValue();
+        Date dateExpect = captorDate.getValue();
+        List<String> listStatesExpect = captorlistStates.getValue();
 
-		assertThat(pageable.getPageNumber()).isEqualTo(0);
-		assertThat(pageable.getPageSize()).isEqualTo(2);
-		assertThat(actual.getList()).isEqualTo(expectList);
-		assertThat(actual.getTotalPages()).isEqualTo(2);
-		assertThat(pageable.getSort().ascending()).isEqualTo(Sort.by("assignment.asset.code"));
-		
-	}
+        assertThat(listStatesExpect.size()).isEqualTo(listStates.size());
+        assertThat(dateExpect).isEqualTo(dtoValue.getReturnedDate());
 
-	@Test
-	void getListRequestReturning_ShouldReturnListRequestReturningResponseDto_whenTheRequestLackOfReturnDate() {
+        assertThat(pageable.getPageNumber()).isEqualTo(0);
+        assertThat(pageable.getPageSize()).isEqualTo(2);
+        assertThat(actual.getList()).isEqualTo(expectList);
+        assertThat(actual.getTotalPages()).isEqualTo(2);
+        assertThat(pageable.getSort().ascending()).isEqualTo(Sort.by("assignment.asset.code"));
 
-		List<String> listStatesActual = new ArrayList<String>();
-		listStatesActual.add("COMPLETED");
-		listStatesActual.add("WAITING_FOR_RETURNING");
-		RequestReturningRequestGetListDto dtoValue = new RequestReturningRequestGetListDto(listStatesActual, "", "a",
-				"id", "ASC", 1, 2);
+    }
 
-		RequestReturningRequestGetListDto dto = mock(RequestReturningRequestGetListDto.class);
-		Page<RequestReturning> pageRequestReturning = mock(Page.class);
-		List<RequestReturning> listEntity = mock(List.class);
-		List<RequestReturningResponseDto> expectList = mock(List.class);
-		List<RequestReturningState> requestReturningState = mock(List.class);
-		List<String> listStates = mock(List.class);
+    @Test
+    void getListRequestReturning_ShouldReturnListRequestReturningResponseDto_whenTheRequestLackOfReturnDate() {
 
-		when(requestReturningMapper.mapperListStates(dto.getStates())).thenReturn(requestReturningState);
-		when(requestReturningRepository.getListRequestReturningByStates(Mockito.any(List.class), eq("a"),
-				Mockito.any(Pageable.class))).thenReturn(pageRequestReturning);
-		when(pageRequestReturning.getTotalPages()).thenReturn(2);
-		when(pageRequestReturning.getContent()).thenReturn(listEntity);
+        List<String> listStatesActual = new ArrayList<String>();
+        listStatesActual.add("COMPLETED");
+        listStatesActual.add("WAITING_FOR_RETURNING");
+        RequestReturningRequestGetListDto dtoValue = new RequestReturningRequestGetListDto(listStatesActual, "", "a",
+                "id", "ASC", 1, 2);
 
-		when(requestReturningMapper.mapperListRequestReturning(listEntity)).thenReturn(expectList);
+        RequestReturningRequestGetListDto dto = mock(RequestReturningRequestGetListDto.class);
+        Page<RequestReturning> pageRequestReturning = mock(Page.class);
+        List<RequestReturning> listEntity = mock(List.class);
+        List<RequestReturningResponseDto> expectList = mock(List.class);
+        List<RequestReturningState> requestReturningState = mock(List.class);
+        List<String> listStates = mock(List.class);
 
-		ListRequestReturningResponseDto actual = requestReturningServiceImpl.getListRequestReturning(dtoValue);
+        when(requestReturningMapper.mapperListStates(dto.getStates())).thenReturn(requestReturningState);
+        when(requestReturningRepository.getListRequestReturningByStates(Mockito.any(List.class), eq("a"),
+                Mockito.any(Pageable.class))).thenReturn(pageRequestReturning);
+        when(pageRequestReturning.getTotalPages()).thenReturn(2);
+        when(pageRequestReturning.getContent()).thenReturn(listEntity);
 
-		ArgumentCaptor<List> captorlistStates = ArgumentCaptor.forClass(List.class);
-		ArgumentCaptor<Pageable> captorPageable = ArgumentCaptor.forClass(Pageable.class);
+        when(requestReturningMapper.mapperListRequestReturning(listEntity)).thenReturn(expectList);
 
-		verify(requestReturningRepository).getListRequestReturningByStates(captorlistStates.capture(), eq("a"),
-				captorPageable.capture());
+        ListRequestReturningResponseDto actual = requestReturningServiceImpl.getListRequestReturning(dtoValue);
 
-		Pageable pageable = captorPageable.getValue();
-		List<String> listStatesExpect = captorlistStates.getValue();
+        ArgumentCaptor<List> captorlistStates = ArgumentCaptor.forClass(List.class);
+        ArgumentCaptor<Pageable> captorPageable = ArgumentCaptor.forClass(Pageable.class);
 
-		assertThat(listStatesExpect.size()).isEqualTo(listStates.size());
-		assertThat(dtoValue.getReturnedDate()).isEqualTo("");
+        verify(requestReturningRepository).getListRequestReturningByStates(captorlistStates.capture(), eq("a"),
+                captorPageable.capture());
 
-		assertThat(pageable.getPageNumber()).isEqualTo(0);
-		assertThat(pageable.getPageSize()).isEqualTo(2);
-		assertThat(actual.getList()).isEqualTo(expectList);
-		assertThat(actual.getTotalPages()).isEqualTo(2);
+        Pageable pageable = captorPageable.getValue();
+        List<String> listStatesExpect = captorlistStates.getValue();
 
-		assertThat(pageable.getSort().ascending()).isEqualTo(Sort.by("id"));
-	}
+        assertThat(listStatesExpect.size()).isEqualTo(listStates.size());
+        assertThat(dtoValue.getReturnedDate()).isEqualTo("");
 
-	@Test
-	void getListRequestReturning_ShouldThrowsDateInvalidException_whenTheRequestLackOfReturnDate() {
-		List<String> listStatesActual = new ArrayList<String>();
-		listStatesActual.add("COMPLETED");
-		listStatesActual.add("WAITING_FOR_RETURNING");
-		RequestReturningRequestGetListDto dtoValue = new RequestReturningRequestGetListDto(listStatesActual,
-				"2022/08/99", "a", "id", "DESC", 1, 2);
+        assertThat(pageable.getPageNumber()).isEqualTo(0);
+        assertThat(pageable.getPageSize()).isEqualTo(2);
+        assertThat(actual.getList()).isEqualTo(expectList);
+        assertThat(actual.getTotalPages()).isEqualTo(2);
 
-		RequestReturningRequestGetListDto dto = mock(RequestReturningRequestGetListDto.class);
-		List<RequestReturningState> requestReturningState = mock(List.class);
-		when(requestReturningMapper.mapperListStates(dto.getStates())).thenReturn(requestReturningState);
+        assertThat(pageable.getSort().ascending()).isEqualTo(Sort.by("id"));
+    }
 
-		Exception exception = assertThrows(Exception.class, () -> {
-			requestReturningServiceImpl.getListRequestReturning(dtoValue);
-		});
+    @Test
+    void cancelRequestReturningAssignment_ShouldReturnSuccessMessage_WhenRequestValid() {
+        when(requestReturningRepository.findById(1L)).thenReturn(Optional.of(requestReturning));
+        when(requestReturning.getState()).thenReturn(WAITING_FOR_RETURNING);
+        MessageResponse expected = mock(MessageResponse.class);
+        when(expected.getStatus()).thenReturn(HttpStatus.OK);
+        when(expected.getMessage()).thenReturn("Cancel successfully!");
+        MessageResponse actual =
+                requestReturningServiceImpl.cancelRequestReturningAssignment(1L);
+        verify(requestReturningRepository).delete(requestReturning);
+        assertThat(actual.getTimeStamp()).isNotNull();
+        assertThat(actual.getStatus()).isEqualTo(expected.getStatus());
+        assertThat(actual.getMessage()).isEqualTo(expected.getMessage());
+    }
 
-		assertThat(exception.getMessage()).isEqualTo("Date.format.is.not.valid");
-	}
+    @Test
+    void cancelRequestReturningAssignment_ShouldThrowResourceNotFoundException_WhenCannotFindRequestReturning() {
+        when(requestReturningRepository.findById(1L)).thenReturn(Optional.empty());
+        ResourceNotFoundException exception = Assertions.assertThrows(ResourceNotFoundException.class,
+                () -> requestReturningServiceImpl.cancelRequestReturningAssignment(1L));
+        assertThat(exception.getMessage()).isEqualTo("Cannot find request returning " +
+                "with id: " + 1L);
+    }
+
+    @Test
+    void cancelRequestReturningAssignment_ShouldThrowRequestNotAcceptException_WhenStateIsNotWaitingForReturning() {
+        when(requestReturningRepository.findById(1L)).thenReturn(Optional.of(requestReturning));
+        when(requestReturning.getState()).thenReturn(RequestReturningState.COMPLETED);
+        RequestNotAcceptException exception = Assertions.assertThrows(RequestNotAcceptException.class,
+                () -> requestReturningServiceImpl.cancelRequestReturningAssignment(1L));
+        assertThat(exception.getMessage()).isEqualTo("Only request with state 'Waiting for " +
+                "returning' can be deleted");
+    }
+
+    @Test
+    void getListRequestReturning_ShouldThrowsDateInvalidException_whenTheRequestLackOfReturnDate() {
+        List<String> listStatesActual = new ArrayList<String>();
+        listStatesActual.add("COMPLETED");
+        listStatesActual.add("WAITING_FOR_RETURNING");
+        RequestReturningRequestGetListDto dtoValue = new RequestReturningRequestGetListDto(listStatesActual,
+                "2022/08/99", "a", "id", "DESC", 1, 2);
+
+        RequestReturningRequestGetListDto dto = mock(RequestReturningRequestGetListDto.class);
+        List<RequestReturningState> requestReturningState = mock(List.class);
+        when(requestReturningMapper.mapperListStates(dto.getStates())).thenReturn(requestReturningState);
+
+        Exception exception = assertThrows(Exception.class, () -> {
+            requestReturningServiceImpl.getListRequestReturning(dtoValue);
+        });
+
+        assertThat(exception.getMessage()).isEqualTo("Date.format.is.not.valid");
+    }
 }
 

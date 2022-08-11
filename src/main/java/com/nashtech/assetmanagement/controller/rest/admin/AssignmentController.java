@@ -21,6 +21,7 @@ import org.springframework.web.bind.annotation.*;
 import java.net.URI;
 import java.sql.Date;
 import java.util.List;
+
 @Tag(name = "Assignment Resources Management",
         description = "Provide the ability of assignment management and information")
 @RestController
@@ -97,18 +98,35 @@ public class AssignmentController {
                     content = {@Content(examples = {@ExampleObject()})})
     })
     @GetMapping("/{assetId}")
-    public ResponseEntity<List<AssignmentResponseDto>> getListAssignmentByAsset(@PathVariable("assetId")String assetId) {
+    public ResponseEntity<List<AssignmentResponseDto>> getListAssignmentByAsset(@PathVariable("assetId") String assetId) {
         return new ResponseEntity<>(assignmentService.getListAssignmentByAssetCode(assetId), HttpStatus.OK);
     }
 
+    @Operation(summary = "Delete assignment",
+            description = "Delete assignment which had state 'Waiting for acceptance' " +
+                    "or 'Decline'")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "OK - Successfully retrieved"),
+            @ApiResponse(responseCode = "400",
+                    description = "Bad Request - The request is invalid"),
+            @ApiResponse(responseCode = "401", description = "UNAUTHORIZED - The request is unauthorized"),
+            @ApiResponse(responseCode = "403", description = "FORBIDDEN - You don’t have permission to access"),
+            @ApiResponse(responseCode = "404", description = "NOT FOUND - The " +
+                    "assignment or asset resource is not found"),
+            @ApiResponse(responseCode = "406", description = "NOT_ACCEPTABLE - The " +
+                    "state of the assignment is 'Accepted'"),
+            @ApiResponse(responseCode = "500",
+                    description = "Internal Error - There were some error while processing in server")
+    })
     @DeleteMapping
+    @ResponseStatus(HttpStatus.OK)
     public MessageResponse deleteAssignment(
             @RequestParam(value = "assignedTo") String assignedTo,
             @RequestParam(value = "assetCode") String assetCode,
             @RequestParam(value = "assignedDate") Date assignedDate
-    ){
-        DeleteAssignmentRequestDto deleteAssignmentRequestDto=
-                new DeleteAssignmentRequestDto(assignedTo,assetCode,assignedDate);
+    ) {
+        DeleteAssignmentRequestDto deleteAssignmentRequestDto =
+                new DeleteAssignmentRequestDto(assignedTo, assetCode, assignedDate);
         return assignmentService.deleteAssignment(deleteAssignmentRequestDto);
     }
 }

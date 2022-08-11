@@ -1,49 +1,47 @@
 package com.nashtech.assetmanagement.service.impl;
 
-
-import java.time.LocalDate;
-import java.util.ArrayList;
-import java.sql.Date;
-import java.util.List;
-
+import com.nashtech.assetmanagement.dto.request.CreateRequestReturningAssetRequestDto;
+import com.nashtech.assetmanagement.dto.request.RequestReturningRequestGetListDto;
 import com.nashtech.assetmanagement.dto.request.ReturningRequestDto;
+import com.nashtech.assetmanagement.dto.response.CreateRequestReturningResponseDto;
+import com.nashtech.assetmanagement.dto.response.ListRequestReturningResponseDto;
+import com.nashtech.assetmanagement.dto.response.MessageResponse;
+import com.nashtech.assetmanagement.dto.response.RequestReturningResponseDto;
 import com.nashtech.assetmanagement.entities.*;
 import com.nashtech.assetmanagement.enums.AssetState;
+import com.nashtech.assetmanagement.enums.RequestReturningState;
 import com.nashtech.assetmanagement.exception.BadRequestException;
+import com.nashtech.assetmanagement.exception.DateInvalidException;
+import com.nashtech.assetmanagement.exception.RequestNotAcceptException;
 import com.nashtech.assetmanagement.exception.ResourceNotFoundException;
+import com.nashtech.assetmanagement.mapper.RequestReturningMapper;
 import com.nashtech.assetmanagement.repositories.AssetRepository;
 import com.nashtech.assetmanagement.repositories.AssignmentRepository;
-import com.nashtech.assetmanagement.service.AuthenticationService;
-import lombok.AllArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
-import org.modelmapper.ModelMapper;
-
-import java.util.Optional;
-
-import com.nashtech.assetmanagement.dto.request.CreateRequestReturningAssetRequestDto;
-import com.nashtech.assetmanagement.dto.response.CreateRequestReturningResponseDto;
+import com.nashtech.assetmanagement.repositories.RequestReturningRepository;
 import com.nashtech.assetmanagement.repositories.UserRepository;
+import com.nashtech.assetmanagement.service.AuthenticationService;
+import com.nashtech.assetmanagement.service.RequestReturningService;
 import com.nashtech.assetmanagement.utils.AppConstants;
+import lombok.AllArgsConstructor;
+import org.modelmapper.ModelMapper;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 
-import com.nashtech.assetmanagement.dto.request.RequestReturningRequestGetListDto;
-import com.nashtech.assetmanagement.dto.response.ListRequestReturningResponseDto;
-import com.nashtech.assetmanagement.dto.response.RequestReturningResponseDto;
-import com.nashtech.assetmanagement.enums.RequestReturningState;
-import com.nashtech.assetmanagement.exception.DateInvalidException;
-import com.nashtech.assetmanagement.mapper.RequestReturningMapper;
-import com.nashtech.assetmanagement.repositories.RequestReturningRepository;
-import com.nashtech.assetmanagement.service.RequestReturningService;
-import static com.nashtech.assetmanagement.utils.AppConstants.DONE;
+import java.sql.Date;
+import java.time.LocalDate;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Optional;
+
 import static com.nashtech.assetmanagement.enums.RequestReturningState.WAITING_FOR_RETURNING;
+import static com.nashtech.assetmanagement.utils.AppConstants.DONE;
 
 @Service
 @AllArgsConstructor
-@Slf4j
 public class RequestReturningServiceImpl implements RequestReturningService {
 
 	private final UserRepository userRepository;
@@ -73,7 +71,7 @@ public class RequestReturningServiceImpl implements RequestReturningService {
 		if (dto.getSortDirection().equals("DESC")) {
 			sort = Sort.Direction.DESC;
 		}
-		
+
 		Pageable pageable = PageRequest.of(dto.getPage() - 1, dto.getSize(), Sort.by(sort, dto.getSortBy()));
 		List<RequestReturningState> requestReturningState = requestReturningMapper.mapperListStates(dto.getStates());
 
@@ -93,7 +91,7 @@ public class RequestReturningServiceImpl implements RequestReturningService {
 				throw new DateInvalidException("Date.format.is.not.valid");
 			}
 		}
-		
+
 		List<RequestReturningResponseDto> listDto = requestReturningMapper.mapperListRequestReturning(listEntity);
 		ListRequestReturningResponseDto result = new ListRequestReturningResponseDto(listDto, totalItems);
 		return result;
@@ -106,7 +104,6 @@ public class RequestReturningServiceImpl implements RequestReturningService {
 		try {
 			assignedDate = Date.valueOf(requestDto.getAssignedDate());
 		} catch (Exception e) {
-			log.error("Date.format.is.not.valid");
 			throw new BadRequestException("Assigned date format is not valid !");
 		}
 
@@ -183,4 +180,17 @@ public class RequestReturningServiceImpl implements RequestReturningService {
 		return mapper.map(requestReturning, CreateRequestReturningResponseDto.class);
 	}
 
+
+    @Override
+    public MessageResponse cancelRequestReturningAssignment(Long id) {
+        RequestReturning requestReturning = requestReturningRepository.findById(id).orElseThrow(() ->
+                new ResourceNotFoundException("Cannot find request returning with id: " + id));
+        if (requestReturning.getState() != WAITING_FOR_RETURNING) {
+            throw new RequestNotAcceptException("Only request with state 'Waiting for " +
+                    "returning' can be deleted");
+        }
+        requestReturningRepository.delete(requestReturning);
+        return new MessageResponse(HttpStatus.OK, "Cancel successfully!",
+				new java.util.Date());
+    }
 }
