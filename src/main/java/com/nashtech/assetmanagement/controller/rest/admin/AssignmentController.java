@@ -4,6 +4,7 @@ import com.nashtech.assetmanagement.dto.DeleteAssignmentRequestDto;
 import com.nashtech.assetmanagement.dto.request.AssignmentRequestDto;
 import com.nashtech.assetmanagement.dto.response.AssignmentResponseDto;
 import com.nashtech.assetmanagement.dto.response.ListAssignmentResponseDto;
+import com.nashtech.assetmanagement.dto.request.EditAssignmentRequestDto;
 import com.nashtech.assetmanagement.dto.response.MessageResponse;
 import com.nashtech.assetmanagement.service.AssignmentService;
 import com.nashtech.assetmanagement.utils.AppConstants;
@@ -78,10 +79,28 @@ public class AssignmentController {
     })
     @PostMapping()
     public ResponseEntity<AssignmentResponseDto> createNewAssignment(@RequestBody AssignmentRequestDto request) {
-        return ResponseEntity.created(URI.create("/admin/api/assignment/create"))
+        return ResponseEntity.created(URI.create("/admin/api/assignments"))
                 .body(this.assignmentService.createNewAssignment(request));
     }
 
+    @Operation(summary = "Edit assignment feature",
+            description = "Edit assignment with all properties given")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "OK - Successfully edit assignment"),
+            @ApiResponse(responseCode = "400",
+                    description = "Bad Request - The request is invalid",
+                    content = {@Content(examples = {@ExampleObject()})}),
+            @ApiResponse(responseCode = "401", description = "UNAUTHORIZED - The request is unauthorized"),
+            @ApiResponse(responseCode = "403", description = "FORBIDDEN - You don’t have permission to access"),
+            @ApiResponse(responseCode = "404", description = "NOT FOUND - The assignment resource is not found"),
+            @ApiResponse(responseCode = "500",
+                    description = "Internal Error - There were some error while processing in server",
+                    content = {@Content(examples = {@ExampleObject()})})
+    })
+    @PutMapping()
+    public ResponseEntity<AssignmentResponseDto> editAssignment(@RequestBody EditAssignmentRequestDto request){
+        return ResponseEntity.ok(this.assignmentService.editAssignment(request));
+    }
 
     @Operation(summary = "Get list assignment of the specified asset",
             description = "Given asset code then this will return list assignment of the given asset")

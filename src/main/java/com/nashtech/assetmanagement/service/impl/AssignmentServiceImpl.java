@@ -3,6 +3,7 @@ package com.nashtech.assetmanagement.service.impl;
 import com.nashtech.assetmanagement.dto.DeleteAssignmentRequestDto;
 import com.nashtech.assetmanagement.dto.request.AssignmentRequestDto;
 import com.nashtech.assetmanagement.dto.request.ChangeAssignmentStateRequestDto;
+import com.nashtech.assetmanagement.dto.request.EditAssignmentRequestDto;
 import com.nashtech.assetmanagement.dto.response.AssignmentResponseDto;
 import com.nashtech.assetmanagement.dto.response.ListAssignmentResponseDto;
 import com.nashtech.assetmanagement.dto.response.MessageResponse;
@@ -21,6 +22,7 @@ import com.nashtech.assetmanagement.repositories.AssetRepository;
 import com.nashtech.assetmanagement.repositories.AssignmentRepository;
 import com.nashtech.assetmanagement.repositories.UserRepository;
 import com.nashtech.assetmanagement.service.AssignmentService;
+import com.nashtech.assetmanagement.service.AuthenticationService;
 import com.nashtech.assetmanagement.utils.AppConstants;
 import com.nashtech.assetmanagement.utils.StateConverter;
 import lombok.AllArgsConstructor;
@@ -50,6 +52,7 @@ public class AssignmentServiceImpl implements AssignmentService {
     private final UserRepository userRepository;
     private final AssetRepository assetRepository;
     private final AssignmentMapper assignmentMapper;
+    private final AuthenticationService authenticationService;
 
     @Override
     public ListAssignmentResponseDto getAssignmentsByCondition(int pageNo,
@@ -106,13 +109,52 @@ public class AssignmentServiceImpl implements AssignmentService {
             throw new ResourceNotFoundException("Assign by User not found");
         }
         asset.get().setState(AssetState.ASSIGNED);
-        Assignment assignment = assignmentMapper.MapRequestAssignmentToAssignment(request);
+        Assignment assignment = assignmentMapper.mapRequestAssignmentToAssignment(request);
         assignment.setAssignedTo(assignTo.get());
         assignment.setAssignedBy(assignBy.get());
         assignment.setAsset(asset.get());
         assignmentRepository.save(assignment);
-        return assignmentMapper.MapAssignmentToResponseDto(assignment);
+        return assignmentMapper.mapAssignmentToResponseDto(assignment);
     }
+
+    @Override
+    @Transactional(rollbackFor = {SQLException.class,NotUniqueException.class,ResourceNotFoundException.class})
+    public AssignmentResponseDto editAssignment(EditAssignmentRequestDto requestDto) {
+        AssignmentId assignmentId = new AssignmentId(
+                requestDto.getOldAssignedTo(),
+                requestDto.getOldAssetCode(),
+                requestDto.getOldAssignedDate());
+        Assignment assignment = assignmentRepository.findById(assignmentId).orElseThrow(
+                () -> new ResourceNotFoundException("Assignment.not.found"));
+        if(!assignment.getState().equals(AppConstants.WAITING_FOR_ACCEPTANCE)){
+            throw new IllegalStateException("Assignment.state.invalid");
+        }
+        if(requestDto.getOldAssignedDate().compareTo(requestDto.getAssignedDate())>0){
+            throw new DateInvalidException("New.assignment.date.occurs.before.old.assignment.date");
+        }
+        Users assignBy = authenticationService.getUser();
+        if(requestDto.getOldAssignedDate().compareTo(requestDto.getAssignedDate())==0
+                && requestDto.getOldAssignedTo().equals(requestDto.getAssignedToStaffCode())
+                && requestDto.getOldAssetCode().equals(requestDto.getAssetCode())) {
+            assignment.setNote(requestDto.getNote());
+            assignment.setAssignedBy(assignBy);
+            return assignmentMapper.mapAssignmentToResponseDto(assignment);
+        }
+        assignment.getAsset().setState(AssetState.AVAILABLE);
+        if(assignmentRepository.existsById_AssetCodeAndId_AssignedDateAndId_AssignedTo
+                (requestDto.getAssetCode(), requestDto.getAssignedDate(), requestDto.getAssignedToStaffCode())){
+            throw new NotUniqueException("New.assignment.exist");
+        }
+        Asset asset = assetRepository.findById(requestDto.getAssetCode()).orElseThrow(
+                ()-> new ResourceNotFoundException("Asset.not.found"));
+        Users assignTo = userRepository.findById(requestDto.getAssignedToStaffCode()).orElseThrow(
+                ()-> new ResourceNotFoundException("Assign.to.user.not.found"));
+        Assignment newAssignment = assignmentMapper.mapEditAssignmentToAssignment(requestDto,asset,assignTo,assignBy);
+        assignmentRepository.delete(assignment);
+        assignmentRepository.save(newAssignment);
+        return assignmentMapper.mapAssignmentToResponseDto(newAssignment);
+    }
+
 
     @Override
     public List<AssignmentResponseDto> getListAssignmentByAssetCode(String assetCode) {

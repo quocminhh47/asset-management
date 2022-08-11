@@ -34,6 +34,12 @@ public class AssignmentResponseDto {
 
     private String assetSpecification;
 
+    private String assignedToFirstname;
+
+    private String assignedToLastname;
+
+    private String assignedToStaffCode;
+
     private Long requestReturningId;
 
 }

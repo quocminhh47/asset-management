@@ -4,6 +4,7 @@ package com.nashtech.assetmanagement.service.impl;
 import com.nashtech.assetmanagement.dto.DeleteAssignmentRequestDto;
 import com.nashtech.assetmanagement.dto.request.AssignmentRequestDto;
 import com.nashtech.assetmanagement.dto.request.ChangeAssignmentStateRequestDto;
+import com.nashtech.assetmanagement.dto.request.EditAssignmentRequestDto;
 import com.nashtech.assetmanagement.dto.response.AssignmentResponseDto;
 import com.nashtech.assetmanagement.dto.response.MessageResponse;
 import com.nashtech.assetmanagement.entities.Asset;
@@ -13,13 +14,13 @@ import com.nashtech.assetmanagement.entities.Users;
 import com.nashtech.assetmanagement.enums.AssetState;
 import com.nashtech.assetmanagement.exception.DateInvalidException;
 import com.nashtech.assetmanagement.exception.NotUniqueException;
-import com.nashtech.assetmanagement.exception.RequestNotAcceptException;
 import com.nashtech.assetmanagement.exception.ResourceNotFoundException;
 import com.nashtech.assetmanagement.mapper.AssignmentContent;
 import com.nashtech.assetmanagement.mapper.AssignmentMapper;
 import com.nashtech.assetmanagement.repositories.AssetRepository;
 import com.nashtech.assetmanagement.repositories.AssignmentRepository;
 import com.nashtech.assetmanagement.repositories.UserRepository;
+import com.nashtech.assetmanagement.utils.AppConstants;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -38,6 +39,7 @@ import java.util.Optional;
 
 import static com.nashtech.assetmanagement.utils.AppConstants.WAITING_FOR_ACCEPTANCE;
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.*;
@@ -50,6 +52,7 @@ class AssignmentServiceImplTest {
     AssetRepository assetRepository;
     AssignmentMapper assignmentMapper;
     AssignmentServiceImpl assignmentServiceImpl;
+    AuthenticationServiceImpl authenticationService;
     List<String> states;
 
 
@@ -60,8 +63,9 @@ class AssignmentServiceImplTest {
         userRepository = mock(UserRepository.class);
         assetRepository = mock(AssetRepository.class);
         assignmentMapper = mock(AssignmentMapper.class);
+        authenticationService = mock(AuthenticationServiceImpl.class);
         assignmentServiceImpl = new AssignmentServiceImpl(assignmentRepository, assignmentContent, userRepository,
-                assetRepository, assignmentMapper);
+                assetRepository, assignmentMapper,authenticationService);
 
     }
 
@@ -171,8 +175,8 @@ class AssignmentServiceImplTest {
         when(assetRepository.findById("assetCode")).thenReturn(Optional.of(asset));
         when(userRepository.findById("assignBy")).thenReturn(Optional.of(assignBy));
         when(userRepository.findById("assignTo")).thenReturn(Optional.of(assignTo));
-        when(assignmentMapper.MapRequestAssignmentToAssignment(request)).thenReturn(assignment);
-        when(assignmentMapper.MapAssignmentToResponseDto(assignment)).thenReturn(response);
+        when(assignmentMapper.mapRequestAssignmentToAssignment(request)).thenReturn(assignment);
+        when(assignmentMapper.mapAssignmentToResponseDto(assignment)).thenReturn(response);
         AssignmentResponseDto result = assignmentServiceImpl.createNewAssignment(request);
         verify(asset).setState(AssetState.ASSIGNED);
         verify(assignment).setAssignedTo(assignTo);
@@ -233,6 +237,80 @@ class AssignmentServiceImplTest {
         NotUniqueException e = Assertions.assertThrows(NotUniqueException.class,
                 () -> assignmentServiceImpl.createNewAssignment(request));
         assertThat(e.getMessage()).isEqualTo("AssignmentId.is.exist");
+    }
+
+    // US585 Admin Edit Assignment
+    @Test
+    void editAssignment_ShouldReturnAssignmentResponseDto_WhenRequestValid(){
+        ArgumentCaptor<AssignmentId> assignmentIdCaptor = ArgumentCaptor.forClass(AssignmentId.class);
+        Assignment assignment = mock(Assignment.class);
+        Asset asset = mock(Asset.class);
+        Asset oldAsset = mock(Asset.class);
+        Users assignTo = mock(Users.class);
+        Users assignBy = mock(Users.class);
+        Assignment newAssignment = mock(Assignment.class);
+        EditAssignmentRequestDto requestDto = mock(EditAssignmentRequestDto.class);
+        AssignmentResponseDto responseDto = mock(AssignmentResponseDto.class);
+        when(requestDto.getOldAssetCode()).thenReturn("OldAssetCode");
+        when(requestDto.getAssetCode()).thenReturn("AssetCode");
+        when(requestDto.getOldAssignedDate()).thenReturn(Date.valueOf("2022-08-09"));
+        when(requestDto.getAssignedDate()).thenReturn(Date.valueOf("2022-08-10"));
+        when(requestDto.getOldAssignedTo()).thenReturn("OldAssignTo");
+        when(requestDto.getAssignedToStaffCode()).thenReturn("AssignTo");
+        when(assignmentRepository.findById(assignmentIdCaptor.capture())).thenReturn(Optional.of(assignment));
+        when(assignment.getState()).thenReturn(AppConstants.WAITING_FOR_ACCEPTANCE);
+        when(assignment.getAsset()).thenReturn(oldAsset);
+        when(assignmentRepository.existsById_AssetCodeAndId_AssignedDateAndId_AssignedTo
+                ("AssetCode",Date.valueOf("2022-08-10"),"AssignTo")).thenReturn(false);
+        when(assetRepository.findById("AssetCode")).thenReturn(Optional.of(asset));
+        when(userRepository.findById("AssignTo")).thenReturn(Optional.of(assignTo));
+        when(authenticationService.getUser()).thenReturn(assignBy);
+        when(assignmentMapper.mapEditAssignmentToAssignment(requestDto,asset,assignTo,assignBy)).thenReturn(newAssignment);
+        when(assignmentMapper.mapAssignmentToResponseDto(newAssignment)).thenReturn(responseDto);
+        AssignmentResponseDto result = assignmentServiceImpl.editAssignment(requestDto);
+        assertThat(result).isEqualTo(responseDto);
+        verify(oldAsset).setState(AssetState.AVAILABLE);
+        assertEquals("OldAssetCode",assignmentIdCaptor.getValue().getAssetCode());
+        assertEquals("OldAssignTo",assignmentIdCaptor.getValue().getAssignedTo());
+        assertEquals(Date.valueOf("2022-08-09"),assignmentIdCaptor.getValue().getAssignedDate());
+        verify(assignmentRepository).delete(assignment);
+        verify(assignmentRepository).save(newAssignment);
+    }
+
+    @Test
+    void editAssignment_ShouldThrowIllegalStateEx_WhenAssignmentStateIncorrect(){
+        ArgumentCaptor<AssignmentId> assignmentIdCaptor = ArgumentCaptor.forClass(AssignmentId.class);
+        Assignment assignment = mock(Assignment.class);
+        EditAssignmentRequestDto requestDto = mock(EditAssignmentRequestDto.class);
+        when(assignmentRepository.findById(assignmentIdCaptor.capture())).thenReturn(Optional.of(assignment));
+        when(assignment.getState()).thenReturn("Not waiting for acceptance");
+        IllegalStateException ex = Assertions.assertThrows(IllegalStateException.class,
+                () -> assignmentServiceImpl.editAssignment(requestDto));
+        assertThat(ex.getMessage()).isEqualTo("Assignment.state.invalid");
+    }
+
+    @Test
+    void editAssignment_ShouldThrowDateInvalidEx_WhenAssignedDateBeforeOldAssignedDate(){
+        EditAssignmentRequestDto requestDto = mock(EditAssignmentRequestDto.class);
+        ArgumentCaptor<AssignmentId> assignmentIdCaptor = ArgumentCaptor.forClass(AssignmentId.class);
+        Assignment assignment = mock(Assignment.class);
+        when(requestDto.getOldAssignedDate()).thenReturn(Date.valueOf("2022-08-09"));
+        when(requestDto.getAssignedDate()).thenReturn(Date.valueOf("2022-08-08"));
+        when(assignmentRepository.findById(assignmentIdCaptor.capture())).thenReturn(Optional.of(assignment));
+        when(assignment.getState()).thenReturn(WAITING_FOR_ACCEPTANCE);
+        DateInvalidException ex = Assertions.assertThrows(DateInvalidException.class,
+                () -> assignmentServiceImpl.editAssignment(requestDto));
+        assertThat(ex.getMessage()).isEqualTo("New.assignment.date.occurs.before.old.assignment.date");
+    }
+
+    @Test
+    void editAssignment_ShouldThrowResourceNotFoundEx_WhenOldAssignmentIdNotExist(){
+        EditAssignmentRequestDto requestDto = mock(EditAssignmentRequestDto.class);
+        ArgumentCaptor<AssignmentId> assignmentIdCaptor = ArgumentCaptor.forClass(AssignmentId.class);
+        when(assignmentRepository.findById(assignmentIdCaptor.capture())).thenReturn(Optional.empty());
+        ResourceNotFoundException ex = Assertions.assertThrows(ResourceNotFoundException.class,
+                () -> assignmentServiceImpl.editAssignment(requestDto));
+        assertThat(ex.getMessage()).isEqualTo("Assignment.not.found");
     }
 
     @Test

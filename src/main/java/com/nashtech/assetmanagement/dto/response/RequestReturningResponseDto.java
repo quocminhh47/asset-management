@@ -2,6 +2,7 @@ package com.nashtech.assetmanagement.dto.response;
 
 import java.sql.Date;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -21,5 +22,9 @@ public class RequestReturningResponseDto {
 	private String assignmentAssetCode;
 	private String assignmentAssetName;
 	private String assignmentIdAssigneddate;
-	
+	@JsonProperty("assignedTo")
+	private String assignmentIdAssignedTo;
+
+
+
 }
