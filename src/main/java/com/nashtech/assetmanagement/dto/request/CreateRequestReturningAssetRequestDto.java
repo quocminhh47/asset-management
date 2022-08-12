@@ -16,10 +16,12 @@ public class CreateRequestReturningAssetRequestDto {
     @NotEmpty(message = "requestedBy must not be empty.")
     private String requestedBy;
 
+    @NotEmpty(message = "assignedTo must not be empty.")
+    private String assignedTo;
+
     @NotEmpty(message = "assetCode must not be empty.")
     private String assetCode;
 
     private Date assignedDate;
 
-    private Date returnedDate;
 }

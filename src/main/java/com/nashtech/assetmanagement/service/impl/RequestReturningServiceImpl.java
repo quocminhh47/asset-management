@@ -146,11 +146,14 @@ public class RequestReturningServiceImpl implements RequestReturningService {
 		Users requestedByUser = userRepository.findByUserName(createRequestReturningAssetRequestDto.getRequestedBy()).orElseThrow(
 				() -> new ResourceNotFoundException("Cannot find requestedByUser with username: " + createRequestReturningAssetRequestDto.getRequestedBy()));
 
+		Users assignedToUser = userRepository.findByUserName(createRequestReturningAssetRequestDto.getAssignedTo()).orElseThrow(
+				() -> new ResourceNotFoundException("Cannot find assignedToUser with username: " + createRequestReturningAssetRequestDto.getAssignedTo()));
+
 		assetRepository.findById(createRequestReturningAssetRequestDto.getAssetCode()).orElseThrow(
 				() -> new ResourceNotFoundException("Cannot find asset with asset code: " + createRequestReturningAssetRequestDto.getAssetCode()));
 
 		AssignmentId assignmentId = new AssignmentId(
-				requestedByUser.getStaffCode(),
+				assignedToUser.getStaffCode(),
 				createRequestReturningAssetRequestDto.getAssetCode(),
 				createRequestReturningAssetRequestDto.getAssignedDate());
 
@@ -170,7 +173,6 @@ public class RequestReturningServiceImpl implements RequestReturningService {
 		RequestReturning requestReturning = RequestReturning.builder()
 				.requestedBy(requestedByUser)
 				.assignment(assignment)
-				.returnedDate(createRequestReturningAssetRequestDto.getReturnedDate())
 				.state(WAITING_FOR_RETURNING)
 				.build();
 

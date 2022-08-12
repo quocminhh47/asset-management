@@ -208,14 +208,33 @@ class RequestReturningServiceImplTest {
         assertThat(exception.getMessage()).isEqualTo("Cannot find requestedByUser with username: longt");
     }
 
+    @DisplayName("Given invalid assignedTo username when create request returning asset then return exception - negative case")
+    @Test
+    public void createRequestReturningAsset_ShouldReturnResourceNotFoundException_WhenAssignedToUsernameInvalid() {
+        CreateRequestReturningAssetRequestDto createRequestReturningAssetRequestDto = mock(CreateRequestReturningAssetRequestDto.class);
+        Users requestedByUser = mock(Users.class);
+        when(createRequestReturningAssetRequestDto.getRequestedBy()).thenReturn("longt");
+        when(userRepository.findByUserName("longt")).thenReturn(Optional.of(requestedByUser));
+        when(createRequestReturningAssetRequestDto.getAssignedTo()).thenReturn("longt2");
+        when(userRepository.findByUserName("longt2")).thenReturn(Optional.empty());
+        ResourceNotFoundException exception = Assertions.assertThrows(ResourceNotFoundException.class,
+                () -> requestReturningServiceImpl.createRequestReturningAsset(createRequestReturningAssetRequestDto));
+
+        assertThat(exception.getMessage()).isEqualTo("Cannot find assignedToUser with username: longt2");
+    }
+
     @DisplayName("Given invalid assetCode when create request returning asset then return exception - negative case")
     @Test
     public void createRequestReturningAsset_ShouldReturnResourceNotFoundException_WhenAssetCodeInvalid() {
         CreateRequestReturningAssetRequestDto createRequestReturningAssetRequestDto = mock(CreateRequestReturningAssetRequestDto.class);
         Users requestedByUser = mock(Users.class);
+        Users assignedToUser = mock(Users.class);
+
 
         when(createRequestReturningAssetRequestDto.getRequestedBy()).thenReturn("longt");
         when(userRepository.findByUserName("longt")).thenReturn(Optional.of(requestedByUser));
+        when(createRequestReturningAssetRequestDto.getAssignedTo()).thenReturn("longt2");
+        when(userRepository.findByUserName("longt2")).thenReturn(Optional.of(assignedToUser));
         when(createRequestReturningAssetRequestDto.getAssetCode()).thenReturn("CT123456");
         when(assetRepository.findById("CT123456")).thenReturn(Optional.empty());
         ResourceNotFoundException exception = Assertions.assertThrows(ResourceNotFoundException.class,
@@ -229,10 +248,13 @@ class RequestReturningServiceImplTest {
     public void createRequestReturningAsset_ShouldReturnResourceNotFoundException_WhenAssignmentIdInvalid() {
         CreateRequestReturningAssetRequestDto createRequestReturningAssetRequestDto = mock(CreateRequestReturningAssetRequestDto.class);
         Users requestedByUser = mock(Users.class);
+        Users assignedToUser = mock(Users.class);
         Asset asset = mock(Asset.class);
 
         when(createRequestReturningAssetRequestDto.getRequestedBy()).thenReturn("longt");
         when(userRepository.findByUserName("longt")).thenReturn(Optional.of(requestedByUser));
+        when(createRequestReturningAssetRequestDto.getAssignedTo()).thenReturn("longt2");
+        when(userRepository.findByUserName("longt2")).thenReturn(Optional.of(assignedToUser));
         when(createRequestReturningAssetRequestDto.getAssetCode()).thenReturn("CT123456");
         when(assetRepository.findById("CT123456")).thenReturn(Optional.of(asset));
         ArgumentCaptor<AssignmentId> assignmentIdArgumentCaptor = ArgumentCaptor.forClass(AssignmentId.class);
@@ -248,11 +270,15 @@ class RequestReturningServiceImplTest {
     public void createRequestReturningAsset_ShouldReturnRuntimeException_WhenAssignmentStateIsNotAccepted() {
         CreateRequestReturningAssetRequestDto createRequestReturningAssetRequestDto = mock(CreateRequestReturningAssetRequestDto.class);
         Users requestedByUser = mock(Users.class);
+        Users assignedToUser = mock(Users.class);
         Asset asset = mock(Asset.class);
         Assignment assignment = mock(Assignment.class);
 
         when(createRequestReturningAssetRequestDto.getRequestedBy()).thenReturn("longt");
         when(userRepository.findByUserName("longt")).thenReturn(Optional.of(requestedByUser));
+        when(createRequestReturningAssetRequestDto.getAssignedTo()).thenReturn("longt2");
+        when(userRepository.findByUserName("longt2")).thenReturn(Optional.of(assignedToUser));
+        when(createRequestReturningAssetRequestDto.getAssetCode()).thenReturn("CT123456");
         when(createRequestReturningAssetRequestDto.getAssetCode()).thenReturn("CT123456");
         when(assetRepository.findById("CT123456")).thenReturn(Optional.of(asset));
         ArgumentCaptor<AssignmentId> assignmentIdArgumentCaptor = ArgumentCaptor.forClass(AssignmentId.class);
@@ -271,12 +297,15 @@ class RequestReturningServiceImplTest {
     public void createRequestReturningAsset_ShouldReturnRuntimeException_WhenRequestReturningHaveMoreThanOneAssignment() {
         CreateRequestReturningAssetRequestDto createRequestReturningAssetRequestDto = mock(CreateRequestReturningAssetRequestDto.class);
         Users requestedByUser = mock(Users.class);
+        Users assignedToUser = mock(Users.class);
         Asset asset = mock(Asset.class);
         Assignment assignment = mock(Assignment.class);
         RequestReturning requestReturning = mock(RequestReturning.class);
 
         when(createRequestReturningAssetRequestDto.getRequestedBy()).thenReturn("longt");
         when(userRepository.findByUserName("longt")).thenReturn(Optional.of(requestedByUser));
+        when(createRequestReturningAssetRequestDto.getAssignedTo()).thenReturn("longt2");
+        when(userRepository.findByUserName("longt2")).thenReturn(Optional.of(assignedToUser));
         when(createRequestReturningAssetRequestDto.getAssetCode()).thenReturn("CT123456");
         when(assetRepository.findById("CT123456")).thenReturn(Optional.of(asset));
         ArgumentCaptor<AssignmentId> assignmentIdArgumentCaptor = ArgumentCaptor.forClass(AssignmentId.class);
@@ -294,11 +323,15 @@ class RequestReturningServiceImplTest {
     public void createRequestReturningAsset_ShouldReturnCreateRequestReturningResponseDto_WhenCreateRequestReturningAssetRequestDtoValid() {
         CreateRequestReturningAssetRequestDto createRequestReturningAssetRequestDto = mock(CreateRequestReturningAssetRequestDto.class);
         Users requestedByUser = mock(Users.class);
+        Users assignedToUser = mock(Users.class);
         Asset asset = mock(Asset.class);
         Assignment assignment = mock(Assignment.class);
+        CreateRequestReturningResponseDto createRequestReturningResponseDtoActual = mock(CreateRequestReturningResponseDto.class);
 
         when(createRequestReturningAssetRequestDto.getRequestedBy()).thenReturn("longt");
         when(userRepository.findByUserName("longt")).thenReturn(Optional.of(requestedByUser));
+        when(createRequestReturningAssetRequestDto.getAssignedTo()).thenReturn("longt2");
+        when(userRepository.findByUserName("longt2")).thenReturn(Optional.of(assignedToUser));
 
         when(createRequestReturningAssetRequestDto.getAssetCode()).thenReturn("CT123456");
         when(assetRepository.findById("CT123456")).thenReturn(Optional.of(asset));
@@ -310,17 +343,16 @@ class RequestReturningServiceImplTest {
 
         when(requestReturningRepository.getRequestReturningByAssignment(assignment)).thenReturn(Optional.empty());
         var requestReturningArgumentCaptor = ArgumentCaptor.forClass(RequestReturning.class);
-
         CreateRequestReturningResponseDto createRequestReturningResponseDtoExpected
                 = requestReturningServiceImpl.createRequestReturningAsset(createRequestReturningAssetRequestDto);
 
         verify(requestReturningRepository).save(requestReturningArgumentCaptor.capture());
-
         RequestReturning returningValue = requestReturningArgumentCaptor.getValue();
         assertThat(returningValue.getRequestedBy()).isEqualTo(requestedByUser);
         assertThat(returningValue.getAssignment()).isEqualTo(assignment);
-        assertThat(returningValue.getReturnedDate()).isEqualTo(createRequestReturningAssetRequestDto.getReturnedDate());
         assertThat(returningValue.getState()).isEqualTo(WAITING_FOR_RETURNING);
+
+        when(modelMapper.map(returningValue, CreateRequestReturningResponseDto.class)).thenReturn(createRequestReturningResponseDtoActual);
 
         verify(modelMapper).map(returningValue, CreateRequestReturningResponseDto.class);
     }

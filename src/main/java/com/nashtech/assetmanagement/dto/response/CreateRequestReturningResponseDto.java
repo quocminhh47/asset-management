@@ -43,7 +43,4 @@ public class CreateRequestReturningResponseDto {
 
     @JsonProperty("assignmentNote")
     private String assignmentNote;
-
-    @JsonProperty("assignmentIsRequestReturning")
-    private Boolean assignmentIsRequestReturning;
 }
