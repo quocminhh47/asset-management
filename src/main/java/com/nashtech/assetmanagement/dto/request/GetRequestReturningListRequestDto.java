@@ -11,14 +11,14 @@ import lombok.Setter;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-public class RequestReturningRequestGetListDto {
-	
-	List<String> states;
-	String returnedDate;
-	String keyword;
-	String sortBy;
-	String sortDirection;
-	Integer page;
-	Integer size;
-	
+public class GetRequestReturningListRequestDto {
+
+	private List<String> states;
+	private String returnedDate;
+	private String keyword;
+	private String sortBy;
+	private String sortDirection;
+	private Integer page;
+	private Integer size;
+
 }

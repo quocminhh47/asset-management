@@ -19,7 +19,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 
 import com.nashtech.assetmanagement.dto.request.CreateRequestReturningAssetRequestDto;
-import com.nashtech.assetmanagement.dto.request.RequestReturningRequestGetListDto;
+import com.nashtech.assetmanagement.dto.request.GetRequestReturningListRequestDto;
 import com.nashtech.assetmanagement.dto.request.ReturningRequestDto;
 import com.nashtech.assetmanagement.dto.response.CreateRequestReturningResponseDto;
 import com.nashtech.assetmanagement.dto.response.ListRequestReturningResponseDto;
@@ -69,7 +69,7 @@ public class RequestReturningServiceImpl implements RequestReturningService {
 			"request only when its state is : 'Waiting for returning'! ";
 
 	@Override
-	public ListRequestReturningResponseDto getListRequestReturning(RequestReturningRequestGetListDto dto) {
+	public ListRequestReturningResponseDto getListRequestReturning(GetRequestReturningListRequestDto dto) {
 
 		long totalItems = 0;
 		List<RequestReturning> listEntity = new ArrayList<>();

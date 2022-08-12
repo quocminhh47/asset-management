@@ -37,7 +37,7 @@ import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
 
 import com.nashtech.assetmanagement.dto.request.CreateRequestReturningAssetRequestDto;
-import com.nashtech.assetmanagement.dto.request.RequestReturningRequestGetListDto;
+import com.nashtech.assetmanagement.dto.request.GetRequestReturningListRequestDto;
 import com.nashtech.assetmanagement.dto.request.ReturningRequestDto;
 import com.nashtech.assetmanagement.dto.response.CreateRequestReturningResponseDto;
 import com.nashtech.assetmanagement.dto.response.ListRequestReturningResponseDto;
@@ -392,10 +392,10 @@ class RequestReturningServiceImplTest {
 	@Test
 	void getListRequestReturning_ShouldReturnListRequestReturningResponseDto_whenTheRequestIsLackOfSearchValue() {
 		List<String> listStatesActual = List.of("COMPLETED", "WAITING_FOR_RETURNING");
-		RequestReturningRequestGetListDto dtoValue = new RequestReturningRequestGetListDto(listStatesActual,
+		GetRequestReturningListRequestDto dtoValue = new GetRequestReturningListRequestDto(listStatesActual,
 				"2022-08-09", "", "assignment.asset.code", "ASC", 1, 2);
 
-		RequestReturningRequestGetListDto dto = mock(RequestReturningRequestGetListDto.class);
+		GetRequestReturningListRequestDto dto = mock(GetRequestReturningListRequestDto.class);
 		Page<RequestReturning> pageRequestReturning = mock(Page.class);
 		List<RequestReturning> listEntity = mock(List.class);
 		List<RequestReturningResponseDto> expectList = mock(List.class);
@@ -433,10 +433,10 @@ class RequestReturningServiceImplTest {
 	@Test
 	void getListRequestReturning_ShouldReturnListRequestReturningResponseDto_whenTheRequestIsValid() {
 		List<String> listStatesActual = List.of("COMPLETED", "WAITING_FOR_RETURNING");
-		RequestReturningRequestGetListDto dtoValue = new RequestReturningRequestGetListDto(listStatesActual,
+		GetRequestReturningListRequestDto dtoValue = new GetRequestReturningListRequestDto(listStatesActual,
 				"2022-08-09", "a", "assignment.asset.code", "ASC", 1, 2);
 
-		RequestReturningRequestGetListDto dto = mock(RequestReturningRequestGetListDto.class);
+		GetRequestReturningListRequestDto dto = mock(GetRequestReturningListRequestDto.class);
 		Page<RequestReturning> pageRequestReturning = mock(Page.class);
 		List<RequestReturning> listEntity = mock(List.class);
 		List<RequestReturningResponseDto> expectList = mock(List.class);
@@ -474,10 +474,10 @@ class RequestReturningServiceImplTest {
 	@Test
 	void getListRequestReturning_ShouldReturnListRequestReturningResponseDtoDESC_whenTheRequestIsValid() {
 		List<String> listStatesActual = List.of("COMPLETED", "WAITING_FOR_RETURNING");
-		RequestReturningRequestGetListDto dtoValue = new RequestReturningRequestGetListDto(listStatesActual,
+		GetRequestReturningListRequestDto dtoValue = new GetRequestReturningListRequestDto(listStatesActual,
 				"2022-08-09", "a", "assignment.asset.code", "DESC", 1, 2);
 
-		RequestReturningRequestGetListDto dto = mock(RequestReturningRequestGetListDto.class);
+		GetRequestReturningListRequestDto dto = mock(GetRequestReturningListRequestDto.class);
 		Page<RequestReturning> pageRequestReturning = mock(Page.class);
 		List<RequestReturning> listEntity = mock(List.class);
 		List<RequestReturningResponseDto> expectList = mock(List.class);
@@ -514,10 +514,10 @@ class RequestReturningServiceImplTest {
 	@Test
 	void getListRequestReturning_ShouldReturnListRequestReturningResponseDto_whenTheRequestLackOfReturnDate() {
 		List<String> listStatesActual = List.of("COMPLETED", "WAITING_FOR_RETURNING");
-		RequestReturningRequestGetListDto dtoValue = new RequestReturningRequestGetListDto(listStatesActual, "", "a",
+		GetRequestReturningListRequestDto dtoValue = new GetRequestReturningListRequestDto(listStatesActual, "", "a",
 				"assignment.asset.code", "ASC", 1, 2);
 
-		RequestReturningRequestGetListDto dto = mock(RequestReturningRequestGetListDto.class);
+		GetRequestReturningListRequestDto dto = mock(GetRequestReturningListRequestDto.class);
 		Page<RequestReturning> pageRequestReturning = mock(Page.class);
 		List<RequestReturning> listEntity = mock(List.class);
 		List<RequestReturningResponseDto> expectList = mock(List.class);
@@ -556,10 +556,10 @@ class RequestReturningServiceImplTest {
 	@Test
 	void getListSortByAcceptedByDESC_ShouldReturnListRequestReturningResponseDto_whenTheRequestLackOfReturnDate() {
 		List<String> listStatesActual = List.of("COMPLETED", "WAITING_FOR_RETURNING");
-		RequestReturningRequestGetListDto dtoValue = new RequestReturningRequestGetListDto(listStatesActual, "", "a",
+		GetRequestReturningListRequestDto dtoValue = new GetRequestReturningListRequestDto(listStatesActual, "", "a",
 				"acceptedBy.userName", "DESC", 1, 2);
 
-		RequestReturningRequestGetListDto dto = mock(RequestReturningRequestGetListDto.class);
+		GetRequestReturningListRequestDto dto = mock(GetRequestReturningListRequestDto.class);
 		Page<RequestReturning> pageRequestReturning = mock(Page.class);
 		List<RequestReturning> listEntity = mock(List.class);
 		List<RequestReturningResponseDto> expectList = mock(List.class);
@@ -598,10 +598,10 @@ class RequestReturningServiceImplTest {
 	@Test
 	void getListSortByAcceptedByDESC_ShouldReturnListRequestReturningResponseDto_whenTheRequestIsValid() {
 		List<String> listStatesActual = List.of("COMPLETED", "WAITING_FOR_RETURNING");
-		RequestReturningRequestGetListDto dtoValue = new RequestReturningRequestGetListDto(listStatesActual,
+		GetRequestReturningListRequestDto dtoValue = new GetRequestReturningListRequestDto(listStatesActual,
 				"2022-08-09", "a", "acceptedBy.userName", "DESC", 1, 2);
 
-		RequestReturningRequestGetListDto dto = mock(RequestReturningRequestGetListDto.class);
+		GetRequestReturningListRequestDto dto = mock(GetRequestReturningListRequestDto.class);
 		Page<RequestReturning> pageRequestReturning = mock(Page.class);
 		List<RequestReturning> listEntity = mock(List.class);
 		List<RequestReturningResponseDto> expectList = mock(List.class);
@@ -640,10 +640,10 @@ class RequestReturningServiceImplTest {
 	@Test
 	void getListSortByAcceptedByASC_ShouldReturnListRequestReturningResponseDto_whenTheRequestLackOfReturnDate() {
 		List<String> listStatesActual = List.of("COMPLETED", "WAITING_FOR_RETURNING");
-		RequestReturningRequestGetListDto dtoValue = new RequestReturningRequestGetListDto(listStatesActual, "", "a",
+		GetRequestReturningListRequestDto dtoValue = new GetRequestReturningListRequestDto(listStatesActual, "", "a",
 				"acceptedBy.userName", "ASC", 1, 2);
 
-		RequestReturningRequestGetListDto dto = mock(RequestReturningRequestGetListDto.class);
+		GetRequestReturningListRequestDto dto = mock(GetRequestReturningListRequestDto.class);
 		Page<RequestReturning> pageRequestReturning = mock(Page.class);
 		List<RequestReturning> listEntity = mock(List.class);
 		List<RequestReturningResponseDto> expectList = mock(List.class);
@@ -682,10 +682,10 @@ class RequestReturningServiceImplTest {
 	@Test
 	void getListSortByAcceptedByASC_ShouldReturnListRequestReturningResponseDto_whenTheRequestIsValid() {
 		List<String> listStatesActual = List.of("COMPLETED", "WAITING_FOR_RETURNING");
-		RequestReturningRequestGetListDto dtoValue = new RequestReturningRequestGetListDto(listStatesActual,
+		GetRequestReturningListRequestDto dtoValue = new GetRequestReturningListRequestDto(listStatesActual,
 				"2022-08-09", "a", "acceptedBy.userName", "ASC", 1, 2);
 
-		RequestReturningRequestGetListDto dto = mock(RequestReturningRequestGetListDto.class);
+		GetRequestReturningListRequestDto dto = mock(GetRequestReturningListRequestDto.class);
 		Page<RequestReturning> pageRequestReturning = mock(Page.class);
 		List<RequestReturning> listEntity = mock(List.class);
 		List<RequestReturningResponseDto> expectList = mock(List.class);

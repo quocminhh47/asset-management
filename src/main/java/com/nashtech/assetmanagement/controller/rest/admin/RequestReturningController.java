@@ -17,7 +17,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.nashtech.assetmanagement.dto.request.RequestReturningRequestGetListDto;
+import com.nashtech.assetmanagement.dto.request.GetRequestReturningListRequestDto;
 import com.nashtech.assetmanagement.dto.request.ReturningRequestDto;
 import com.nashtech.assetmanagement.dto.response.ListRequestReturningResponseDto;
 import com.nashtech.assetmanagement.dto.response.ListStateRequestReturningResponseDto;
@@ -57,7 +57,7 @@ public class RequestReturningController {
 			@RequestParam(required = false, defaultValue = "", value = "sortDirection") String sortDirection,
 			@RequestParam(required = false, defaultValue = "", value = "returnDate") String returnDate,
 			@RequestParam(required = false, defaultValue = "", value = "states") List<String> states) {
-		RequestReturningRequestGetListDto dto = new RequestReturningRequestGetListDto(states, returnDate, keyword,
+		GetRequestReturningListRequestDto dto = new GetRequestReturningListRequestDto(states, returnDate, keyword,
 				sortBy, sortDirection, page, size);
 		ListRequestReturningResponseDto result = requestReturningService.getListRequestReturning(dto);
 		return new ResponseEntity<ListRequestReturningResponseDto>(result, HttpStatus.OK);

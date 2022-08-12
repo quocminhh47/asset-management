@@ -1,6 +1,5 @@
 package com.nashtech.assetmanagement.service.impl;
 
-
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.eq;
@@ -13,7 +12,6 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 
-import com.nashtech.assetmanagement.dto.response.*;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -24,8 +22,16 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 
-import com.nashtech.assetmanagement.dto.request.EditAssetRequestDto;
 import com.nashtech.assetmanagement.dto.request.CreateAssetRequestDto;
+import com.nashtech.assetmanagement.dto.request.EditAssetRequestDto;
+import com.nashtech.assetmanagement.dto.request.GetAssetListRequestDto;
+import com.nashtech.assetmanagement.dto.response.AssetResponseDto;
+import com.nashtech.assetmanagement.dto.response.EditAssetResponseDto;
+import com.nashtech.assetmanagement.dto.response.IAssetReportResponseDto;
+import com.nashtech.assetmanagement.dto.response.ListAssetResponseDto;
+import com.nashtech.assetmanagement.dto.response.ListSearchingAssetResponseDto;
+import com.nashtech.assetmanagement.dto.response.MessageResponse;
+import com.nashtech.assetmanagement.dto.response.ResponseAssetDto;
 import com.nashtech.assetmanagement.entities.Asset;
 import com.nashtech.assetmanagement.entities.Assignment;
 import com.nashtech.assetmanagement.entities.Category;
@@ -63,7 +69,7 @@ public class AssetServiceImplTest {
 	@BeforeEach
 	void setUp() {
 		asset = mock(Asset.class);
-		authenticationServiceImpl=mock(AuthenticationServiceImpl.class);
+		authenticationServiceImpl = mock(AuthenticationServiceImpl.class);
 		assetRepository = mock(AssetRepository.class);
 		assetMapper = mock(AssetMapper.class);
 		locationRepository = mock(LocationRepository.class);
@@ -71,30 +77,30 @@ public class AssetServiceImplTest {
 		userRepository = mock(UserRepository.class);
 		assignmentRepository = mock(AssignmentRepository.class);
 		assetServiceImpl = new AssetServiceImpl(assetRepository, categoryRepository, userRepository, locationRepository,
-				assetMapper, assignmentRepository,authenticationServiceImpl);
+				assetMapper, assignmentRepository, authenticationServiceImpl);
 
 		request = new EditAssetRequestDto("Dell inspriration 5432", "CPU 7200U, RAM 16GB", "2022-01-01", newAssetState);
 	}
 
-    @Test
-    public void createAsset_ShouldReturnAsset_WhenRequestValid() {
-        CreateAssetRequestDto requestCreateAsset = new CreateAssetRequestDto("Lap top", "LT", "good", AssetState.AVAILABLE,
-                null);
-		Users users=mock(Users.class);
+	@Test
+	public void createAsset_ShouldReturnAsset_WhenRequestValid() {
+		CreateAssetRequestDto requestCreateAsset = new CreateAssetRequestDto("Lap top", "LT", "good",
+				AssetState.AVAILABLE, null);
+		Users users = mock(Users.class);
 		when(authenticationServiceImpl.getUser()).thenReturn(users);
-        when(assetMapper.requestAssetToAsset(requestCreateAsset)).thenReturn(asset);
-        Category category = mock(Category.class);
-        Optional<Category> categoryOptional = Optional.of(category);
-        when(categoryRepository.findById("LT")).thenReturn(categoryOptional);
-        when(assetRepository.save(asset)).thenReturn(asset);
-        ResponseAssetDto expected = mock(ResponseAssetDto.class);
-        when(assetMapper.assetToResponseAssetDTO(asset)).thenReturn(expected);
-        ResponseAssetDto actual = assetServiceImpl.createAsset(requestCreateAsset);
-        ArgumentCaptor<String> assetCodeCapture = ArgumentCaptor.forClass(java.lang.String.class);
-        verify(asset).setCode(assetCodeCapture.capture());
-        verify(asset).setCategory(category);
-        assertThat(actual).isEqualTo(expected);
-    }
+		when(assetMapper.requestAssetToAsset(requestCreateAsset)).thenReturn(asset);
+		Category category = mock(Category.class);
+		Optional<Category> categoryOptional = Optional.of(category);
+		when(categoryRepository.findById("LT")).thenReturn(categoryOptional);
+		when(assetRepository.save(asset)).thenReturn(asset);
+		ResponseAssetDto expected = mock(ResponseAssetDto.class);
+		when(assetMapper.assetToResponseAssetDTO(asset)).thenReturn(expected);
+		ResponseAssetDto actual = assetServiceImpl.createAsset(requestCreateAsset);
+		ArgumentCaptor<String> assetCodeCapture = ArgumentCaptor.forClass(java.lang.String.class);
+		verify(asset).setCode(assetCodeCapture.capture());
+		verify(asset).setCategory(category);
+		assertThat(actual).isEqualTo(expected);
+	}
 
 	// US584-CreateNewAssignment
 	@Test
@@ -174,12 +180,14 @@ public class AssetServiceImplTest {
 	@DisplayName("Test for get list asset by user but user_id not found")
 	@Test
 	void getListAsset_ShouldThrownExceptionUserNotFound_WhenUserIdNotExist() {
+
 		List<String> listStates = mock(List.class);
 		List<String> listcategories = mock(List.class);
 		when(userRepository.findById("SD001")).thenReturn(Optional.empty());
+		GetAssetListRequestDto requestDto = new GetAssetListRequestDto("SD001", 1, 2, "a", "sortBy", "sortDirection",
+				listcategories, listStates);
 		Exception exception = assertThrows(ResourceNotFoundException.class, () -> {
-			assetServiceImpl.getListAsset("SD001", listcategories, listStates, "keyword", "sortBy", "sortDirection", 1,
-					1);
+			assetServiceImpl.getListAsset(requestDto);
 		});
 		assertThat(exception.getMessage()).isEqualTo("user.not.found.with.code:SD001");
 	}
@@ -207,8 +215,9 @@ public class AssetServiceImplTest {
 		when(pageAsset.getContent()).thenReturn(listAsset);
 		when(assetMapper.mapperListAsset(listAsset)).thenReturn(expectList);
 
-		ListAssetResponseDto actual = assetServiceImpl.getListAsset("SD001", listcategories, listStates, "a", "code",
-				"DESC", 1, 2);
+		GetAssetListRequestDto requestDto = new GetAssetListRequestDto("SD001", 1, 2, "a", "sortBy", "sortDirection",
+				listcategories, listStates);
+		ListAssetResponseDto actual = assetServiceImpl.getListAsset(requestDto);
 
 		ArgumentCaptor<Pageable> captor = ArgumentCaptor.forClass(Pageable.class);
 		ArgumentCaptor<List> captorlistCategories = ArgumentCaptor.forClass(List.class);
@@ -217,7 +226,7 @@ public class AssetServiceImplTest {
 		verify(assetRepository).getListAsset(eq("SD001"), captorlistCategories.capture(), captorlistStates.capture(),
 				eq("a"), captor.capture());
 		Pageable pageable = captor.getValue();
-		
+
 		List<String> listCategoriesExpect = captorlistCategories.getValue();
 		List<String> listStatesExpect = captorlistStates.getValue();
 
@@ -250,9 +259,10 @@ public class AssetServiceImplTest {
 		when(pageAsset.getTotalPages()).thenReturn(2);
 		when(pageAsset.getContent()).thenReturn(listAsset);
 		when(assetMapper.mapperListAsset(listAsset)).thenReturn(expectList);
-
-		ListAssetResponseDto actual = assetServiceImpl.getListAsset("SD001", listcategories, listStates, "a", "code",
-				"DESC", 1, 2);
+		
+		GetAssetListRequestDto requestDto = new GetAssetListRequestDto("SD001", 1, 2, "a", "sortBy", "sortDirection",
+				listcategories, listStates);
+		ListAssetResponseDto actual = assetServiceImpl.getListAsset(requestDto);
 
 		ArgumentCaptor<Pageable> captor = ArgumentCaptor.forClass(Pageable.class);
 		ArgumentCaptor<List> captorlist = ArgumentCaptor.forClass(List.class);
@@ -291,15 +301,17 @@ public class AssetServiceImplTest {
 		when(pageAsset.getTotalPages()).thenReturn(2);
 		when(pageAsset.getContent()).thenReturn(listAsset);
 		when(assetMapper.mapperListAsset(listAsset)).thenReturn(expectList);
-
-		ListAssetResponseDto actual = assetServiceImpl.getListAsset("SD001", listcategories, listStates, "a", "code",
-				"DESC", 1, 2);
+		
+		GetAssetListRequestDto requestDto = new GetAssetListRequestDto("SD001", 1, 2, "a", "sortBy", "sortDirection",
+				listcategories, listStates);
+		ListAssetResponseDto actual = assetServiceImpl.getListAsset(requestDto);
+		
 		ArgumentCaptor<Pageable> captor = ArgumentCaptor.forClass(Pageable.class);
 		ArgumentCaptor<List> captorlist = ArgumentCaptor.forClass(List.class);
 
 		verify(assetRepository).getListAssetByState(eq("SD001"), captorlist.capture(), eq("a"), captor.capture());
 		Pageable pageable = captor.getValue();
-		
+
 		List<String> listStatesExpect = captorlist.getValue();
 
 		assertThat(listStatesExpect.size()).isEqualTo(listStates.size());
@@ -309,7 +321,7 @@ public class AssetServiceImplTest {
 		assertThat(actual.getTotalPages()).isEqualTo(2);
 	}
 
-	//582 - Delete asset
+	// 582 - Delete asset
 	@Test
 	void deleteAsset_ShouldThrowResourceNotFoundException_WhenAssetCodeIncorrect() {
 		when(assetRepository.findById("LT1111")).thenReturn(Optional.empty());
@@ -342,18 +354,17 @@ public class AssetServiceImplTest {
 		assertThat(responseMessage.getMessage()).isEqualTo("Delete asset successfully!");
 	}
 
-
 	@DisplayName("Given page number and page size when get report list then return AssetReportResponseDto Object")
 	@Test
 	void getAssetReportList_ShouldReturnAssetReportResponseDto_WhenRequestIsValid() {
-		//given
+		// given
 		var pageableCaptor = ArgumentCaptor.forClass(Pageable.class);
 		var assetPageCaptor = ArgumentCaptor.forClass(Page.class);
 
-		//when
+		// when
 		assetServiceImpl.getAssetReportList(0, 1);
 
-		//then
+		// then
 		verify(assetRepository).getAssetReportList(pageableCaptor.capture());
 		assertThat(pageableCaptor.getValue()).isEqualTo(PageRequest.of(0, 1));
 
@@ -363,14 +374,14 @@ public class AssetServiceImplTest {
 	@DisplayName("Given all list asset report for exporting to .xlsx file")
 	@Test
 	void getAllAssetReport_ShouldReturnListAssetReportResponseDto_WhenTheRequestIsValid() {
-		//given
+		// given
 		List<IAssetReportResponseDto> expectedResponse = mock(List.class);
 		when(assetRepository.getAssetReportList()).thenReturn(expectedResponse);
 
-		//when
+		// when
 		List<IAssetReportResponseDto> actualResponse = assetRepository.getAssetReportList();
 
-		//then
+		// then
 		assertThat(actualResponse).isEqualTo(expectedResponse);
 
 	}

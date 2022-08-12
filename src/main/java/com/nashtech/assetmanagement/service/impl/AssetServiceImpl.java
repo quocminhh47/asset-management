@@ -15,6 +15,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 
 import com.nashtech.assetmanagement.dto.request.EditAssetRequestDto;
+import com.nashtech.assetmanagement.dto.request.GetAssetListRequestDto;
 import com.nashtech.assetmanagement.dto.request.CreateAssetRequestDto;
 import com.nashtech.assetmanagement.entities.Asset;
 import com.nashtech.assetmanagement.entities.Assignment;
@@ -64,7 +65,7 @@ public class AssetServiceImpl implements AssetService {
 
 	@Override
 	public ResponseAssetDto createAsset(CreateAssetRequestDto requestCreateAsset) {
-		Users users=authenticationService.getUser();
+		Users users = authenticationService.getUser();
 		Asset asset = assetMapper.requestAssetToAsset(requestCreateAsset);
 		asset.setCode(generateAssetCode(requestCreateAsset.getCategoryId()));
 		Category category = categoryRepository.findById(requestCreateAsset.getCategoryId())
@@ -78,43 +79,40 @@ public class AssetServiceImpl implements AssetService {
 	}
 
 	@Override
-	public ListAssetResponseDto getListAsset(String userId, List<String> categoryId, List<String> state, String keyword,
-			String sortBy, String sortDirection, Integer page, Integer size) {
+	public ListAssetResponseDto getListAsset(GetAssetListRequestDto dto) {
 		Sort.Direction sort = Sort.Direction.ASC;
-		if(sortDirection.equals("DESC")) {
+		if (dto.getSortDirection().equals("DESC")) {
 			sort = Sort.Direction.DESC;
 		}
-		Pageable pageable = PageRequest.of(page - 1, size , Sort.by(sort, sortBy));
+		Pageable pageable = PageRequest.of(dto.getPage() - 1, dto.getSize(), Sort.by(sort, dto.getSortBy()));
 		Page<Asset> pageAsset = null;
 		long totalItems = 0;
-		Optional<Users> optionalUsers = userRepository.findById(userId);
+		Optional<Users> optionalUsers = userRepository.findById(dto.getUserId());
 		if (!optionalUsers.isPresent()) {
-			throw new ResourceNotFoundException(String.format("user.not.found.with.code:%s", userId));
+			throw new ResourceNotFoundException(String.format("user.not.found.with.code:%s", dto.getUserId()));
 		}
-		Users user = optionalUsers.get();
-		List<AssetState> assetState = new ArrayList<>();
-
-		if (state.size() == 0 && categoryId.size() == 0) {
-			pageAsset = assetRepository.findByUser(user, pageable);
+		if (dto.getStates().size() == 0 && dto.getCategoryIds().size() == 0) {
+			pageAsset = assetRepository.getListAssetBySearchs(dto.getUserId(), dto.getKeyword(), pageable);
 			totalItems = pageAsset.getTotalPages();
-		} else if (state.size() > 0) {
-			for (int i = 0; i < state.size(); i++) {
-				assetState.add(AssetState.valueOf(state.get(i)));
-			}
-			if (categoryId.size() == 0) {
-				pageAsset = assetRepository.getListAssetByState(userId, assetState, keyword, pageable);
+		} else if (dto.getStates().size() > 0) {
+			List<AssetState> assetState = assetMapper.mapperListStates(dto.getStates());
+			if (dto.getCategoryIds().size() == 0) {
+				pageAsset = assetRepository.getListAssetByState(dto.getUserId(), assetState, dto.getKeyword(),
+						pageable);
 				totalItems = pageAsset.getTotalPages();
 			} else {
-				pageAsset = assetRepository.getListAsset(userId, categoryId, assetState, keyword, pageable);
+				pageAsset = assetRepository.getListAsset(dto.getUserId(), dto.getCategoryIds(), assetState,
+						dto.getKeyword(), pageable);
 				totalItems = pageAsset.getTotalPages();
 			}
-		} else if (state.size() == 0) {
-			pageAsset = assetRepository.getListAssetByCategory(userId, categoryId, keyword, pageable);
+		} else if (dto.getStates().size() == 0) {
+			pageAsset = assetRepository.getListAssetByCategory(dto.getUserId(), dto.getCategoryIds(), dto.getKeyword(),
+					pageable);
 			totalItems = pageAsset.getTotalPages();
 		}
 
-		List<Asset> dto = pageAsset.getContent();
-		List<AssetResponseDto> list = assetMapper.mapperListAsset(dto);
+		List<Asset> listAsset = pageAsset.getContent();
+		List<AssetResponseDto> list = assetMapper.mapperListAsset(listAsset);
 		ListAssetResponseDto result = new ListAssetResponseDto(list, totalItems);
 		return result;
 	}
@@ -123,39 +121,42 @@ public class AssetServiceImpl implements AssetService {
 	public ListSearchingAssetResponseDto getAssetByCodeOrNameAndLocationCode(String text) {
 		Users users = authenticationService.getUser();
 		Location location = users.getLocation();
-		List<Asset> assetList = assetRepository.findAssetByNameOrCodeAndLocationCode(text.toLowerCase(), location.getCode());
-		ListSearchingAssetResponseDto listSearchingAssetResponseDto = assetMapper.getAssetListToResponseAssetDTOList(assetList);
+		List<Asset> assetList = assetRepository.findAssetByNameOrCodeAndLocationCode(text.toLowerCase(),
+				location.getCode());
+		ListSearchingAssetResponseDto listSearchingAssetResponseDto = assetMapper
+				.getAssetListToResponseAssetDTOList(assetList);
 		return listSearchingAssetResponseDto;
 	}
 
 	@Override
 	public EditAssetResponseDto editAsset(EditAssetRequestDto editAssetRequest, String assetCode) {
-		Asset asset = assetRepository.findById(assetCode).orElseThrow(
-				() -> new ResourceNotFoundException("Asset." + assetCode + ".not.found"));
+		Asset asset = assetRepository.findById(assetCode)
+				.orElseThrow(() -> new ResourceNotFoundException("Asset." + assetCode + ".not.found"));
 
-		if(asset.getState().equals(AssetState.ASSIGNED)) {
-			throw new IllegalStateException("Asset."+ assetCode + ".is.being.assigned.Cannot modify");
+		if (asset.getState().equals(AssetState.ASSIGNED)) {
+			throw new IllegalStateException("Asset." + assetCode + ".is.being.assigned.Cannot modify");
 		}
 		Asset mappedAsset = assetMapper.mapEditAssetRequestToEntity(editAssetRequest, asset);
 		Asset savedAsset = assetRepository.save(mappedAsset);
 		return assetMapper.mapToEditAssetResponse(savedAsset);
 	}
 
-	//582 - Delete asset
+	// 582 - Delete asset
 	@Override
 	public MessageResponse deleteAssetByAssetCode(String assetCode) {
-		Asset asset = assetRepository.findById(assetCode).orElseThrow(
-				() -> new ResourceNotFoundException("Cannot find asset with asset code: " + assetCode));
+		Asset asset = assetRepository.findById(assetCode)
+				.orElseThrow(() -> new ResourceNotFoundException("Cannot find asset with asset code: " + assetCode));
 		List<Assignment> assignmentList = assignmentRepository.findByAsset(asset);
 		if (!assignmentList.isEmpty()) {
-			return new MessageResponse(HttpStatus.CONFLICT, "Asset belongs to one or more historical assignments", new Date());
+			return new MessageResponse(HttpStatus.CONFLICT, "Asset belongs to one or more historical assignments",
+					new Date());
 		}
 		assetRepository.delete(asset);
 		return new MessageResponse(HttpStatus.OK, "Delete asset successfully!", new Date());
 	}
 
 	@Override
-	public AssetReportResponseDto getAssetReportList( int pageNo, int pageSize) {
+	public AssetReportResponseDto getAssetReportList(int pageNo, int pageSize) {
 		Pageable pageable = PageRequest.of(pageNo, pageSize);
 		Page<IAssetReportResponseDto> assetReportPage = assetRepository.getAssetReportList(pageable);
 		return assetMapper.mapToAssetReportDto(assetReportPage);
