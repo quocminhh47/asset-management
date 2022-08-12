@@ -194,27 +194,12 @@ class RequestReturningServiceImplTest {
 
     }
 
-
-    @DisplayName("Given invalid requestedBy username when create request returning asset then return exception - negative case")
-    @Test
-    public void createRequestReturningAsset_ShouldReturnResourceNotFoundException_WhenRequestedByUsernameInvalid() {
-        CreateRequestReturningAssetRequestDto createRequestReturningAssetRequestDto = mock(CreateRequestReturningAssetRequestDto.class);
-
-        when(createRequestReturningAssetRequestDto.getRequestedBy()).thenReturn("longt");
-        when(userRepository.findByUserName("longt")).thenReturn(Optional.empty());
-        ResourceNotFoundException exception = Assertions.assertThrows(ResourceNotFoundException.class,
-                () -> requestReturningServiceImpl.createRequestReturningAsset(createRequestReturningAssetRequestDto));
-
-        assertThat(exception.getMessage()).isEqualTo("Cannot find requestedByUser with username: longt");
-    }
-
     @DisplayName("Given invalid assignedTo username when create request returning asset then return exception - negative case")
     @Test
     public void createRequestReturningAsset_ShouldReturnResourceNotFoundException_WhenAssignedToUsernameInvalid() {
         CreateRequestReturningAssetRequestDto createRequestReturningAssetRequestDto = mock(CreateRequestReturningAssetRequestDto.class);
         Users requestedByUser = mock(Users.class);
-        when(createRequestReturningAssetRequestDto.getRequestedBy()).thenReturn("longt");
-        when(userRepository.findByUserName("longt")).thenReturn(Optional.of(requestedByUser));
+        when(authenticationService.getUser()).thenReturn(requestedByUser);
         when(createRequestReturningAssetRequestDto.getAssignedTo()).thenReturn("longt2");
         when(userRepository.findByUserName("longt2")).thenReturn(Optional.empty());
         ResourceNotFoundException exception = Assertions.assertThrows(ResourceNotFoundException.class,
@@ -230,9 +215,7 @@ class RequestReturningServiceImplTest {
         Users requestedByUser = mock(Users.class);
         Users assignedToUser = mock(Users.class);
 
-
-        when(createRequestReturningAssetRequestDto.getRequestedBy()).thenReturn("longt");
-        when(userRepository.findByUserName("longt")).thenReturn(Optional.of(requestedByUser));
+        when(authenticationService.getUser()).thenReturn(requestedByUser);
         when(createRequestReturningAssetRequestDto.getAssignedTo()).thenReturn("longt2");
         when(userRepository.findByUserName("longt2")).thenReturn(Optional.of(assignedToUser));
         when(createRequestReturningAssetRequestDto.getAssetCode()).thenReturn("CT123456");
@@ -251,8 +234,7 @@ class RequestReturningServiceImplTest {
         Users assignedToUser = mock(Users.class);
         Asset asset = mock(Asset.class);
 
-        when(createRequestReturningAssetRequestDto.getRequestedBy()).thenReturn("longt");
-        when(userRepository.findByUserName("longt")).thenReturn(Optional.of(requestedByUser));
+        when(authenticationService.getUser()).thenReturn(requestedByUser);
         when(createRequestReturningAssetRequestDto.getAssignedTo()).thenReturn("longt2");
         when(userRepository.findByUserName("longt2")).thenReturn(Optional.of(assignedToUser));
         when(createRequestReturningAssetRequestDto.getAssetCode()).thenReturn("CT123456");
@@ -274,8 +256,7 @@ class RequestReturningServiceImplTest {
         Asset asset = mock(Asset.class);
         Assignment assignment = mock(Assignment.class);
 
-        when(createRequestReturningAssetRequestDto.getRequestedBy()).thenReturn("longt");
-        when(userRepository.findByUserName("longt")).thenReturn(Optional.of(requestedByUser));
+        when(authenticationService.getUser()).thenReturn(requestedByUser);
         when(createRequestReturningAssetRequestDto.getAssignedTo()).thenReturn("longt2");
         when(userRepository.findByUserName("longt2")).thenReturn(Optional.of(assignedToUser));
         when(createRequestReturningAssetRequestDto.getAssetCode()).thenReturn("CT123456");
@@ -302,8 +283,7 @@ class RequestReturningServiceImplTest {
         Assignment assignment = mock(Assignment.class);
         RequestReturning requestReturning = mock(RequestReturning.class);
 
-        when(createRequestReturningAssetRequestDto.getRequestedBy()).thenReturn("longt");
-        when(userRepository.findByUserName("longt")).thenReturn(Optional.of(requestedByUser));
+        when(authenticationService.getUser()).thenReturn(requestedByUser);
         when(createRequestReturningAssetRequestDto.getAssignedTo()).thenReturn("longt2");
         when(userRepository.findByUserName("longt2")).thenReturn(Optional.of(assignedToUser));
         when(createRequestReturningAssetRequestDto.getAssetCode()).thenReturn("CT123456");
@@ -328,8 +308,7 @@ class RequestReturningServiceImplTest {
         Assignment assignment = mock(Assignment.class);
         CreateRequestReturningResponseDto createRequestReturningResponseDtoActual = mock(CreateRequestReturningResponseDto.class);
 
-        when(createRequestReturningAssetRequestDto.getRequestedBy()).thenReturn("longt");
-        when(userRepository.findByUserName("longt")).thenReturn(Optional.of(requestedByUser));
+        when(authenticationService.getUser()).thenReturn(requestedByUser);
         when(createRequestReturningAssetRequestDto.getAssignedTo()).thenReturn("longt2");
         when(userRepository.findByUserName("longt2")).thenReturn(Optional.of(assignedToUser));
 

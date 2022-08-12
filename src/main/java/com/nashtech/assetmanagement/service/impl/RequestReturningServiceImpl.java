@@ -143,8 +143,10 @@ public class RequestReturningServiceImpl implements RequestReturningService {
 	@Override
 	public CreateRequestReturningResponseDto createRequestReturningAsset(CreateRequestReturningAssetRequestDto createRequestReturningAssetRequestDto) {
 		// Validate exist data & valid data
-		Users requestedByUser = userRepository.findByUserName(createRequestReturningAssetRequestDto.getRequestedBy()).orElseThrow(
-				() -> new ResourceNotFoundException("Cannot find requestedByUser with username: " + createRequestReturningAssetRequestDto.getRequestedBy()));
+        Users requestedByUser = authenticationService.getUser();
+
+		Users assignedToUser = userRepository.findByUserName(createRequestReturningAssetRequestDto.getAssignedTo()).orElseThrow(
+				() -> new ResourceNotFoundException("Cannot find assignedToUser with username: " + createRequestReturningAssetRequestDto.getAssignedTo()));
 
 		Users assignedToUser = userRepository.findByUserName(createRequestReturningAssetRequestDto.getAssignedTo()).orElseThrow(
 				() -> new ResourceNotFoundException("Cannot find assignedToUser with username: " + createRequestReturningAssetRequestDto.getAssignedTo()));
