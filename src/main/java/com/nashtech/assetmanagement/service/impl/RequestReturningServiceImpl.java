@@ -1,17 +1,39 @@
 package com.nashtech.assetmanagement.service.impl;
 
+import static com.nashtech.assetmanagement.enums.RequestReturningState.WAITING_FOR_RETURNING;
+import static com.nashtech.assetmanagement.utils.AppConstants.DONE;
+
+import java.sql.Date;
+import java.time.LocalDate;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Optional;
+
+import org.modelmapper.ModelMapper;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
+import org.springframework.http.HttpStatus;
+import org.springframework.stereotype.Service;
+
 import com.nashtech.assetmanagement.dto.request.CreateRequestReturningAssetRequestDto;
 import com.nashtech.assetmanagement.dto.request.RequestReturningRequestGetListDto;
 import com.nashtech.assetmanagement.dto.request.ReturningRequestDto;
 import com.nashtech.assetmanagement.dto.response.CreateRequestReturningResponseDto;
 import com.nashtech.assetmanagement.dto.response.ListRequestReturningResponseDto;
+import com.nashtech.assetmanagement.dto.response.ListStateRequestReturningResponseDto;
 import com.nashtech.assetmanagement.dto.response.MessageResponse;
 import com.nashtech.assetmanagement.dto.response.RequestReturningResponseDto;
-import com.nashtech.assetmanagement.entities.*;
+import com.nashtech.assetmanagement.entities.Asset;
+import com.nashtech.assetmanagement.entities.Assignment;
+import com.nashtech.assetmanagement.entities.AssignmentId;
+import com.nashtech.assetmanagement.entities.RequestReturning;
+import com.nashtech.assetmanagement.entities.Users;
 import com.nashtech.assetmanagement.enums.AssetState;
 import com.nashtech.assetmanagement.enums.RequestReturningState;
 import com.nashtech.assetmanagement.exception.BadRequestException;
-import com.nashtech.assetmanagement.exception.DateInvalidException;
 import com.nashtech.assetmanagement.exception.RequestNotAcceptException;
 import com.nashtech.assetmanagement.exception.ResourceNotFoundException;
 import com.nashtech.assetmanagement.mapper.RequestReturningMapper;
@@ -22,23 +44,8 @@ import com.nashtech.assetmanagement.repositories.UserRepository;
 import com.nashtech.assetmanagement.service.AuthenticationService;
 import com.nashtech.assetmanagement.service.RequestReturningService;
 import com.nashtech.assetmanagement.utils.AppConstants;
+
 import lombok.AllArgsConstructor;
-import org.modelmapper.ModelMapper;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Pageable;
-import org.springframework.data.domain.Sort;
-import org.springframework.http.HttpStatus;
-import org.springframework.stereotype.Service;
-
-import java.sql.Date;
-import java.time.LocalDate;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
-
-import static com.nashtech.assetmanagement.enums.RequestReturningState.WAITING_FOR_RETURNING;
-import static com.nashtech.assetmanagement.utils.AppConstants.DONE;
 
 @Service
 @AllArgsConstructor
@@ -66,37 +73,39 @@ public class RequestReturningServiceImpl implements RequestReturningService {
 
 		long totalItems = 0;
 		List<RequestReturning> listEntity = new ArrayList<>();
-
 		Sort.Direction sort = Sort.Direction.ASC;
 		if (dto.getSortDirection().equals("DESC")) {
 			sort = Sort.Direction.DESC;
 		}
-
-		Pageable pageable = PageRequest.of(dto.getPage() - 1, dto.getSize(), Sort.by(sort, dto.getSortBy()));
 		List<RequestReturningState> requestReturningState = requestReturningMapper.mapperListStates(dto.getStates());
-
 		if (dto.getReturnedDate().equals("")) {
-			Page<RequestReturning> pageRequestReturning = requestReturningRepository
-					.getListRequestReturningByStates(requestReturningState, dto.getKeyword(), pageable);
-			totalItems = pageRequestReturning.getTotalPages();
-			listEntity = pageRequestReturning.getContent();
-		} else {
-			try {
-				Date date = Date.valueOf(dto.getReturnedDate());
-				Page<RequestReturning> pageRequestReturning = requestReturningRepository
-						.getListRequestReturning(requestReturningState, date, dto.getKeyword(), pageable);
+			dto.setReturnedDate(null);
+		}
+		if (dto.getSortBy().equals("acceptedBy.userName")) {
+			Pageable pageable = PageRequest.of(dto.getPage() - 1, dto.getSize());
+			if (dto.getSortDirection().equals("DESC")) {
+				Page<RequestReturning> pageRequestReturning = requestReturningRepository.getListSortByAcceptedByDESC(
+						requestReturningState, dto.getReturnedDate(), dto.getKeyword(), pageable);
 				totalItems = pageRequestReturning.getTotalPages();
 				listEntity = pageRequestReturning.getContent();
-			} catch (Exception e) {
-				throw new DateInvalidException("Date.format.is.not.valid");
 			}
+			if (dto.getSortDirection().equals("ASC")) {
+				Page<RequestReturning> pageRequestReturning = requestReturningRepository.getListSortByAcceptedByASC(
+						requestReturningState, dto.getReturnedDate(), dto.getKeyword(), pageable);
+				totalItems = pageRequestReturning.getTotalPages();
+				listEntity = pageRequestReturning.getContent();
+			}
+		} else {
+			Pageable pageable = PageRequest.of(dto.getPage() - 1, dto.getSize(), Sort.by(sort, dto.getSortBy()));
+			Page<RequestReturning> pageRequestReturning = requestReturningRepository
+					.getListRequestReturning(requestReturningState, dto.getReturnedDate(), dto.getKeyword(), pageable);
+			totalItems = pageRequestReturning.getTotalPages();
+			listEntity = pageRequestReturning.getContent();
 		}
-
 		List<RequestReturningResponseDto> listDto = requestReturningMapper.mapperListRequestReturning(listEntity);
 		ListRequestReturningResponseDto result = new ListRequestReturningResponseDto(listDto, totalItems);
 		return result;
 	}
-
 
 	@Override
 	public RequestReturningResponseDto completeReturningRequest(ReturningRequestDto requestDto) {
@@ -138,8 +147,14 @@ public class RequestReturningServiceImpl implements RequestReturningService {
 		return mapper.map(savedRequest, RequestReturningResponseDto.class);
 	}
 
-
+	@Override
+	public ListStateRequestReturningResponseDto getRequestReturningState() {
+		HashMap<String, String> listStates = RequestReturningState.getRequestReturningState();
+		ListStateRequestReturningResponseDto responseDto = new ListStateRequestReturningResponseDto(listStates);
+		return responseDto;
+	}
 	//587 - Create request for returning asset
+	
 	@Override
 	public CreateRequestReturningResponseDto createRequestReturningAsset(CreateRequestReturningAssetRequestDto createRequestReturningAssetRequestDto) {
 		// Validate exist data & valid data
@@ -180,7 +195,6 @@ public class RequestReturningServiceImpl implements RequestReturningService {
 		// Map Dto and return
 		return mapper.map(requestReturning, CreateRequestReturningResponseDto.class);
 	}
-
 
     @Override
     public MessageResponse cancelRequestReturningAssignment(Long id) {

@@ -28,4 +28,8 @@ public class RequestReturningMapper {
 				.map(item -> modelMapper.map(item, RequestReturningState.class)).collect(Collectors.toList());
 		return result;
 	}
+	public List<RequestReturning> mapperListRequestReturningSort(List<RequestReturning> list) {
+		List<RequestReturning> result = list.stream().sorted().collect(Collectors.toList());
+		return result;
+	}
 }

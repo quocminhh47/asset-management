@@ -5,6 +5,7 @@ import com.nashtech.assetmanagement.dto.request.RequestReturningRequestGetListDt
 import com.nashtech.assetmanagement.dto.request.ReturningRequestDto;
 import com.nashtech.assetmanagement.dto.response.CreateRequestReturningResponseDto;
 import com.nashtech.assetmanagement.dto.response.ListRequestReturningResponseDto;
+import com.nashtech.assetmanagement.dto.response.ListStateRequestReturningResponseDto;
 import com.nashtech.assetmanagement.dto.response.MessageResponse;
 import com.nashtech.assetmanagement.dto.response.RequestReturningResponseDto;
 
@@ -12,7 +13,8 @@ public interface RequestReturningService {
 
  	ListRequestReturningResponseDto getListRequestReturning(RequestReturningRequestGetListDto dto);
 
-	//587 - Create request for returning asset
+ 	ListStateRequestReturningResponseDto getRequestReturningState();
+
 	CreateRequestReturningResponseDto createRequestReturningAsset(CreateRequestReturningAssetRequestDto createRequestReturningAssetRequestDto);
 
 	RequestReturningResponseDto completeReturningRequest(ReturningRequestDto requestDto);

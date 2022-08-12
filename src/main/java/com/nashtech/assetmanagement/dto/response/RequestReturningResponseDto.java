@@ -1,8 +1,7 @@
 package com.nashtech.assetmanagement.dto.response;
 
-import java.sql.Date;
-
 import com.fasterxml.jackson.annotation.JsonProperty;
+
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -15,16 +14,26 @@ import lombok.Setter;
 public class RequestReturningResponseDto {
 	
 	private Long id;
+	
+	@JsonProperty("requestedBy")
 	private String requestedByUsername;
+	
+	@JsonProperty("acceptedBy")
 	private String acceptedByUsername;
-	private Date returnedDate;
-	private String state;
-	private String assignmentAssetCode;
-	private String assignmentAssetName;
-	private String assignmentIdAssigneddate;
+	
 	@JsonProperty("assignedTo")
-	private String assignmentIdAssignedTo;
-
-
-
+    private String assignmentIdAssignedTo;
+	
+	private String returnedDate;
+	private String state;
+	
+	@JsonProperty("assetCode")
+	private String assignmentAssetCode;
+	
+	@JsonProperty("assetName")
+	private String assignmentAssetName;
+	
+	@JsonProperty("assignedDate")
+	private String assignmentIdAssigneddate;
+	
 }
