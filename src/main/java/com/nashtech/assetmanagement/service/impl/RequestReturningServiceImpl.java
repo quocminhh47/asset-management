@@ -148,9 +148,6 @@ public class RequestReturningServiceImpl implements RequestReturningService {
 		Users assignedToUser = userRepository.findByUserName(createRequestReturningAssetRequestDto.getAssignedTo()).orElseThrow(
 				() -> new ResourceNotFoundException("Cannot find assignedToUser with username: " + createRequestReturningAssetRequestDto.getAssignedTo()));
 
-		Users assignedToUser = userRepository.findByUserName(createRequestReturningAssetRequestDto.getAssignedTo()).orElseThrow(
-				() -> new ResourceNotFoundException("Cannot find assignedToUser with username: " + createRequestReturningAssetRequestDto.getAssignedTo()));
-
 		assetRepository.findById(createRequestReturningAssetRequestDto.getAssetCode()).orElseThrow(
 				() -> new ResourceNotFoundException("Cannot find asset with asset code: " + createRequestReturningAssetRequestDto.getAssetCode()));
 
