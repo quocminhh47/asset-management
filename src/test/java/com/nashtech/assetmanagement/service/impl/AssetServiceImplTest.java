@@ -177,7 +177,7 @@ public class AssetServiceImplTest {
 	}
 
 	// ===========US 579=======
-	@DisplayName("Test for get list asset by user but user_id not found")
+	@DisplayName("Get list asset by user but user_id not found")
 	@Test
 	void getListAsset_ShouldThrownExceptionUserNotFound_WhenUserIdNotExist() {
 
@@ -192,31 +192,33 @@ public class AssetServiceImplTest {
 		assertThat(exception.getMessage()).isEqualTo("user.not.found.with.code:SD001");
 	}
 
-	@DisplayName("Test for get list asset by user and states, and categories or asset name or asset code")
+	@DisplayName("Get list asset by user and states, and categories or asset name or asset code")
 	@Test
 	void getListAsset_ShouldReturnListAssetResponseDto_WhenUserIdExistAndCategoriesAndStates() {
+		List<String> listStates = List.of("AVAILABLE", "NOT_AVAILABLE");
+
+		List<String> listcategories = List.of("Laptop", "PC");
+		GetAssetListRequestDto requestDto = new GetAssetListRequestDto("SD001", 1, 2, "a", "sortBy", "sortDirection",
+				listcategories, listStates);
+		
 		Users entity = mock(Users.class);
 		Page<Asset> pageAsset = mock(Page.class);
 		List<Asset> listAsset = mock(List.class);
 		List<AssetResponseDto> expectList = mock(List.class);
-
-		List<String> listStates = new ArrayList<String>();
-		listStates.add("AVAILABLE");
-		listStates.add("NOT_AVAILABLE");
-
-		List<String> listcategories = new ArrayList<String>();
-		listcategories.add("Laptop");
-		listcategories.add("PC");
+		GetAssetListRequestDto dto = mock(GetAssetListRequestDto.class);
+		List<AssetState> assetState = mock(List.class);
+		
+		
 
 		when(userRepository.findById("SD001")).thenReturn(Optional.of(entity));
+		when(assetMapper.mapperListStates(dto.getStates())).thenReturn(assetState);
 		when(assetRepository.getListAsset(eq("SD001"), Mockito.any(List.class), Mockito.any(List.class), eq("a"),
 				Mockito.any(Pageable.class))).thenReturn(pageAsset);
 		when(pageAsset.getTotalPages()).thenReturn(2);
 		when(pageAsset.getContent()).thenReturn(listAsset);
 		when(assetMapper.mapperListAsset(listAsset)).thenReturn(expectList);
-
-		GetAssetListRequestDto requestDto = new GetAssetListRequestDto("SD001", 1, 2, "a", "sortBy", "sortDirection",
-				listcategories, listStates);
+		
+		
 		ListAssetResponseDto actual = assetServiceImpl.getListAsset(requestDto);
 
 		ArgumentCaptor<Pageable> captor = ArgumentCaptor.forClass(Pageable.class);
@@ -231,7 +233,7 @@ public class AssetServiceImplTest {
 		List<String> listStatesExpect = captorlistStates.getValue();
 
 		assertThat(listCategoriesExpect.size()).isEqualTo(listcategories.size());
-		assertThat(listStatesExpect.size()).isEqualTo(listStates.size());
+		assertThat(listStatesExpect.size()).isEqualTo(assetState.size());
 
 		assertThat(pageable.getPageNumber()).isEqualTo(0);
 		assertThat(pageable.getPageSize()).isEqualTo(2);
@@ -239,7 +241,7 @@ public class AssetServiceImplTest {
 		assertThat(actual.getTotalPages()).isEqualTo(2);
 	}
 
-	@DisplayName("Test for get list asset by user and categories or asset name or asset code")
+	@DisplayName("Get list asset by user and categories or asset name or asset code")
 	@Test
 	void getListAsset_ShouldReturnListAssetResponseDto_WhenUserIdExistAndCategories() {
 		Users entity = mock(Users.class);
@@ -248,17 +250,15 @@ public class AssetServiceImplTest {
 		List<AssetResponseDto> expectList = mock(List.class);
 
 		List<String> listStates = mock(List.class);
-		List<String> listcategories = new ArrayList<>();
-		listcategories.add("Laptop");
-		listcategories.add("PC");
+		List<String> listcategories = List.of("Laptop", "PC");
 
 		when(userRepository.findById("SD001")).thenReturn(Optional.of(entity));
+		when(assetMapper.mapperListAsset(listAsset)).thenReturn(expectList);
 		when(listStates.size()).thenReturn(0);
 		when(assetRepository.getListAssetByCategory(eq("SD001"), Mockito.any(List.class), eq("a"),
 				Mockito.any(Pageable.class))).thenReturn(pageAsset);
 		when(pageAsset.getTotalPages()).thenReturn(2);
 		when(pageAsset.getContent()).thenReturn(listAsset);
-		when(assetMapper.mapperListAsset(listAsset)).thenReturn(expectList);
 		
 		GetAssetListRequestDto requestDto = new GetAssetListRequestDto("SD001", 1, 2, "a", "sortBy", "sortDirection",
 				listcategories, listStates);
@@ -280,21 +280,20 @@ public class AssetServiceImplTest {
 		assertThat(actual.getTotalPages()).isEqualTo(2);
 	}
 
-	@DisplayName("Test for get list asset by user and states or asset name or asset code")
+	@DisplayName("Get list asset by user and states or asset name or asset code")
 	@Test
 	void getListAsset_ShouldReturnListAssetResponseDto_WhenUserIdExistAndState() {
 		Users entity = mock(Users.class);
 		Page<Asset> pageAsset = mock(Page.class);
 		List<Asset> listAsset = mock(List.class);
 		List<AssetResponseDto> expectList = mock(List.class);
-
-		List<String> listStates = new ArrayList<>();
-		listStates.add("AVAILABLE");
-		listStates.add("NOT_AVAILABLE");
-
+		GetAssetListRequestDto dto = mock(GetAssetListRequestDto.class);
+		List<AssetState> assetState = mock(List.class);
+		List<String> listStates = List.of("AVAILABLE", "NOT_AVAILABLE");
 		List<String> listcategories = mock(List.class);
-
+		
 		when(userRepository.findById("SD001")).thenReturn(Optional.of(entity));
+		when(assetMapper.mapperListStates(dto.getStates())).thenReturn(assetState);
 		when(listcategories.size()).thenReturn(0);
 		when(assetRepository.getListAssetByState(eq("SD001"), Mockito.any(List.class), eq("a"),
 				Mockito.any(Pageable.class))).thenReturn(pageAsset);
@@ -314,7 +313,7 @@ public class AssetServiceImplTest {
 
 		List<String> listStatesExpect = captorlist.getValue();
 
-		assertThat(listStatesExpect.size()).isEqualTo(listStates.size());
+		assertThat(listStatesExpect.size()).isEqualTo(assetState.size());
 		assertThat(pageable.getPageNumber()).isEqualTo(0);
 		assertThat(pageable.getPageSize()).isEqualTo(2);
 		assertThat(actual.getList()).isEqualTo(expectList);

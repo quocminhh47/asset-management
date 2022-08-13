@@ -1,12 +1,9 @@
 package com.nashtech.assetmanagement.service.impl;
 
-import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.Optional;
 
-import com.nashtech.assetmanagement.dto.response.*;
-import com.nashtech.assetmanagement.service.AuthenticationService;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -14,9 +11,17 @@ import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 
+import com.nashtech.assetmanagement.dto.request.CreateAssetRequestDto;
 import com.nashtech.assetmanagement.dto.request.EditAssetRequestDto;
 import com.nashtech.assetmanagement.dto.request.GetAssetListRequestDto;
-import com.nashtech.assetmanagement.dto.request.CreateAssetRequestDto;
+import com.nashtech.assetmanagement.dto.response.AssetReportResponseDto;
+import com.nashtech.assetmanagement.dto.response.AssetResponseDto;
+import com.nashtech.assetmanagement.dto.response.EditAssetResponseDto;
+import com.nashtech.assetmanagement.dto.response.IAssetReportResponseDto;
+import com.nashtech.assetmanagement.dto.response.ListAssetResponseDto;
+import com.nashtech.assetmanagement.dto.response.ListSearchingAssetResponseDto;
+import com.nashtech.assetmanagement.dto.response.MessageResponse;
+import com.nashtech.assetmanagement.dto.response.ResponseAssetDto;
 import com.nashtech.assetmanagement.entities.Asset;
 import com.nashtech.assetmanagement.entities.Assignment;
 import com.nashtech.assetmanagement.entities.Category;
@@ -31,6 +36,7 @@ import com.nashtech.assetmanagement.repositories.CategoryRepository;
 import com.nashtech.assetmanagement.repositories.LocationRepository;
 import com.nashtech.assetmanagement.repositories.UserRepository;
 import com.nashtech.assetmanagement.service.AssetService;
+import com.nashtech.assetmanagement.service.AuthenticationService;
 import com.nashtech.assetmanagement.utils.GenerateRandomNumber;
 
 import lombok.AllArgsConstructor;
