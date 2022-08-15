@@ -4,7 +4,7 @@ import com.nashtech.assetmanagement.entities.Users;
 import org.springframework.security.core.Authentication;
 
 public interface AuthenticationService {
-    Authentication getAuthentication();
+//    Authentication getAuthentication();
 
     Users getUser();
 }

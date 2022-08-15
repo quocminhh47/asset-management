@@ -22,13 +22,6 @@ public class UserRepositoryTest {
     @Autowired
     private UserRepository userRepository;
 
-    @Test
-    void findStaffCodeList_ShouldReturnStaffCodeList_WhenStaffCodeBeginWithSDExist() {
-        List<String> staffCode = userRepository.findAllStaffCode();
-        for (String result : staffCode) {
-            assertEquals("SD", result.substring(0, 2));
-        }
-    }
 
     @Test
     void findByStaffCodeOrNameAndLocationCode_ShouldReturnUserList_WhenNameOrCodeAndLocationCodeExist() {

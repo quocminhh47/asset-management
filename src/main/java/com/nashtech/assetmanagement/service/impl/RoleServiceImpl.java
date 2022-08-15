@@ -18,27 +18,11 @@ public class RoleServiceImpl implements RoleService {
 
     private final RoleMapper roleMapper;
 
-    @Autowired
     public RoleServiceImpl(RoleRepository roleRepository, RoleMapper roleMapper) {
         this.roleRepository = roleRepository;
         this.roleMapper = roleMapper;
     }
 
-    @Override
-    public Role getRole(String name) {
-        Role role =
-                roleRepository.findByName(name).orElseThrow(() -> new ResourceNotFoundException("Did not find role with name: " + name)
-                );
-        return role;
-    }
-
-    @Override
-    public Role getRole(Long id) {
-        Role role =
-                roleRepository.findById(id).orElseThrow(() -> new ResourceNotFoundException("Did not find role with id: " + id)
-                );
-        return role;
-    }
 
     @Override
     public List<RoleResponseDto> getRoleList() {

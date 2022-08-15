@@ -60,27 +60,8 @@ public class UserServiceImpl implements UserService {
     private final LocationRepository locationRepository;
     private final LocationMapper locationMapper;
     private final ModelMapper modelMapper;
+    private final  AssignmentRepository assignmentRepository;
 
-    @Autowired
-    private AssignmentRepository assignmentRepository;
-
-    @Autowired
-    public UserServiceImpl(UserRepository userRepository, UsersContent usersContent, RoleRepository roleRepository,
-                           UserMapper userMapper, AuthenticationManager authenticationManager, JwtUtils jwtUtils,
-                           PasswordEncoder passwordEncoder, LocationRepository locationRepository, LocationMapper locationMapper,
-                           AuthenticationService authenticationService, ModelMapper modelMapper) {
-        this.userRepository = userRepository;
-        this.usersContent = usersContent;
-        this.roleRepository = roleRepository;
-        this.userMapper = userMapper;
-        this.authenticationManager = authenticationManager;
-        this.jwtUtils = jwtUtils;
-        this.passwordEncoder = passwordEncoder;
-        this.authenticationService = authenticationService;
-        this.locationRepository = locationRepository;
-        this.locationMapper = locationMapper;
-        this.modelMapper = modelMapper;
-    }
 
     @Override
     public boolean isUsernameExist(String username) {

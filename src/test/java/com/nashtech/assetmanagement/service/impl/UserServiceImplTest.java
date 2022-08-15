@@ -269,7 +269,7 @@ public class UserServiceImplTest {
 
     @DisplayName("change password throw password incorrect when user exist")
     @Test
-    public void changePassword_shouldReturnExceptionPasswordIncorrect_whenUserIdExist() {
+    void changePassword_shouldReturnExceptionPasswordIncorrect_whenUserIdExist() {
         Users entity = mock(Users.class);
         ChangePassRequestDto request = mock(ChangePassRequestDto.class);
         when(userRepository.findById(request.getStaffCode())).thenReturn(Optional.of(entity));
@@ -282,7 +282,7 @@ public class UserServiceImplTest {
 
     @DisplayName("change password throw same password when user exist")
     @Test
-    public void changePassword_shouldReturnExceptionSamePassword_whenUserIdExist() {
+    void changePassword_shouldReturnExceptionSamePassword_whenUserIdExist() {
         Users entity = mock(Users.class);
         ChangePassRequestDto request = mock(ChangePassRequestDto.class);
         when(userRepository.findById(request.getStaffCode())).thenReturn(Optional.of(entity));
@@ -295,7 +295,7 @@ public class UserServiceImplTest {
 
     @DisplayName("change password throw not found when user not exist")
     @Test
-    public void changePassword_shouldThrowsExceptionNotFound_whenNotFound() {
+    void changePassword_shouldThrowsExceptionNotFound_whenNotFound() {
         ChangePassRequestDto requestDto = mock(ChangePassRequestDto.class);
         when(userRepository.findById(requestDto.getStaffCode())).thenReturn(Optional.empty());
         Exception exception = assertThrows(ResourceNotFoundException.class, () -> {
@@ -307,7 +307,7 @@ public class UserServiceImplTest {
 //	=================================#578 disable user===========================================
 
     @Test
-    public void checkExistsAssignment_shouldReturnException_whenUserIdExist() {
+    void checkExistsAssignment_shouldReturnException_whenUserIdExist() {
         Users entity = mock(Users.class);
         when(userRepository.findById("SD001")).thenReturn(Optional.of(entity));
         when(assignmentRepository.existsByAssignedToOrAssignedBy(entity, entity)).thenReturn(true);
@@ -318,7 +318,7 @@ public class UserServiceImplTest {
     }
 
     @Test
-    public void checkExistsAssignment_shouldThrowsExceptionNotFound_whenUserIdNotExist() {
+    void checkExistsAssignment_shouldThrowsExceptionNotFound_whenUserIdNotExist() {
         when(userRepository.findById("SD001")).thenReturn(Optional.empty());
         Exception exception = assertThrows(ResourceNotFoundException.class, () -> {
             userServiceImpl.checkExistsAssignment("SD001");
@@ -327,7 +327,7 @@ public class UserServiceImplTest {
     }
 
     @Test
-    public void disableStaff_shouldThrowsExceptionNotFound_whenUserIdNotExist() {
+    void disableStaff_shouldThrowsExceptionNotFound_whenUserIdNotExist() {
         when(userRepository.findById("SD001")).thenReturn(Optional.empty());
         Exception exception = assertThrows(ResourceNotFoundException.class, () -> {
             userServiceImpl.checkExistsAssignment("SD001");
@@ -336,7 +336,7 @@ public class UserServiceImplTest {
     }
 
     @Test
-    public void disableStaff_shouldReturnResponseDto_whenUserIdExist() {
+    void disableStaff_shouldReturnResponseDto_whenUserIdExist() {
 
         Users entity = mock(Users.class);
         UserResponseDto expected = mock(UserResponseDto.class);
@@ -350,9 +350,5 @@ public class UserServiceImplTest {
         assertThat(actual).isEqualTo(expected);
     }
 
-    public Sort defaultSorting(String sortBy, String sortDirection) {
-        return sortDirection.equalsIgnoreCase(Sort.Direction.ASC.name()) ? Sort.by(sortBy).ascending()
-                : Sort.by(sortBy).descending();
-    }
 
 }

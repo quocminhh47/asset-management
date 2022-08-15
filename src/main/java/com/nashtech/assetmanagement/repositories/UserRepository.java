@@ -28,7 +28,7 @@ public interface UserRepository extends JpaRepository<Users, String> {
     List<String> findAllStaffCode();
 
 
-@Query(value = "from Users u " +
+    @Query(value = "from Users u " +
         "where ( lower(u.staffCode) like concat('%', :text, '%') ) " +
         "and u.location.code = :locationCode " +
         "and u.state <> 'INACTIVE' " +

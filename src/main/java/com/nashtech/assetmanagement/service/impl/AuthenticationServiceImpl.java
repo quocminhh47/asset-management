@@ -15,10 +15,10 @@ public class AuthenticationServiceImpl implements AuthenticationService {
 
     private final UserRepository userRepository;
 
-    @Override
-    public Authentication getAuthentication() {
-        return SecurityContextHolder.getContext().getAuthentication();
-    }
+//    @Override
+//    public Authentication getAuthentication() {
+//        return SecurityContextHolder.getContext().getAuthentication();
+//    }
 
     @Override
     public Users getUser() {
