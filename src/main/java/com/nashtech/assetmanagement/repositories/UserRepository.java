@@ -22,9 +22,7 @@ public interface UserRepository extends JpaRepository<Users, String> {
             "order by u.firstName asc, u.staffCode desc")
     Page<Users> findAllByOrderByFirstNameAsc(Pageable pageable, @Param("staffCode") String staffCode, @Param("location") String location);
 
-    @Query(value = "select staff_code from users" +
-            " where staff_code LIKE 'SD%' and u.state <> 'INACTIVE' " +
-            " order by u.firstName asc, u.staffCode desc", nativeQuery = true)
+    @Query(value = "select staff_code from users where staff_code LIKE 'SD%'", nativeQuery = true)
     List<String> findAllStaffCode();
 
 
