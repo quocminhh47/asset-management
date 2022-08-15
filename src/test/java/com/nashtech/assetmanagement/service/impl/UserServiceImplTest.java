@@ -130,7 +130,7 @@ public class UserServiceImplTest {
         assertThat(staffCodeCaptor.getValue()).isEqualTo("SD0001".replaceAll(" ",""));
         assertThat(locationCaptor.getValue()).isEqualTo("HCM".toLowerCase());
         assertThat(pageableCaptor.getValue())
-                .isEqualTo(PageRequest.of(pageNo, pageSize, Sort.by(sortBy).ascending()));
+                .isEqualTo(PageRequest.of(pageNo, pageSize));
 
         verify(usersContent).getUsersContent(pageCaptor.capture());
         assertThat(pageCaptor.getValue()).isEqualTo(userRepository.searchByStaffCodeOrNameWithRole(

@@ -27,11 +27,7 @@ public interface UserRepository extends JpaRepository<Users, String> {
             " order by u.firstName asc, u.staffCode desc", nativeQuery = true)
     List<String> findAllStaffCode();
 
-//    @Query(value = " select * from users where" +
-//            " (lower(staff_code) LIKE %:text% OR lower(concat(first_name,' ',last_name)) LIKE %:text%)" +
-//            "and location_id=:locationCode " +
-//            "and u.state != 'INACTIVE' " +
-//            "order by u.first_name desc , u.staff_code desc ", nativeQuery = true)
+
 @Query(value = "from Users u " +
         "where ( lower(u.staffCode) like concat('%', :text, '%') ) " +
         "and u.location.code = :locationCode " +
