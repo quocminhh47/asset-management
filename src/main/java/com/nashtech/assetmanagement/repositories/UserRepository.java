@@ -15,15 +15,28 @@ public interface UserRepository extends JpaRepository<Users, String> {
 
     boolean existsByUserName(String userName);
 
-    @Query(value = " select u from Users u where not u.staffCode = :staffCode and u.location.code = :location")
+    @Query(value = " select u from Users u" +
+            " where not u.staffCode = :staffCode " +
+            "and u.location.code = :location" +
+            " and u.state <> 'INACTIVE' " +
+            "order by u.firstName asc, u.staffCode desc")
     Page<Users> findAllByOrderByFirstNameAsc(Pageable pageable, @Param("staffCode") String staffCode, @Param("location") String location);
 
-    @Query(value = "select staff_code from users where staff_code LIKE 'SD%'", nativeQuery = true)
+    @Query(value = "select staff_code from users" +
+            " where staff_code LIKE 'SD%' and u.state <> 'INACTIVE' " +
+            " order by u.firstName asc, u.staffCode desc", nativeQuery = true)
     List<String> findAllStaffCode();
 
-    @Query(value = " select * from users where" +
-            " (lower(staff_code) LIKE %:text% OR lower(concat(first_name,' ',last_name)) LIKE %:text%)" +
-            "and location_id=:locationCode", nativeQuery = true)
+//    @Query(value = " select * from users where" +
+//            " (lower(staff_code) LIKE %:text% OR lower(concat(first_name,' ',last_name)) LIKE %:text%)" +
+//            "and location_id=:locationCode " +
+//            "and u.state != 'INACTIVE' " +
+//            "order by u.first_name desc , u.staff_code desc ", nativeQuery = true)
+@Query(value = "from Users u " +
+        "where ( lower(u.staffCode) like concat('%', :text, '%') ) " +
+        "and u.location.code = :locationCode " +
+        "and u.state <> 'INACTIVE' " +
+        "order by u.firstName asc , u.staffCode desc ")
     List<Users> findByStaffCodeOrNameAndLocationCode(@Param("text") String text, String locationCode);
 
 
@@ -38,7 +51,8 @@ public interface UserRepository extends JpaRepository<Users, String> {
             "and lower(u.location.code) = :location " +
             "and upper(u.role.name) in :roles " +
             "and u.staffCode <> :loggedStaffCode " +
-            "and u.state <> 'INACTIVE'", nativeQuery = false)
+            "and u.state <> 'INACTIVE' " +
+            "order by u.firstName asc, u.staffCode desc ", nativeQuery = false)
     Page<Users> searchByStaffCodeOrNameWithRole(@Param("text") String text,
                                                 @Param("loggedStaffCode") String loggedStaffCode,
                                                 @Param("location") String adminLocation,

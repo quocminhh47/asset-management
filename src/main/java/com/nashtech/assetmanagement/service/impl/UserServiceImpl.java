@@ -174,7 +174,8 @@ public class UserServiceImpl implements UserService {
         Users user = authenticationService.getUser();
         String loggedStaffCode = user.getStaffCode();
         String location = user.getLocation().getCode();
-        Pageable pageable = PageRequest.of(pageNo, pageSize, defaultSorting(sortBy, sortDirection));
+//        Pageable pageable = PageRequest.of(pageNo, pageSize, defaultSorting(sortBy, sortDirection));
+        Pageable pageable = PageRequest.of(pageNo, pageSize);
 
         Page<Users> users = userRepository.searchByStaffCodeOrNameWithRole(
                 searchText.toLowerCase(),
