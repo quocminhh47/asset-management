@@ -2,8 +2,10 @@ package com.nashtech.assetmanagement.service.impl;
 
 import com.nashtech.assetmanagement.dto.response.LocationResponseDto;
 import com.nashtech.assetmanagement.entities.Location;
+import com.nashtech.assetmanagement.exception.ResourceNotFoundException;
 import com.nashtech.assetmanagement.mapper.LocationMapper;
 import com.nashtech.assetmanagement.repositories.LocationRepository;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -35,5 +37,15 @@ public class LocationServiceImplTest {
         when(locationMapper.locationListToLocationResponseDtoList(locationList)).thenReturn(responseList);
         List<LocationResponseDto> result = locationService.getLocationList();
         assertThat(result).isEqualTo(responseList);
+    }
+
+    @Test
+    void getLocationList_ShouldThrowResourceNotFoundEx_WhenLocationNotExist() {
+        List<Location> locationList = mock(ArrayList.class);
+        when(locationRepository.findAll()).thenReturn(locationList);
+        when(locationList.isEmpty()).thenReturn(true);
+        ResourceNotFoundException ex = Assertions.assertThrows(ResourceNotFoundException.class,
+                () -> locationService.getLocationList());
+        assertThat(ex.getMessage()).isEqualTo("Location list not found");
     }
 }

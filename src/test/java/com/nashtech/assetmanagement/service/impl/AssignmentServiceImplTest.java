@@ -364,7 +364,7 @@ class AssignmentServiceImplTest {
         verify(assignmentRepository).getListAssignmentByUser(eq("SD001"), captor.capture());
         Pageable pageable = captor.getValue();
 
-        assertThat(pageable.getPageSize()).isEqualTo(20);
+        assertThat(pageable.getPageSize()).isEqualTo(AppConstants.HOME_SIZE);
         assertThat(pageable.getPageNumber()).isEqualTo(0);
         assertThat(pageable.getSort().ascending()).isEqualTo(Sort.by("code"));
         assertThat(actual).isEqualTo(expectList);

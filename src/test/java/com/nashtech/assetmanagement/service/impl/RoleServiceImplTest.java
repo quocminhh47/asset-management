@@ -2,8 +2,10 @@ package com.nashtech.assetmanagement.service.impl;
 
 import com.nashtech.assetmanagement.dto.response.RoleResponseDto;
 import com.nashtech.assetmanagement.entities.Role;
+import com.nashtech.assetmanagement.exception.ResourceNotFoundException;
 import com.nashtech.assetmanagement.mapper.RoleMapper;
 import com.nashtech.assetmanagement.repositories.RoleRepository;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -35,5 +37,14 @@ public class RoleServiceImplTest {
         when(roleMapper.roleListToResponseRoleDtoList(roles)).thenReturn(responseList);
         List<RoleResponseDto> result = roleService.getRoleList();
         assertThat(result).isEqualTo(responseList);
+    }
+    @Test
+    void getRoleList_ShouldThrowResourceNotFoundEx_WhenRoleNotExist() {
+        List<Role> roles = mock(ArrayList.class);
+        when(roleRepository.findAll()).thenReturn(roles);
+        when(roles.isEmpty()).thenReturn(true);
+        ResourceNotFoundException ex = Assertions.assertThrows(ResourceNotFoundException.class,
+                () -> roleService.getRoleList());
+        assertThat(ex.getMessage()).isEqualTo("Role list not found");
     }
 }

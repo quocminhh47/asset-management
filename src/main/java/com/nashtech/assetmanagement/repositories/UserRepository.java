@@ -27,7 +27,7 @@ public interface UserRepository extends JpaRepository<Users, String> {
 
 
     @Query(value = "from Users u " +
-        "where ( lower(u.staffCode) like concat('%', :text, '%') ) " +
+        "where ( lower(u.staffCode) like concat('%', :text, '%')  OR lower(concat(u.firstName,' ',u.lastName)) like concat('%', :text, '%')) "+
         "and u.location.code = :locationCode " +
         "and u.state <> 'INACTIVE' " +
         "order by u.firstName asc , u.staffCode desc ")
