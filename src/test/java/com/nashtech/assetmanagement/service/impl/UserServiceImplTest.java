@@ -16,8 +16,7 @@ import com.nashtech.assetmanagement.repositories.AssignmentRepository;
 import com.nashtech.assetmanagement.repositories.LocationRepository;
 import com.nashtech.assetmanagement.repositories.RoleRepository;
 import com.nashtech.assetmanagement.repositories.UserRepository;
-import com.nashtech.assetmanagement.sercurity.jwt.JwtUtils;
-import com.nashtech.assetmanagement.service.AuthenticationService;
+import com.nashtech.assetmanagement.service.AuthenticationServices;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -30,9 +29,7 @@ import org.modelmapper.ModelMapper;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
-import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
-import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
 import java.util.ArrayList;
@@ -55,13 +52,9 @@ public class UserServiceImplTest {
     @Mock
     UserMapper userMapper;
     @Mock
-    AuthenticationManager authenticationManager;
-    @Mock
-    JwtUtils jwtUtils;
-    @Mock
     PasswordEncoder passwordEncoder;
     @Mock
-    AuthenticationService authenticationService;
+    AuthenticationServices authenticationService;
     @Mock
     LocationRepository locationRepository;
     @Mock

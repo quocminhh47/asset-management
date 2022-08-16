@@ -16,7 +16,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
-import java.util.HashMap;
 import java.util.List;
 
 
@@ -39,7 +38,8 @@ public class UsersController {
                     content = {@Content(examples = {@ExampleObject()})}),
             @ApiResponse(responseCode = "401", description = "UNAUTHORIZED - The request is unauthorized"),
             @ApiResponse(responseCode = "403", description = "FORBIDDEN - You don’t have permission to access"),
-            @ApiResponse(responseCode = "404", description = "NOT FOUND - The user role or location resource is not found"),
+            @ApiResponse(responseCode = "404",
+                    description = "NOT FOUND - The user role or location resource is not found"),
             @ApiResponse(responseCode = "500",
                     description = "Internal Error - There were some error while processing in server",
                     content = {@Content(examples = {@ExampleObject()})})
@@ -60,14 +60,17 @@ public class UsersController {
                     content = {@Content(examples = {@ExampleObject()})}),
             @ApiResponse(responseCode = "401", description = "UNAUTHORIZED - The request is unauthorized"),
             @ApiResponse(responseCode = "403", description = "FORBIDDEN - You don’t have permission to access"),
-            @ApiResponse(responseCode = "404", description = "NOT FOUND - The user with given ID resource is not found"),
+            @ApiResponse(responseCode = "404",
+                    description = "NOT FOUND - The user with given ID resource is not found"),
             @ApiResponse(responseCode = "500",
                     description = "Internal Error - There were some error while processing in server",
                     content = {@Content(examples = {@ExampleObject()})})
     })
     @PutMapping("/{id}")
     @ResponseStatus(HttpStatus.OK)
-    public UserContentResponseDto editUser(@RequestBody @Valid UserRequestDto user, @PathVariable("id") String staffCode) {
+    public UserContentResponseDto editUser(@RequestBody @Valid UserRequestDto user,
+                                           @PathVariable("id") String staffCode) {
+
         return userService.editUser(user, staffCode);
     }
 
@@ -93,7 +96,8 @@ public class UsersController {
 
 
     @Operation(summary = "Get user list  by staff's code or staff's name",
-            description = "Given staff's code or staff's name then this return all users matched with the given conditions")
+            description = "Given staff's code or staff's name then " +
+                    "this return all users matched with the given conditions")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "OK - Successfully retrieved"),
             @ApiResponse(responseCode = "400",
@@ -144,7 +148,8 @@ public class UsersController {
                     value = "sortDirection", defaultValue = AppConstants.DEFAULT_SORT_DIRECTION, required = false)
                     String sortDirection
     ) {
-        return userService.getAllUsersBySearchingStaffCodeOrNameOrRole(pageNo, pageSize, sortBy, sortDirection, searchText, roles);
+        return userService
+                .getAllUsersBySearchingStaffCodeOrNameOrRole(pageNo, pageSize, sortBy, sortDirection, searchText, roles);
     }
 
 

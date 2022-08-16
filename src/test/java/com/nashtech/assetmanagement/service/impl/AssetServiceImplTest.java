@@ -43,7 +43,6 @@ import com.nashtech.assetmanagement.mapper.AssetMapper;
 import com.nashtech.assetmanagement.repositories.AssetRepository;
 import com.nashtech.assetmanagement.repositories.AssignmentRepository;
 import com.nashtech.assetmanagement.repositories.CategoryRepository;
-import com.nashtech.assetmanagement.repositories.LocationRepository;
 import com.nashtech.assetmanagement.repositories.UserRepository;
 
 public class AssetServiceImplTest {
@@ -54,29 +53,29 @@ public class AssetServiceImplTest {
 
 	private CategoryRepository categoryRepository;
 
-	private LocationRepository locationRepository;
 	private AssetMapper assetMapper;
+
 	private Asset asset;
 
 	private AssignmentRepository assignmentRepository;
 
 	private AssetServiceImpl assetServiceImpl;
 
-	private AuthenticationServiceImpl authenticationServiceImpl;
+	private AuthenticationServicesImpl authenticationServiceImpl;
+
 	EditAssetRequestDto request;
 	AssetState newAssetState = AssetState.NOT_AVAILABLE;
 
 	@BeforeEach
 	void setUp() {
 		asset = mock(Asset.class);
-		authenticationServiceImpl = mock(AuthenticationServiceImpl.class);
+		authenticationServiceImpl = mock(AuthenticationServicesImpl.class);
 		assetRepository = mock(AssetRepository.class);
 		assetMapper = mock(AssetMapper.class);
-		locationRepository = mock(LocationRepository.class);
 		categoryRepository = mock(CategoryRepository.class);
 		userRepository = mock(UserRepository.class);
 		assignmentRepository = mock(AssignmentRepository.class);
-		assetServiceImpl = new AssetServiceImpl(assetRepository, categoryRepository, userRepository, locationRepository,
+		assetServiceImpl = new AssetServiceImpl(assetRepository, categoryRepository, userRepository,
 				assetMapper, assignmentRepository, authenticationServiceImpl);
 
 		request = new EditAssetRequestDto("Dell inspriration 5432", "CPU 7200U, RAM 16GB", "2022-01-01", newAssetState);
@@ -102,7 +101,7 @@ public class AssetServiceImplTest {
 		assertThat(actual).isEqualTo(expected);
 	}
 
-	// US584-CreateNewAssignment
+
 	@Test
 	void getAssetList_ShouldReturnResponseAssetDtoList_WhenAssetExist() {
 		Users users = mock(Users.class);
@@ -176,7 +175,7 @@ public class AssetServiceImplTest {
 		assertThat(exception.getMessage()).isEqualTo("Asset." + assetCode + ".not.found");
 	}
 
-	// ===========US 579=======
+
 	@DisplayName("Get list asset by user but user_id not found")
 	@Test
 	void getListAsset_ShouldThrownExceptionUserNotFound_WhenUserIdNotExist() {
@@ -222,8 +221,8 @@ public class AssetServiceImplTest {
 		ListAssetResponseDto actual = assetServiceImpl.getListAsset(requestDto);
 
 		ArgumentCaptor<Pageable> captor = ArgumentCaptor.forClass(Pageable.class);
-		ArgumentCaptor<List> captorlistCategories = ArgumentCaptor.forClass(List.class);
-		ArgumentCaptor<List> captorlistStates = ArgumentCaptor.forClass(List.class);
+		var captorlistCategories = ArgumentCaptor.forClass(List.class);
+		var captorlistStates = ArgumentCaptor.forClass(List.class);
 
 		verify(assetRepository).getListAsset(eq("SD001"), captorlistCategories.capture(), captorlistStates.capture(),
 				eq("a"), captor.capture());
@@ -320,7 +319,7 @@ public class AssetServiceImplTest {
 		assertThat(actual.getTotalPages()).isEqualTo(2);
 	}
 
-	// 582 - Delete asset
+
 	@Test
 	void deleteAsset_ShouldThrowResourceNotFoundException_WhenAssetCodeIncorrect() {
 		when(assetRepository.findById("LT1111")).thenReturn(Optional.empty());

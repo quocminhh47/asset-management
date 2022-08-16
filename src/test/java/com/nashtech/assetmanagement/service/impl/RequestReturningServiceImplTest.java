@@ -14,7 +14,6 @@ import static org.mockito.Mockito.when;
 
 import java.sql.Date;
 import java.time.LocalDate;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
@@ -27,9 +26,6 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
-import org.mockito.internal.matchers.Null;
-import org.mockito.junit.jupiter.MockitoSettings;
-import org.mockito.quality.Strictness;
 import org.modelmapper.ModelMapper;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -58,7 +54,7 @@ import com.nashtech.assetmanagement.repositories.AssetRepository;
 import com.nashtech.assetmanagement.repositories.AssignmentRepository;
 import com.nashtech.assetmanagement.repositories.RequestReturningRepository;
 import com.nashtech.assetmanagement.repositories.UserRepository;
-import com.nashtech.assetmanagement.service.AuthenticationService;
+import com.nashtech.assetmanagement.service.AuthenticationServices;
 
 class RequestReturningServiceImplTest {
 
@@ -75,7 +71,7 @@ class RequestReturningServiceImplTest {
 	@Mock
 	ModelMapper modelMapper;
 	@Mock
-	AuthenticationService authenticationService;
+	AuthenticationServices authenticationService;
 	@InjectMocks
 	RequestReturningServiceImpl requestReturningServiceImpl;
 

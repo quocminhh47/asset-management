@@ -16,7 +16,6 @@ public interface AssetService {
 
     EditAssetResponseDto editAsset(EditAssetRequestDto editAssetRequest, String assetCode);
 
-    //582 - Delete asset
     MessageResponse deleteAssetByAssetCode(String assetCode);
 
     AssetReportResponseDto getAssetReportList(int pageNo, int pageSize);

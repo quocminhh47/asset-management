@@ -1,18 +1,17 @@
 package com.nashtech.assetmanagement.repositories;
 
-import java.sql.Date;
-import java.util.List;
-
+import com.nashtech.assetmanagement.entities.Asset;
+import com.nashtech.assetmanagement.entities.Assignment;
 import com.nashtech.assetmanagement.entities.AssignmentId;
+import com.nashtech.assetmanagement.entities.Users;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
-import com.nashtech.assetmanagement.entities.Asset;
-import com.nashtech.assetmanagement.entities.Assignment;
-import com.nashtech.assetmanagement.entities.Users;
+import java.sql.Date;
+import java.util.List;
 
 public interface AssignmentRepository extends JpaRepository<Assignment, AssignmentId> {
 

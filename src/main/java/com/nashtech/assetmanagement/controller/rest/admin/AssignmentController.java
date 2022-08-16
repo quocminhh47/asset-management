@@ -1,10 +1,10 @@
 package com.nashtech.assetmanagement.controller.rest.admin;
 
-import com.nashtech.assetmanagement.dto.DeleteAssignmentRequestDto;
 import com.nashtech.assetmanagement.dto.request.AssignmentRequestDto;
+import com.nashtech.assetmanagement.dto.request.DeleteAssignmentRequestDto;
+import com.nashtech.assetmanagement.dto.request.EditAssignmentRequestDto;
 import com.nashtech.assetmanagement.dto.response.AssignmentResponseDto;
 import com.nashtech.assetmanagement.dto.response.ListAssignmentResponseDto;
-import com.nashtech.assetmanagement.dto.request.EditAssignmentRequestDto;
 import com.nashtech.assetmanagement.dto.response.MessageResponse;
 import com.nashtech.assetmanagement.service.AssignmentService;
 import com.nashtech.assetmanagement.utils.AppConstants;
@@ -51,16 +51,15 @@ public class AssignmentController {
     public ListAssignmentResponseDto getAssignmentListOrderByDefaultOrFilter(
             @RequestParam(
                     value = "pageNo", defaultValue = AppConstants.DEFAULT_PAGE_NUMBER, required = false)
-            int pageNo,
+                    int pageNo,
             @RequestParam(
                     value = "pageSize", defaultValue = "20", required = false)
-            int pageSize,
+                    int pageSize,
             @RequestParam(value = "text", defaultValue = "", required = false) String text,
             @RequestParam(value = "state", defaultValue = "", required = false) List<String> states,
             @RequestParam(value = "assigned-date", defaultValue = "", required = false) String assignedDate
     ) {
-        return assignmentService
-                .getAssignmentsByCondition(pageNo, pageSize, text, states, assignedDate);
+        return assignmentService.getAssignmentsByCondition(pageNo, pageSize, text, states, assignedDate);
     }
 
 
@@ -98,7 +97,7 @@ public class AssignmentController {
                     content = {@Content(examples = {@ExampleObject()})})
     })
     @PutMapping()
-    public ResponseEntity<AssignmentResponseDto> editAssignment(@RequestBody EditAssignmentRequestDto request){
+    public ResponseEntity<AssignmentResponseDto> editAssignment(@RequestBody EditAssignmentRequestDto request) {
         return ResponseEntity.ok(this.assignmentService.editAssignment(request));
     }
 
@@ -111,7 +110,8 @@ public class AssignmentController {
                     content = {@Content(examples = {@ExampleObject()})}),
             @ApiResponse(responseCode = "401", description = "UNAUTHORIZED - The request is unauthorized"),
             @ApiResponse(responseCode = "403", description = "FORBIDDEN - You don’t have permission to access"),
-            @ApiResponse(responseCode = "404", description = "NOT FOUND - The assignment resource of this asset is not found"),
+            @ApiResponse(responseCode = "404",
+                    description = "NOT FOUND - The assignment resource of this asset is not found"),
             @ApiResponse(responseCode = "500",
                     description = "Internal Error - There were some error while processing in server",
                     content = {@Content(examples = {@ExampleObject()})})
@@ -130,10 +130,10 @@ public class AssignmentController {
                     description = "Bad Request - The request is invalid"),
             @ApiResponse(responseCode = "401", description = "UNAUTHORIZED - The request is unauthorized"),
             @ApiResponse(responseCode = "403", description = "FORBIDDEN - You don’t have permission to access"),
-            @ApiResponse(responseCode = "404", description = "NOT FOUND - The " +
-                    "assignment or asset resource is not found"),
-            @ApiResponse(responseCode = "406", description = "NOT_ACCEPTABLE - The " +
-                    "state of the assignment is 'Accepted'"),
+            @ApiResponse(responseCode = "404",
+                    description = "NOT FOUND - The assignment or asset resource is not found"),
+            @ApiResponse(responseCode = "406",
+                    description = "NOT_ACCEPTABLE - The state of the assignment is 'Accepted'"),
             @ApiResponse(responseCode = "500",
                     description = "Internal Error - There were some error while processing in server")
     })
@@ -144,6 +144,7 @@ public class AssignmentController {
             @RequestParam(value = "assetCode") String assetCode,
             @RequestParam(value = "assignedDate") Date assignedDate
     ) {
+
         DeleteAssignmentRequestDto deleteAssignmentRequestDto =
                 new DeleteAssignmentRequestDto(assignedTo, assetCode, assignedDate);
         return assignmentService.deleteAssignment(deleteAssignmentRequestDto);

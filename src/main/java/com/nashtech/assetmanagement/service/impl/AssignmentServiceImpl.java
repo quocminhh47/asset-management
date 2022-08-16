@@ -1,8 +1,8 @@
 package com.nashtech.assetmanagement.service.impl;
 
-import com.nashtech.assetmanagement.dto.DeleteAssignmentRequestDto;
 import com.nashtech.assetmanagement.dto.request.AssignmentRequestDto;
 import com.nashtech.assetmanagement.dto.request.ChangeAssignmentStateRequestDto;
+import com.nashtech.assetmanagement.dto.request.DeleteAssignmentRequestDto;
 import com.nashtech.assetmanagement.dto.request.EditAssignmentRequestDto;
 import com.nashtech.assetmanagement.dto.response.AssignmentResponseDto;
 import com.nashtech.assetmanagement.dto.response.ListAssignmentResponseDto;
@@ -22,7 +22,7 @@ import com.nashtech.assetmanagement.repositories.AssetRepository;
 import com.nashtech.assetmanagement.repositories.AssignmentRepository;
 import com.nashtech.assetmanagement.repositories.UserRepository;
 import com.nashtech.assetmanagement.service.AssignmentService;
-import com.nashtech.assetmanagement.service.AuthenticationService;
+import com.nashtech.assetmanagement.service.AuthenticationServices;
 import com.nashtech.assetmanagement.utils.AppConstants;
 import com.nashtech.assetmanagement.utils.StateConverter;
 import lombok.AllArgsConstructor;
@@ -52,20 +52,20 @@ public class AssignmentServiceImpl implements AssignmentService {
     private final UserRepository userRepository;
     private final AssetRepository assetRepository;
     private final AssignmentMapper assignmentMapper;
-    private final AuthenticationService authenticationService;
+    private final AuthenticationServices authenticationService;
 
     @Override
     public ListAssignmentResponseDto getAssignmentsByCondition(int pageNo,
-                                                            int pageSize,
-                                                            String text,
-                                                            List<String> states,
-                                                            String assignedDateStr) {
+                                                               int pageSize,
+                                                               String text,
+                                                               List<String> states,
+                                                               String assignedDateStr) {
         List<String> assignmentState = states.stream()
                 .map(StateConverter::getAssignmentState)
                 .collect(Collectors.toList());
 
         Pageable pageable = PageRequest.of(pageNo, pageSize);
-        Page<Assignment> assignmentPage ;
+        Page<Assignment> assignmentPage;
         Date assignedDate;
 
         if (!assignedDateStr.replaceAll(" ", "").isBlank()) {
@@ -90,10 +90,10 @@ public class AssignmentServiceImpl implements AssignmentService {
 
 
     @Override
-    @Transactional(rollbackFor = {SQLException.class,NotUniqueException.class})
+    @Transactional(rollbackFor = {SQLException.class, NotUniqueException.class})
     public AssignmentResponseDto createNewAssignment(AssignmentRequestDto request) {
-        if(assignmentRepository.existsById_AssetCodeAndId_AssignedDateAndId_AssignedTo
-                (request.getAssetCode(),request.getAssignedDate(),request.getAssignedTo())){
+        if (assignmentRepository.existsById_AssetCodeAndId_AssignedDateAndId_AssignedTo
+                (request.getAssetCode(), request.getAssignedDate(), request.getAssignedTo())) {
             throw new NotUniqueException("AssignmentId.is.exist");
         }
         Optional<Asset> asset = assetRepository.findById(request.getAssetCode());
@@ -118,7 +118,7 @@ public class AssignmentServiceImpl implements AssignmentService {
     }
 
     @Override
-    @Transactional(rollbackFor = {SQLException.class,NotUniqueException.class,ResourceNotFoundException.class})
+    @Transactional(rollbackFor = {SQLException.class, NotUniqueException.class, ResourceNotFoundException.class})
     public AssignmentResponseDto editAssignment(EditAssignmentRequestDto requestDto) {
         AssignmentId assignmentId = new AssignmentId(
                 requestDto.getOldAssignedTo(),
@@ -126,14 +126,14 @@ public class AssignmentServiceImpl implements AssignmentService {
                 requestDto.getOldAssignedDate());
         Assignment assignment = assignmentRepository.findById(assignmentId).orElseThrow(
                 () -> new ResourceNotFoundException("Assignment.not.found"));
-        if(!assignment.getState().equals(AppConstants.WAITING_FOR_ACCEPTANCE)){
+        if (!assignment.getState().equals(AppConstants.WAITING_FOR_ACCEPTANCE)) {
             throw new IllegalStateException("Assignment.state.invalid");
         }
-        if(requestDto.getOldAssignedDate().compareTo(requestDto.getAssignedDate())>0){
+        if (requestDto.getOldAssignedDate().compareTo(requestDto.getAssignedDate()) > 0) {
             throw new DateInvalidException("New.assignment.date.occurs.before.old.assignment.date");
         }
         Users assignBy = authenticationService.getUser();
-        if(requestDto.getOldAssignedDate().compareTo(requestDto.getAssignedDate())==0
+        if (requestDto.getOldAssignedDate().compareTo(requestDto.getAssignedDate()) == 0
                 && requestDto.getOldAssignedTo().equals(requestDto.getAssignedToStaffCode())
                 && requestDto.getOldAssetCode().equals(requestDto.getAssetCode())) {
             assignment.setNote(requestDto.getNote());
@@ -141,15 +141,15 @@ public class AssignmentServiceImpl implements AssignmentService {
             return assignmentMapper.mapAssignmentToResponseDto(assignment);
         }
         assignment.getAsset().setState(AssetState.AVAILABLE);
-        if(assignmentRepository.existsById_AssetCodeAndId_AssignedDateAndId_AssignedTo
-                (requestDto.getAssetCode(), requestDto.getAssignedDate(), requestDto.getAssignedToStaffCode())){
+        if (assignmentRepository.existsById_AssetCodeAndId_AssignedDateAndId_AssignedTo
+                (requestDto.getAssetCode(), requestDto.getAssignedDate(), requestDto.getAssignedToStaffCode())) {
             throw new NotUniqueException("New.assignment.exist");
         }
         Asset asset = assetRepository.findById(requestDto.getAssetCode()).orElseThrow(
-                ()-> new ResourceNotFoundException("Asset.not.found"));
+                () -> new ResourceNotFoundException("Asset.not.found"));
         Users assignTo = userRepository.findById(requestDto.getAssignedToStaffCode()).orElseThrow(
-                ()-> new ResourceNotFoundException("Assign.to.user.not.found"));
-        Assignment newAssignment = assignmentMapper.mapEditAssignmentToAssignment(requestDto,asset,assignTo,assignBy);
+                () -> new ResourceNotFoundException("Assign.to.user.not.found"));
+        Assignment newAssignment = assignmentMapper.mapEditAssignmentToAssignment(requestDto, asset, assignTo, assignBy);
         assignmentRepository.delete(assignment);
         assignmentRepository.save(newAssignment);
         return assignmentMapper.mapAssignmentToResponseDto(newAssignment);
@@ -159,39 +159,36 @@ public class AssignmentServiceImpl implements AssignmentService {
     @Override
     public List<AssignmentResponseDto> getListAssignmentByAssetCode(String assetCode) {
         Optional<Asset> optionalAsset = assetRepository.findById(assetCode);
-        if (!optionalAsset.isPresent()) {
+        if (optionalAsset.isEmpty()) {
             throw new ResourceNotFoundException(String.format("asset.not.found.with.code:%s", assetCode));
         }
         Asset asset = optionalAsset.get();
         List<Assignment> list = assignmentRepository.findByAsset(asset);
-        List<AssignmentResponseDto> resultList = assignmentMapper.mapperListAssignment(list);
-        return resultList;
-
+        return assignmentMapper.mapperListAssignment(list);
     }
 
 
-	@Override
-	public List<AssignmentResponseDto> getListAssignmentByUser(String userId, String sortBy, String sortDirection) {
-		Sort.Direction sort = Sort.Direction.ASC;
-		if(sortDirection.equals("DESC")) {
-			sort = Sort.Direction.DESC;
-		}
-		Pageable pageable = PageRequest.of(0, AppConstants.HOME_SIZE, Sort.by(sort, sortBy));
-		Optional<Users> optionalUsers = userRepository.findById(userId);
-		if (!optionalUsers.isPresent()) {
-			throw new ResourceNotFoundException(String.format("user.not.found.with.code:%s", userId));
-		}
-		Page<Assignment> pageAssignment = assignmentRepository.getListAssignmentByUser(userId, pageable);
-		List<Assignment> listEntity = pageAssignment.getContent();
-		List<AssignmentResponseDto> listResponse = assignmentMapper.mapperListAssignment(listEntity);
-		return listResponse;
-	}
+    @Override
+    public List<AssignmentResponseDto> getListAssignmentByUser(String userId, String sortBy, String sortDirection) {
+        Sort.Direction sort = Sort.Direction.ASC;
+        if (sortDirection.equals("DESC")) {
+            sort = Sort.Direction.DESC;
+        }
+        Pageable pageable = PageRequest.of(0, AppConstants.HOME_SIZE, Sort.by(sort, sortBy));
+        Optional<Users> optionalUsers = userRepository.findById(userId);
+        if (optionalUsers.isEmpty()) {
+            throw new ResourceNotFoundException(String.format("user.not.found.with.code:%s", userId));
+        }
+        Page<Assignment> pageAssignment = assignmentRepository.getListAssignmentByUser(userId, pageable);
+        List<Assignment> listEntity = pageAssignment.getContent();
+        return assignmentMapper.mapperListAssignment(listEntity);
+    }
 
-    //589 - Respond to his/her own assignment
+
     @Override
     public MessageResponse updateAssignmentState(ChangeAssignmentStateRequestDto changeAssignmentStateRequestDto) {
-        if( !(changeAssignmentStateRequestDto.getState().equalsIgnoreCase(AppConstants.ACCEPTED))
-            && !(changeAssignmentStateRequestDto.getState().equalsIgnoreCase(DECLINED))) {
+        if (!(changeAssignmentStateRequestDto.getState().equalsIgnoreCase(AppConstants.ACCEPTED))
+                && !(changeAssignmentStateRequestDto.getState().equalsIgnoreCase(DECLINED))) {
             return new MessageResponse(HttpStatus.BAD_REQUEST, "Assignment state request is not valid", new java.util.Date());
         }
         Users users = userRepository.findByUserName(changeAssignmentStateRequestDto.getAssignedTo()).orElseThrow(
@@ -203,26 +200,32 @@ public class AssignmentServiceImpl implements AssignmentService {
                 changeAssignmentStateRequestDto.getAssignedDate());
         Assignment assignment = assignmentRepository.findById(assignmentId).orElseThrow(
                 () -> new ResourceNotFoundException("Cannot find assignment with assignment id: " + assignmentId));
-        if(!assignment.getState().equalsIgnoreCase(WAITING_FOR_ACCEPTANCE)) {
+        if (!assignment.getState().equalsIgnoreCase(WAITING_FOR_ACCEPTANCE)) {
             return new MessageResponse(HttpStatus.CONFLICT, "Assignment state in database is Accepted or Declined", new java.util.Date());
         }
 
-        // Change asset state -> Available When Decline assignment
-        if(changeAssignmentStateRequestDto.getState().equalsIgnoreCase(DECLINED)) {
+
+        if (changeAssignmentStateRequestDto.getState().equalsIgnoreCase(DECLINED)) {
             Asset asset = assetRepository.findById(changeAssignmentStateRequestDto.getAssetCode()).orElseThrow(
-                    () -> new ResourceNotFoundException("Cannot find asset with asset code: " + changeAssignmentStateRequestDto.getAssetCode()));
+                    () -> new ResourceNotFoundException("Cannot find asset with asset code: " +
+                            changeAssignmentStateRequestDto.getAssetCode()));
             asset.setState(AssetState.AVAILABLE);
             assetRepository.save(asset);
         }
 
         assignment.setState(changeAssignmentStateRequestDto.getState());
         assignmentRepository.save(assignment);
-        return new MessageResponse(HttpStatus.OK, "Update assignment state to " + changeAssignmentStateRequestDto.getState() + " successfully!", new java.util.Date());
+        return new MessageResponse(
+                HttpStatus.OK,
+                "Update assignment state to " + changeAssignmentStateRequestDto.getState() + " successfully!",
+                new java.util.Date());
     }
+
     @Override
-    public MessageResponse deleteAssignment(DeleteAssignmentRequestDto deleteAssignmentRequestDto){
+    public MessageResponse deleteAssignment(DeleteAssignmentRequestDto deleteAssignmentRequestDto) {
         Users users = userRepository.findByUserName(deleteAssignmentRequestDto.getAssignedTo()).orElseThrow(
-                () -> new ResourceNotFoundException("Cannot find user with username: " + deleteAssignmentRequestDto.getAssignedTo()));
+                () -> new ResourceNotFoundException(
+                        "Cannot find user with username: " + deleteAssignmentRequestDto.getAssignedTo()));
 
         AssignmentId assignmentId = new AssignmentId(
                 users.getStaffCode(),
@@ -231,20 +234,23 @@ public class AssignmentServiceImpl implements AssignmentService {
 
         Assignment assignment = assignmentRepository.findById(assignmentId).orElseThrow(
                 () -> new ResourceNotFoundException("Cannot find assignment"));
-        String assignmentState= assignment.getState();
-        if (!(assignmentState.equalsIgnoreCase(WAITING_FOR_ACCEPTANCE)||(assignmentState.equalsIgnoreCase(DECLINED)))){
+        String assignmentState = assignment.getState();
+        if (!(assignmentState.equalsIgnoreCase(WAITING_FOR_ACCEPTANCE) || (assignmentState.equalsIgnoreCase(DECLINED)))) {
             throw new RequestNotAcceptException("can only be deleted when the status is" +
-                    " 'Waiting for accept' and 'Declined'. Current state: '"+assignmentState.toLowerCase()+"'.");
+                    " 'Waiting for accept' and 'Declined'. Current state: '" + assignmentState.toLowerCase() + "'.");
         }
         assignmentRepository.delete(assignment);
-        Asset asset=assetRepository.findById(deleteAssignmentRequestDto.getAssetCode()).orElseThrow(
-                () -> new ResourceNotFoundException("Cannot find asset with id: "+deleteAssignmentRequestDto.getAssetCode()));
+        Asset asset = assetRepository.findById(deleteAssignmentRequestDto.getAssetCode()).orElseThrow(
+                () -> new ResourceNotFoundException(
+                        "Cannot find asset with id: " + deleteAssignmentRequestDto.getAssetCode()));
 
         asset.setState(AssetState.AVAILABLE);
 
         assetRepository.save(asset);
 
-        return new MessageResponse(HttpStatus.OK,"Assignment deleted",
+        return new MessageResponse(
+                HttpStatus.OK,
+                "Assignment deleted",
                 new java.util.Date());
     }
 }

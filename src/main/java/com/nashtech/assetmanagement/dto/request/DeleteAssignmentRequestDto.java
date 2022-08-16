@@ -1,4 +1,4 @@
-package com.nashtech.assetmanagement.dto;
+package com.nashtech.assetmanagement.dto.request;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;

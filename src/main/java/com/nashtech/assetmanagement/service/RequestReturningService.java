@@ -3,11 +3,7 @@ package com.nashtech.assetmanagement.service;
 import com.nashtech.assetmanagement.dto.request.CreateRequestReturningAssetRequestDto;
 import com.nashtech.assetmanagement.dto.request.GetRequestReturningListRequestDto;
 import com.nashtech.assetmanagement.dto.request.ReturningRequestDto;
-import com.nashtech.assetmanagement.dto.response.CreateRequestReturningResponseDto;
-import com.nashtech.assetmanagement.dto.response.ListRequestReturningResponseDto;
-import com.nashtech.assetmanagement.dto.response.ListStateRequestReturningResponseDto;
-import com.nashtech.assetmanagement.dto.response.MessageResponse;
-import com.nashtech.assetmanagement.dto.response.RequestReturningResponseDto;
+import com.nashtech.assetmanagement.dto.response.*;
 
 public interface RequestReturningService {
 

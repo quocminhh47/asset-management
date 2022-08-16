@@ -8,7 +8,6 @@ import com.nashtech.assetmanagement.exception.NotUniqueException;
 import com.nashtech.assetmanagement.mapper.CategoryMapper;
 import com.nashtech.assetmanagement.repositories.CategoryRepository;
 import com.nashtech.assetmanagement.service.CategoryService;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -20,7 +19,6 @@ public class CategoryServiceImpl implements CategoryService {
 
     CategoryMapper categoryMapper;
 
-    @Autowired
     public CategoryServiceImpl(CategoryRepository categoryRepository, CategoryMapper categoryMapper) {
         this.categoryRepository = categoryRepository;
         this.categoryMapper = categoryMapper;

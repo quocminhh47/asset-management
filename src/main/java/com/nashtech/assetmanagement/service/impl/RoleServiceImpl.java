@@ -6,7 +6,6 @@ import com.nashtech.assetmanagement.exception.ResourceNotFoundException;
 import com.nashtech.assetmanagement.mapper.RoleMapper;
 import com.nashtech.assetmanagement.repositories.RoleRepository;
 import com.nashtech.assetmanagement.service.RoleService;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -30,8 +29,7 @@ public class RoleServiceImpl implements RoleService {
         if (roles.isEmpty()) {
             throw new ResourceNotFoundException("Role list not found");
         }
-        List<RoleResponseDto> responseList = roleMapper.roleListToResponseRoleDtoList(roles);
-        return responseList;
+        return roleMapper.roleListToResponseRoleDtoList(roles);
     }
 
 }

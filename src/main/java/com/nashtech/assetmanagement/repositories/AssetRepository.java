@@ -1,17 +1,16 @@
 package com.nashtech.assetmanagement.repositories;
 
-import java.util.List;
-
+import com.nashtech.assetmanagement.dto.response.IAssetReportResponseDto;
+import com.nashtech.assetmanagement.entities.Asset;
+import com.nashtech.assetmanagement.entities.Users;
+import com.nashtech.assetmanagement.enums.AssetState;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
-import com.nashtech.assetmanagement.dto.response.IAssetReportResponseDto;
-import com.nashtech.assetmanagement.entities.Asset;
-import com.nashtech.assetmanagement.entities.Users;
-import com.nashtech.assetmanagement.enums.AssetState;
+import java.util.List;
 
 public interface AssetRepository extends JpaRepository<Asset, String> {
 
