@@ -29,5 +29,5 @@ public class AppConstants {
     public static final String STRONG_PASSWORD_REGEX="^(?=.*[0-9])(?=.*[a-z])(?=" +
             ".*[A-Z])(?=.*[@#$%^&+=])(?=\\S+$).{8,}$";
 
-
+    public static final int HOME_SIZE = 200;
 }

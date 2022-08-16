@@ -176,7 +176,7 @@ public class AssignmentServiceImpl implements AssignmentService {
 		if(sortDirection.equals("DESC")) {
 			sort = Sort.Direction.DESC;
 		}
-		Pageable pageable = PageRequest.of(0, 20 , Sort.by(sort, sortBy));
+		Pageable pageable = PageRequest.of(0, AppConstants.HOME_SIZE, Sort.by(sort, sortBy));
 		Optional<Users> optionalUsers = userRepository.findById(userId);
 		if (!optionalUsers.isPresent()) {
 			throw new ResourceNotFoundException(String.format("user.not.found.with.code:%s", userId));
