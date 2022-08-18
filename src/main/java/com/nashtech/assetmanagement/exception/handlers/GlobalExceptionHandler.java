@@ -3,6 +3,7 @@ package com.nashtech.assetmanagement.exception.handlers;
 import com.nashtech.assetmanagement.dto.response.ErrorResponseDto;
 import com.nashtech.assetmanagement.dto.response.ErrorResponseMessageDto;
 import com.nashtech.assetmanagement.exception.*;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -96,6 +97,14 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
     protected ResponseEntity<ErrorResponseMessageDto> handleRequestNotAcceptException(RuntimeException exception) {
         ErrorResponseMessageDto responseErrorMessage =
                 new ErrorResponseMessageDto(HttpStatus.NOT_ACCEPTABLE, exception.getMessage(),
+                        new Date());
+        return new ResponseEntity<>(responseErrorMessage, responseErrorMessage.getStatus());
+    }
+    @ExceptionHandler(DataIntegrityViolationException.class)
+    protected ResponseEntity<ErrorResponseMessageDto> handleDataIntegrityViolationException(RuntimeException exception) {
+        ErrorResponseMessageDto responseErrorMessage =
+                new ErrorResponseMessageDto(HttpStatus.NOT_ACCEPTABLE, "Value too long " +
+                        "for type character max(200)",
                         new Date());
         return new ResponseEntity<>(responseErrorMessage, responseErrorMessage.getStatus());
     }
