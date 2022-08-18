@@ -44,7 +44,7 @@ public class UserController {
                     content = {@Content(examples = {@ExampleObject()})})
     })
     @PutMapping("/first-login")
-    public ResponseEntity<?> changePasswordFirstLogin(@Valid @RequestBody FirstLoginRequestDto requestFirstLogin) {
+    public ResponseEntity<MessageResponse> changePasswordFirstLogin(@Valid @RequestBody FirstLoginRequestDto requestFirstLogin) {
         MessageResponse responseMessage=
                 userService.changePasswordFirstLogin(requestFirstLogin.getUserName(),
                         requestFirstLogin.getNewPassword());

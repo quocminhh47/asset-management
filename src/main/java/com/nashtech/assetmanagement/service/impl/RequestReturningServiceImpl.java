@@ -29,10 +29,7 @@ import org.springframework.stereotype.Service;
 
 import java.sql.Date;
 import java.time.LocalDate;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 
 import static com.nashtech.assetmanagement.enums.RequestReturningState.WAITING_FOR_RETURNING;
 import static com.nashtech.assetmanagement.utils.AppConstants.DONE;
@@ -138,7 +135,7 @@ public class RequestReturningServiceImpl implements RequestReturningService {
 
     @Override
     public ListStateRequestReturningResponseDto getRequestReturningState() {
-        HashMap<String, String> listStates = RequestReturningState.getRequestReturningState();
+        Map<String, String> listStates = RequestReturningState.getRequestReturningState();
         return new ListStateRequestReturningResponseDto(listStates);
     }
 
@@ -165,12 +162,12 @@ public class RequestReturningServiceImpl implements RequestReturningService {
                 () -> new ResourceNotFoundException("Cannot find assignment with assignment id: " + assignmentId));
 
         if (!assignment.getState().equalsIgnoreCase(AppConstants.ACCEPTED)) {
-            throw new RuntimeException("Request returning is only enabled for assignments have state is Accepted");
+            throw new RequestNotAcceptException("Request returning is only enabled for assignments have state is Accepted");
         }
 
         Optional<RequestReturning> requestReturningOptional = requestReturningRepository.getRequestReturningByAssignment(assignment);
         if (requestReturningOptional.isPresent()) {
-            throw new RuntimeException("One assignment must have only one request returning");
+            throw new RequestNotAcceptException("One assignment must have only one request returning");
         }
 
         // Create request returning

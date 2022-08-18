@@ -42,7 +42,7 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
-public class UserServiceImplTest {
+class UserServiceImplTest {
     @Mock
     UserRepository userRepository;
     @Mock
@@ -76,7 +76,7 @@ public class UserServiceImplTest {
         UserContentResponseDto userResponse = mock(UserContentResponseDto.class);
         when(locationRepository.findByName(userRequest.getLocationName())).thenReturn(Optional.of(location));
         when(roleRepository.findByName(userRequest.getRoleName())).thenReturn(Optional.of(role));
-        when(userMapper.MapToUser(userRequest, role, location)).thenReturn(user);
+        when(userMapper.mapToUser(userRequest, role, location)).thenReturn(user);
         when(user.getFirstName()).thenReturn("firstname");
         when(user.getLastName()).thenReturn("lastname");
         when(user.getBirthDate()).thenReturn(new Date());

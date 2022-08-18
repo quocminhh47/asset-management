@@ -72,7 +72,7 @@ public class AssignmentUserController {
                     content = {@Content(examples = {@ExampleObject()})})
     })
     @PutMapping("/state")
-    public ResponseEntity<?> updateAssignmentStatus(@Valid @RequestBody ChangeAssignmentStateRequestDto changeAssignmentStateRequestDto) {
+    public ResponseEntity<MessageResponse> updateAssignmentStatus(@Valid @RequestBody ChangeAssignmentStateRequestDto changeAssignmentStateRequestDto) {
         MessageResponse messageResponse = assignmentService.updateAssignmentState(changeAssignmentStateRequestDto);
         return new ResponseEntity<>(messageResponse, messageResponse.getStatus());
     }

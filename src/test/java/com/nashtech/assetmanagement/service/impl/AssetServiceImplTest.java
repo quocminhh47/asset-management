@@ -45,7 +45,7 @@ import com.nashtech.assetmanagement.repositories.AssignmentRepository;
 import com.nashtech.assetmanagement.repositories.CategoryRepository;
 import com.nashtech.assetmanagement.repositories.UserRepository;
 
-public class AssetServiceImplTest {
+class AssetServiceImplTest {
 
 	private AssetRepository assetRepository;
 
@@ -82,7 +82,7 @@ public class AssetServiceImplTest {
 	}
 
 	@Test
-	public void createAsset_ShouldReturnAsset_WhenRequestValid() {
+	void createAsset_ShouldReturnAsset_WhenRequestValid() {
 		CreateAssetRequestDto requestCreateAsset = new CreateAssetRequestDto("Lap top", "LT", "good",
 				AssetState.AVAILABLE, null);
 		Users users = mock(Users.class);
@@ -231,10 +231,10 @@ public class AssetServiceImplTest {
 		List<String> listCategoriesExpect = captorlistCategories.getValue();
 		List<String> listStatesExpect = captorlistStates.getValue();
 
-		assertThat(listCategoriesExpect.size()).isEqualTo(listcategories.size());
-		assertThat(listStatesExpect.size()).isEqualTo(assetState.size());
+		assertThat(listCategoriesExpect).hasSameSizeAs(listcategories);
+		assertThat(listStatesExpect).hasSameSizeAs(assetState);
 
-		assertThat(pageable.getPageNumber()).isEqualTo(0);
+		assertThat(pageable.getPageNumber()).isZero();
 		assertThat(pageable.getPageSize()).isEqualTo(2);
 		assertThat(actual.getList()).isEqualTo(expectList);
 		assertThat(actual.getTotalPages()).isEqualTo(2);
@@ -271,9 +271,9 @@ public class AssetServiceImplTest {
 
 		List<String> listCategoriesExpect = captorlist.getValue();
 
-		assertThat(listCategoriesExpect.size()).isEqualTo(listcategories.size());
+		assertThat(listCategoriesExpect).hasSameSizeAs(listcategories);
 
-		assertThat(pageable.getPageNumber()).isEqualTo(0);
+		assertThat(pageable.getPageNumber()).isZero();
 		assertThat(pageable.getPageSize()).isEqualTo(2);
 		assertThat(actual.getList()).isEqualTo(expectList);
 		assertThat(actual.getTotalPages()).isEqualTo(2);
@@ -312,8 +312,8 @@ public class AssetServiceImplTest {
 
 		List<String> listStatesExpect = captorlist.getValue();
 
-		assertThat(listStatesExpect.size()).isEqualTo(assetState.size());
-		assertThat(pageable.getPageNumber()).isEqualTo(0);
+		assertThat(listStatesExpect).hasSameSizeAs(assetState);
+		assertThat(pageable.getPageNumber()).isZero();
 		assertThat(pageable.getPageSize()).isEqualTo(2);
 		assertThat(actual.getList()).isEqualTo(expectList);
 		assertThat(actual.getTotalPages()).isEqualTo(2);

@@ -43,7 +43,7 @@ public class JwtAuthorizationTokenFilter extends OncePerRequestFilter {
                 String username = jwtUtils.getUsernameFromJwtToken(jwt);
                 Users user = userRepository.findByUserName(username)
                         .orElseThrow(() -> new ResourceNotFoundException(
-                                String.format("Username not found", username)));
+                                String.format("Username %s not found", username)));
                 if (user.getState().equals("INACTIVE"))
                     throw new UnauthorizedException("User is disabled");
                 UserDetails userDetails = userService.loadUserByUsername(username);

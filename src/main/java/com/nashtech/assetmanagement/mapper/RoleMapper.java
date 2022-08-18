@@ -17,9 +17,9 @@ public class RoleMapper {
 
 
     public List<RoleResponseDto> roleListToResponseRoleDtoList(List<Role> roles) {
-        List<RoleResponseDto> responseRoleDtoList = roles.stream()
-                .map(role -> modelMapper.map(role, RoleResponseDto.class)).collect(Collectors.toList());
-        return responseRoleDtoList;
+        return roles.stream()
+                .map(role -> modelMapper.map(role, RoleResponseDto.class))
+                .collect(Collectors.toList());
     }
 
 }

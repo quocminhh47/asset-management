@@ -24,7 +24,7 @@ public class AssignmentResponseDto {
     private String assignedByUsername;
 
     @JsonProperty("assignedDate")
-    private Date IdAssignedDate;
+    private Date idAssignedDate;
 
     private String assetCategoryName;
 

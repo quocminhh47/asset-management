@@ -20,7 +20,7 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
-public class LocationServiceImplTest {
+class LocationServiceImplTest {
     @Mock
     LocationRepository locationRepository;
     @Mock

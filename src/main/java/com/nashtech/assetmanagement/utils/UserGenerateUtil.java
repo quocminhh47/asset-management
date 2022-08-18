@@ -9,10 +9,15 @@ import java.util.List;
 
 @Slf4j
 public class UserGenerateUtil {
+
+    private UserGenerateUtil() {
+        throw new IllegalStateException("Utility class");
+    }
+
     public static int getBiggestStaffCode(List<String> staffCodeList) {
         int max = 0;
         for (String staffCode : staffCodeList) {
-            String parts[] = staffCode.split("SD");
+            String[] parts = staffCode.split("SD");
             int value = Integer.parseInt(parts[1]);
             if (value > max) {
                 max = value;

@@ -16,7 +16,7 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
-public class CategoryServiceImplTest {
+class CategoryServiceImplTest {
 
     private CategoryRepository categoryRepository;
     private CategoryMapper categoryMapper;
@@ -33,19 +33,19 @@ public class CategoryServiceImplTest {
     }
 
     @Test
-    public void getAllCategory_ShouldReturnListCategory_WhenRequestValid() {
+    void getAllCategory_ShouldReturnListCategory_WhenRequestValid() {
         List<Category> categories = mock(List.class);
         List<CategoryResponseDto> expected = mock(List.class);
         when(categoryRepository.findAll()).thenReturn(categories);
-        when(categoryMapper.ListCategoriesToListResponseCategories(categories)).thenReturn(expected);
+        when(categoryMapper.listCategoriesToListResponseCategories(categories)).thenReturn(expected);
         List<CategoryResponseDto> actual = categoryServiceImpl.getAllCategory();
         assertThat(actual).isEqualTo(expected);
     }
 
     @Test
-    public void createCategory_ShouldReturnCategory_WhenRequestValid() {
+    void createCategory_ShouldReturnCategory_WhenRequestValid() {
         CategoryRequestDto requestCategoryDTO = mock(CategoryRequestDto.class);
-        when(categoryMapper.RequestCategoryToCategory(requestCategoryDTO)).thenReturn(category);
+        when(categoryMapper.requestCategoryToCategory(requestCategoryDTO)).thenReturn(category);
         when(categoryRepository.save(category)).thenReturn(category);
         CategoryResponseDto expected = mock(CategoryResponseDto.class);
         when(categoryMapper.categoryToResponseCategoryDTO(category)).thenReturn(expected);
@@ -54,7 +54,7 @@ public class CategoryServiceImplTest {
     }
 
     @Test
-    public void createCategory_ShouldThrowNotUniqueException_WhenCategoryPrefixNotUnique() {
+    void createCategory_ShouldThrowNotUniqueException_WhenCategoryPrefixNotUnique() {
         CategoryRequestDto requestCategoryDTO = new CategoryRequestDto("LT", "Laptop");
         when(categoryRepository.existsCategoriesById("LT")).thenReturn(true);
         when(categoryRepository.existsCategoriesByName("Laptop")).thenReturn(false);
@@ -65,7 +65,7 @@ public class CategoryServiceImplTest {
     }
 
     @Test
-    public void createCategory_ShouldThrowNotUniqueException_WhenCategoryNotUnique() {
+    void createCategory_ShouldThrowNotUniqueException_WhenCategoryNotUnique() {
         CategoryRequestDto requestCategoryDTO = new CategoryRequestDto("LT", "Laptop");
         when(categoryRepository.existsCategoriesById("LT")).thenReturn(false);
         when(categoryRepository.existsCategoriesByName("Laptop")).thenReturn(true);

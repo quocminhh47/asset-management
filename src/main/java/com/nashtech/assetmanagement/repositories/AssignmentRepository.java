@@ -43,7 +43,7 @@ public interface AssignmentRepository extends JpaRepository<Assignment, Assignme
                                                @Param("states") List<String> states,
                                                Pageable pageable);
 
-    Boolean existsById_AssetCodeAndId_AssignedDateAndId_AssignedTo(String id_assetCode, Date id_assignedDate, String id_assignedTo);
+    Boolean existsById_AssetCodeAndId_AssignedDateAndId_AssignedTo(String assetCode, Date assignedDate, String assignedTo);
     
     @Query("select e from Assignment e where  e.assignedTo.staffCode = :staffCode and e.id.assignedDate < CURRENT_DATE + 1 and e.state in ('Accepted','Waiting for acceptance')")
     Page<Assignment> getListAssignmentByUser(String staffCode , Pageable pageable);

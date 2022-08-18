@@ -23,13 +23,13 @@ public class CategoryMapper {
         return mapper.map(category, CategoryResponseDto.class);
     }
 
-    public List<CategoryResponseDto> ListCategoriesToListResponseCategories(List<Category> categories) {
+    public List<CategoryResponseDto> listCategoriesToListResponseCategories(List<Category> categories) {
         return mapper.map(categories,
                 new TypeToken<List<CategoryResponseDto>>() {
                 }.getType());
     }
 
-    public Category RequestCategoryToCategory(CategoryRequestDto requestCategoryDTO) {
+    public Category requestCategoryToCategory(CategoryRequestDto requestCategoryDTO) {
         return mapper.map(requestCategoryDTO, Category.class);
     }
 }

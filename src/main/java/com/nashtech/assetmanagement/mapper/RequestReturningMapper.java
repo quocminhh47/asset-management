@@ -17,18 +17,17 @@ public class RequestReturningMapper {
 	private ModelMapper modelMapper;
 
 	public List<RequestReturningResponseDto> mapperListRequestReturning(List<RequestReturning> list) {
-		List<RequestReturningResponseDto> result = list.stream()
-				.map(item -> modelMapper.map(item, RequestReturningResponseDto.class)).collect(Collectors.toList());
-		return result;
+		return list.stream()
+				.map(item -> modelMapper.map(item, RequestReturningResponseDto.class))
+				.collect(Collectors.toList());
 	}
 
 	public List<RequestReturningState> mapperListStates(List<String> list) {
-		List<RequestReturningState> result = list.stream()
-				.map(item -> modelMapper.map(item, RequestReturningState.class)).collect(Collectors.toList());
-		return result;
+		return list.stream()
+				.map(item -> modelMapper.map(item, RequestReturningState.class))
+				.collect(Collectors.toList());
 	}
 	public List<RequestReturning> mapperListRequestReturningSort(List<RequestReturning> list) {
-		List<RequestReturning> result = list.stream().sorted().collect(Collectors.toList());
-		return result;
+		return list.stream().sorted().collect(Collectors.toList());
 	}
 }

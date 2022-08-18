@@ -33,7 +33,7 @@ public class CompareDateValidator implements ConstraintValidator<JoinedDate, Obj
 
             return beforeDate.before(afterDate);
         } catch (final Exception e) {
-            log.error("comparedate isvalid");
+            log.error("compare date is invalid");
             e.printStackTrace();
             return false;
         }

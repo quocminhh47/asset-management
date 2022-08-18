@@ -119,7 +119,7 @@ public class AssetController {
                     description = "Internal Error - There were some error while processing in server",
                     content = {@Content(examples = {@ExampleObject()})})})
     @DeleteMapping("/{assetCode}")
-    public ResponseEntity<?> deleteAssetByAssetCode(@PathVariable("assetCode") String assetCode) {
+    public ResponseEntity<MessageResponse> deleteAssetByAssetCode(@PathVariable("assetCode") String assetCode) {
         MessageResponse responseMessage = assetService.deleteAssetByAssetCode(assetCode);
         return new ResponseEntity<>(responseMessage, responseMessage.getStatus());
     }

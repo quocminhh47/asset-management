@@ -7,4 +7,8 @@ public class GenerateRandomNumber {
     public static String randomNumber() {
         return randomNumeric(6);
     }
+
+    private GenerateRandomNumber() {
+        throw new IllegalStateException("Utility class");
+    }
 }

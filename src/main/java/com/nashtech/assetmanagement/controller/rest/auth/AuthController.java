@@ -57,7 +57,7 @@ public class AuthController {
                     content = {@Content(examples = {@ExampleObject()})})
     })
     @PostMapping("/signin")
-    public ResponseEntity<?> signIn(@Valid @RequestBody LoginRequestDto requestLoginDTO) {
+    public ResponseEntity<JwtResponseDto> signIn(@Valid @RequestBody LoginRequestDto requestLoginDTO) {
         Users user = userRepository.findByUserName(requestLoginDTO.getUserName())
                 .orElseThrow(() -> new ResourceNotFoundException(("Username is not found")));
 

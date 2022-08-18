@@ -200,7 +200,7 @@ class RequestReturningServiceImplTest {
 
 	@DisplayName("Given invalid assignedTo username when create request returning asset then return exception - negative case")
 	@Test
-	public void createRequestReturningAsset_ShouldReturnResourceNotFoundException_WhenAssignedToUsernameInvalid() {
+	void createRequestReturningAsset_ShouldReturnResourceNotFoundException_WhenAssignedToUsernameInvalid() {
 		CreateRequestReturningAssetRequestDto createRequestReturningAssetRequestDto = mock(
 				CreateRequestReturningAssetRequestDto.class);
 		Users requestedByUser = mock(Users.class);
@@ -215,7 +215,7 @@ class RequestReturningServiceImplTest {
 
 	@DisplayName("Given invalid assetCode when create request returning asset then return exception - negative case")
 	@Test
-	public void createRequestReturningAsset_ShouldReturnResourceNotFoundException_WhenAssetCodeInvalid() {
+	void createRequestReturningAsset_ShouldReturnResourceNotFoundException_WhenAssetCodeInvalid() {
 		CreateRequestReturningAssetRequestDto createRequestReturningAssetRequestDto = mock(
 				CreateRequestReturningAssetRequestDto.class);
 		Users requestedByUser = mock(Users.class);
@@ -234,7 +234,7 @@ class RequestReturningServiceImplTest {
 
 	@DisplayName("Given invalid assignmentId when create request returning asset then return exception - negative case")
 	@Test
-	public void createRequestReturningAsset_ShouldReturnResourceNotFoundException_WhenAssignmentIdInvalid() {
+	void createRequestReturningAsset_ShouldReturnResourceNotFoundException_WhenAssignmentIdInvalid() {
 		CreateRequestReturningAssetRequestDto createRequestReturningAssetRequestDto = mock(
 				CreateRequestReturningAssetRequestDto.class);
 		Users requestedByUser = mock(Users.class);
@@ -257,7 +257,7 @@ class RequestReturningServiceImplTest {
 
 	@DisplayName("Given assignment state is not accepted when create request returning asset then return exception - negative case")
 	@Test
-	public void createRequestReturningAsset_ShouldReturnRuntimeException_WhenAssignmentStateIsNotAccepted() {
+	void createRequestReturningAsset_ShouldReturnRuntimeException_WhenAssignmentStateIsNotAccepted() {
 		CreateRequestReturningAssetRequestDto createRequestReturningAssetRequestDto = mock(
 				CreateRequestReturningAssetRequestDto.class);
 		Users requestedByUser = mock(Users.class);
@@ -285,7 +285,7 @@ class RequestReturningServiceImplTest {
 
 	@DisplayName("Given request returning have more than one assignment when create request returning asset then return exception - negative case")
 	@Test
-	public void createRequestReturningAsset_ShouldReturnRuntimeException_WhenRequestReturningHaveMoreThanOneAssignment() {
+	void createRequestReturningAsset_ShouldReturnRuntimeException_WhenRequestReturningHaveMoreThanOneAssignment() {
 		CreateRequestReturningAssetRequestDto createRequestReturningAssetRequestDto = mock(
 				CreateRequestReturningAssetRequestDto.class);
 		Users requestedByUser = mock(Users.class);
@@ -312,7 +312,7 @@ class RequestReturningServiceImplTest {
 
 	@DisplayName("Given valid createRequestReturningAssetRequestDto when create request returning asset then return CreateRequestReturningResponseDto - positive case")
 	@Test
-	public void createRequestReturningAsset_ShouldReturnCreateRequestReturningResponseDto_WhenCreateRequestReturningAssetRequestDtoValid() {
+	void createRequestReturningAsset_ShouldReturnCreateRequestReturningResponseDto_WhenCreateRequestReturningAssetRequestDtoValid() {
 		CreateRequestReturningAssetRequestDto createRequestReturningAssetRequestDto = mock(
 				CreateRequestReturningAssetRequestDto.class);
 		Users requestedByUser = mock(Users.class);
@@ -416,12 +416,12 @@ class RequestReturningServiceImplTest {
 		Pageable pageable = captorPageable.getValue();
 		List<String> listStatesExpect = captorlistStates.getValue();
 
-		assertThat(listStatesExpect.size()).isEqualTo(listStates.size());
+		assertThat(listStatesExpect).hasSameSizeAs(listStates);
 
 		assertThat(actual.getList()).isEqualTo(expectList);
 		assertThat(actual.getTotalPages()).isEqualTo(2);
 
-		assertThat(pageable.getPageNumber()).isEqualTo(0);
+		assertThat(pageable.getPageNumber()).isZero();
 		assertThat(pageable.getPageSize()).isEqualTo(2);
 		assertThat(pageable.getSort().ascending()).isEqualTo(Sort.by("assignment.asset.code"));
 	}
@@ -457,12 +457,12 @@ class RequestReturningServiceImplTest {
 		Pageable pageable = captorPageable.getValue();
 		List<String> listStatesExpect = captorlistStates.getValue();
 
-		assertThat(listStatesExpect.size()).isEqualTo(listStates.size());
+		assertThat(listStatesExpect).hasSameSizeAs(listStates);
 
 		assertThat(actual.getList()).isEqualTo(expectList);
 		assertThat(actual.getTotalPages()).isEqualTo(2);
 
-		assertThat(pageable.getPageNumber()).isEqualTo(0);
+		assertThat(pageable.getPageNumber()).isZero();
 		assertThat(pageable.getPageSize()).isEqualTo(2);
 		assertThat(pageable.getSort().ascending()).isEqualTo(Sort.by("assignment.asset.code"));
 	}
@@ -497,14 +497,14 @@ class RequestReturningServiceImplTest {
 		Pageable pageable = captorPageable.getValue();
 		List<String> listStatesExpect = captorlistStates.getValue();
 
-		assertThat(listStatesExpect.size()).isEqualTo(listStates.size());
+		assertThat(listStatesExpect).hasSameSizeAs(listStates);
 
 		assertThat(actual.getList()).isEqualTo(expectList);
 		assertThat(actual.getTotalPages()).isEqualTo(2);
 
-		assertThat(pageable.getPageNumber()).isEqualTo(0);
+		assertThat(pageable.getPageNumber()).isZero();
 		assertThat(pageable.getPageSize()).isEqualTo(2);
-		assertThat(pageable.getSort().isSorted()).isEqualTo(true);
+		assertThat(pageable.getSort().isSorted()).isTrue();
 	}
 
 	@Test
@@ -538,13 +538,13 @@ class RequestReturningServiceImplTest {
 		Pageable pageable = captorPageable.getValue();
 		List<String> listStatesExpect = captorlistStates.getValue();
 
-		assertThat(listStatesExpect.size()).isEqualTo(listStates.size());
+		assertThat(listStatesExpect).hasSameSizeAs(listStates);
 		assertThat(dtoValue.getReturnedDate()).isNull();
 
 		assertThat(actual.getList()).isEqualTo(expectList);
 		assertThat(actual.getTotalPages()).isEqualTo(2);
 
-		assertThat(pageable.getPageNumber()).isEqualTo(0);
+		assertThat(pageable.getPageNumber()).isZero();
 		assertThat(pageable.getPageSize()).isEqualTo(2);
 		assertThat(pageable.getSort().ascending()).isEqualTo(Sort.by("assignment.asset.code"));
 	}
@@ -580,13 +580,13 @@ class RequestReturningServiceImplTest {
 		Pageable pageable = captorPageable.getValue();
 		List<String> listStatesExpect = captorlistStates.getValue();
 
-		assertThat(listStatesExpect.size()).isEqualTo(listStates.size());
+		assertThat(listStatesExpect).hasSameSizeAs(listStates);
 		assertThat(dtoValue.getReturnedDate()).isNull();
 
 		assertThat(actual.getList()).isEqualTo(expectList);
 		assertThat(actual.getTotalPages()).isEqualTo(2);
 
-		assertThat(pageable.getPageNumber()).isEqualTo(0);
+		assertThat(pageable.getPageNumber()).isZero();
 		assertThat(pageable.getPageSize()).isEqualTo(2);
 		assertThat(pageable.getSort().ascending()).isEqualTo(Sort.unsorted());
 	}
@@ -622,13 +622,13 @@ class RequestReturningServiceImplTest {
 		Pageable pageable = captorPageable.getValue();
 		List<String> listStatesExpect = captorlistStates.getValue();
 
-		assertThat(listStatesExpect.size()).isEqualTo(listStates.size());
+		assertThat(listStatesExpect).hasSameSizeAs(listStates);
 		assertThat(dtoValue.getReturnedDate()).isEqualTo("2022-08-09");
 
 		assertThat(actual.getList()).isEqualTo(expectList);
 		assertThat(actual.getTotalPages()).isEqualTo(2);
 
-		assertThat(pageable.getPageNumber()).isEqualTo(0);
+		assertThat(pageable.getPageNumber()).isZero();
 		assertThat(pageable.getPageSize()).isEqualTo(2);
 		assertThat(pageable.getSort().ascending()).isEqualTo(Sort.unsorted());
 	}
@@ -664,13 +664,13 @@ class RequestReturningServiceImplTest {
 		Pageable pageable = captorPageable.getValue();
 		List<String> listStatesExpect = captorlistStates.getValue();
 
-		assertThat(listStatesExpect.size()).isEqualTo(listStates.size());
+		assertThat(listStatesExpect).hasSameSizeAs(listStates);
 		assertThat(dtoValue.getReturnedDate()).isNull();
 
 		assertThat(actual.getList()).isEqualTo(expectList);
 		assertThat(actual.getTotalPages()).isEqualTo(2);
 
-		assertThat(pageable.getPageNumber()).isEqualTo(0);
+		assertThat(pageable.getPageNumber()).isZero();
 		assertThat(pageable.getPageSize()).isEqualTo(2);
 		assertThat(pageable.getSort().ascending()).isEqualTo(Sort.unsorted());
 	}
@@ -706,13 +706,13 @@ class RequestReturningServiceImplTest {
 		Pageable pageable = captorPageable.getValue();
 		List<String> listStatesExpect = captorlistStates.getValue();
 
-		assertThat(listStatesExpect.size()).isEqualTo(listStates.size());
+		assertThat(listStatesExpect).hasSameSizeAs(listStates);
 		assertThat(dtoValue.getReturnedDate()).isEqualTo("2022-08-09");
 
 		assertThat(actual.getList()).isEqualTo(expectList);
 		assertThat(actual.getTotalPages()).isEqualTo(2);
 
-		assertThat(pageable.getPageNumber()).isEqualTo(0);
+		assertThat(pageable.getPageNumber()).isZero();
 		assertThat(pageable.getPageSize()).isEqualTo(2);
 		assertThat(pageable.getSort().ascending()).isEqualTo(Sort.unsorted());
 	}

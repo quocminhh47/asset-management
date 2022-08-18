@@ -27,7 +27,7 @@ public class CategoryServiceImpl implements CategoryService {
     @Override
     public List<CategoryResponseDto> getAllCategory() {
         List<Category> categories = categoryRepository.findAll();
-        return categoryMapper.ListCategoriesToListResponseCategories(categories);
+        return categoryMapper.listCategoriesToListResponseCategories(categories);
     }
 
     @Override
@@ -40,7 +40,7 @@ public class CategoryServiceImpl implements CategoryService {
             throw new NotUniqueException("Category is already existed. Please enter a " +
                     "different category.");
         }
-        Category category = categoryMapper.RequestCategoryToCategory(requestCategoryDTO);
+        Category category = categoryMapper.requestCategoryToCategory(requestCategoryDTO);
         category = categoryRepository.save(category);
         return categoryMapper.categoryToResponseCategoryDTO(category);
     }

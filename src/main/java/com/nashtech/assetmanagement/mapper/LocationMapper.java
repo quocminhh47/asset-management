@@ -19,8 +19,8 @@ public class LocationMapper {
     }
 
     public List<LocationResponseDto> locationListToLocationResponseDtoList(List<Location> locations) {
-        List<LocationResponseDto> locationResponseDTOList = locations.stream()
-                .map(location -> modelMapper.map(location, LocationResponseDto.class)).collect(Collectors.toList());
-        return locationResponseDTOList;
+        return locations.stream()
+                .map(location -> modelMapper.map(location, LocationResponseDto.class))
+                .collect(Collectors.toList());
     }
 }

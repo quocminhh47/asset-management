@@ -48,8 +48,9 @@ public class AssignmentMapper {
     }
 
     public List<AssignmentResponseDto> mapperListAssignment(List<Assignment> list) {
-        List<AssignmentResponseDto> result = list.stream().map(item -> mapper.map(item, AssignmentResponseDto.class))
+        return list
+                .stream()
+                .map(item -> mapper.map(item, AssignmentResponseDto.class))
                 .collect(Collectors.toList());
-        return result;
     }
 }

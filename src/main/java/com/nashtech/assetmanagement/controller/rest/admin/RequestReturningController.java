@@ -49,7 +49,7 @@ public class RequestReturningController {
         GetRequestReturningListRequestDto dto = new GetRequestReturningListRequestDto(states, returnDate, keyword,
                 sortBy, sortDirection, page, size);
         ListRequestReturningResponseDto result = requestReturningService.getListRequestReturning(dto);
-        return new ResponseEntity<ListRequestReturningResponseDto>(result, HttpStatus.OK);
+        return new ResponseEntity<>(result, HttpStatus.OK);
     }
 
     @Operation(summary = "Get all states of request returning", description = "This return all of the states of request returning entity")

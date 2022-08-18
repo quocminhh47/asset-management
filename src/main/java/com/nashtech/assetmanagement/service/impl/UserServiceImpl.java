@@ -62,7 +62,7 @@ public class UserServiceImpl implements UserService {
         if (role.isEmpty()) {
             throw new ResourceNotFoundException("Role name not found");
         }
-        Users newUser = userMapper.MapToUser(user, role.get(), location.get());
+        Users newUser = userMapper.mapToUser(user, role.get(), location.get());
         List<String> staffCodeList = userRepository.findAllStaffCode();
         int biggestStaffCode = UserGenerateUtil.getBiggestStaffCode(staffCodeList);
         String pattern = newUser.getLastName().substring(0, 1);

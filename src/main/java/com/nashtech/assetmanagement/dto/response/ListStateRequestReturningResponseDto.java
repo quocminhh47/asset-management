@@ -3,6 +3,7 @@ package com.nashtech.assetmanagement.dto.response;
 import lombok.*;
 
 import java.util.HashMap;
+import java.util.Map;
 
 @Getter
 @Setter
@@ -10,5 +11,5 @@ import java.util.HashMap;
 @AllArgsConstructor
 @NoArgsConstructor
 public class ListStateRequestReturningResponseDto {
-	HashMap<String, String> listStates;
+	Map<String, String> listStates;
 }

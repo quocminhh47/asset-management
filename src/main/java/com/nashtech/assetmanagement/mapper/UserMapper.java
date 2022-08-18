@@ -29,7 +29,7 @@ public class UserMapper {
         return mapper.map(users, UserResponseDto.class);
     }
 
-    public Users MapToUser(UserRequestDto dto, Role role, Location location) {
+    public Users mapToUser(UserRequestDto dto, Role role, Location location) {
         Users newUser = new Users();
         newUser.setFirstName(dto.getFirstName());
         newUser.setLastName(dto.getLastName());
@@ -50,8 +50,7 @@ public class UserMapper {
 
     public ListSearchingUserResponseDto mapListUserToListUserDto(List<Users> usersList) {
         List<UserContentResponseDto> responseList = usersList.stream().map(users -> mapper.map(users, UserContentResponseDto.class)).collect(Collectors.toList());
-        ListSearchingUserResponseDto responseDto = new ListSearchingUserResponseDto(responseList.size(),responseList);
-        return responseDto;
+        return new ListSearchingUserResponseDto(responseList.size(),responseList);
     }
 
 }

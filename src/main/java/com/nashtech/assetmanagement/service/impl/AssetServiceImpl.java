@@ -81,12 +81,12 @@ public class AssetServiceImpl implements AssetService {
 		if (optionalUsers.isEmpty()) {
 			throw new ResourceNotFoundException(String.format("user.not.found.with.code:%s", dto.getUserId()));
 		}
-		if (dto.getStates().size() == 0 && dto.getCategoryIds().size() == 0) {
+		if (dto.getStates().isEmpty()  && dto.getCategoryIds().isEmpty()) {
 			pageAsset = assetRepository.getListAssetBySearchs(dto.getUserId(), dto.getKeyword(), pageable);
 			totalItems = pageAsset.getTotalPages();
-		} else if (dto.getStates().size() > 0) {
+		} else if (!dto.getStates().isEmpty()) {
 			List<AssetState> assetState = assetMapper.mapperListStates(dto.getStates());
-			if (dto.getCategoryIds().size() == 0) {
+			if (dto.getCategoryIds().isEmpty()) {
 				pageAsset = assetRepository.getListAssetByState(dto.getUserId(), assetState, dto.getKeyword(),
 						pageable);
 				totalItems = pageAsset.getTotalPages();
@@ -95,7 +95,7 @@ public class AssetServiceImpl implements AssetService {
 						dto.getKeyword(), pageable);
 				totalItems = pageAsset.getTotalPages();
 			}
-		} else if (dto.getStates().size() == 0) {
+		} else if (dto.getStates().isEmpty()) {
 			pageAsset = assetRepository.getListAssetByCategory(dto.getUserId(), dto.getCategoryIds(), dto.getKeyword(),
 					pageable);
 			totalItems = pageAsset.getTotalPages();

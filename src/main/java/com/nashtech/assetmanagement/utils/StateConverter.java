@@ -4,6 +4,10 @@ import static com.nashtech.assetmanagement.utils.AppConstants.*;
 
 public class StateConverter {
 
+    private StateConverter() {
+        throw new IllegalStateException("Utility class");
+    }
+
     public static String getAssignmentState(String stateCode) {
         String upperSate = stateCode.toUpperCase();
         switch (upperSate) {
